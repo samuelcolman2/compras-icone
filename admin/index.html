@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin • Aprovação de Compras</title>
+
+  <!-- Fonte + Tailwind -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Toastify -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+  <link rel="shortcut icon" href="https://storage.googleapis.com/ecdt-logo-saida/1ebe52af502e25d3521cb9dad62bb72f6bc1c347353cdda5fa381ef8627a9eb8/COLEGIO-E-CURSO-ICONE.webp" type="image/x-icon">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { primaria: '#F1663C' },
+          boxShadow: { glow: '0 0 0 3px rgba(241,102,60,0.15), 0 10px 25px -5px rgba(0,0,0,0.25)' },
+        }
+      }
+    }
+  </script>
+
+  <style>
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Poppins', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+    .badge { @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold border; }
+  </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-orange-50 via-white to-rose-50 text-black antialiased">
+
+  <!-- HEADER -->
+  <header class="w-full max-w-7xl mx-auto pt-6 pb-2 px-4">
+    <div class="flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <img class="w-10 drop-shadow-md" src="https://iconecolegioecurso.com.br/wp-content/uploads/2022/08/xlogo_icone_site.png.pagespeed.ic_.QgXP3GszLC.webp" alt="Logo Ícone" />
+        <div>
+          <h1 class="text-xl sm:text-2xl font-bold">Aprovação de Compras</h1>
+          <p class="text-sm text-slate-600">Painel do administrador</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <span id="adminEmail" class="text-sm text-slate-700"></span>
+        <button id="btnSair" class="rounded-lg bg-white border border-slate-200 px-3 py-1.5 text-sm font-semibold shadow hover:shadow-md">Sair</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTROLES -->
+  <main class="w-full max-w-7xl mx-auto px-4 pb-20">
+    <div class="bg-[#F1663C] border border-white/60 rounded-2xl shadow-2xl shadow-glow p-4 sm:p-6 md:p-8">
+      <div class="grid grid-cols-1 lg:grid-cols-6 gap-3">
+        <input id="fBusca" type="text" placeholder="Buscar por nome, e-mail, produto/serviço…" class="lg:col-span-2 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20" />
+        <select id="fStatus" class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20">
+          <option value="">Status (todos)</option>
+          <option value="pendente">Pendente</option>
+          <option value="aprovado">Aprovado</option>
+          <option value="reprovado">Reprovado</option>
+        </select>
+        <select id="fUnidade" class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20">
+          <option value="">Unidade (todas)</option>
+          <option value="1">Unidade 1</option>
+          <option value="2">Unidade 2</option>
+          <option value="3">Unidade 3</option>
+          <option value="4">Unidade 4</option>
+          <option value="5">Unidade 5</option>
+          <option value="6">Unidade 6</option>
+        </select>
+        <select id="fTipo" class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20">
+          <option value="">Tipo (todos)</option>
+          <option value="servico">Serviço</option>
+          <option value="produto">Produto</option>
+        </select>
+        <select id="fUrgencia" class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20">
+          <option value="">Urgência (todas)</option>
+          <option value="baixa">Baixa</option>
+          <option value="media">Média</option>
+          <option value="alta">Alta</option>
+          <option value="critica">Crítica</option>
+        </select>
+        <div class="flex gap-2">
+          <button id="btnFiltrar" class="flex-1 rounded-lg bg-white px-3 py-2 text-sm font-semibold shadow hover:-translate-y-0.5 hover:shadow-md transition">Aplicar</button>
+          <button id="btnLimpar" class="rounded-lg bg-white/80 px-3 py-2 text-sm font-semibold border border-white/60 hover:bg-white transition">Limpar</button>
+        </div>
+      </div>
+
+      <div class="mt-4 flex items-center justify-between gap-3">
+        <div class="text-sm text-slate-700"><span id="contador"></span></div>
+        <div class="flex items-center gap-2">
+          <button id="btnAtualizar" class="rounded-lg bg-white px-3 py-2 text-sm font-semibold shadow hover:-translate-y-0.5 hover:shadow-md transition">Atualizar</button>
+          <button id="btnExportar" class="rounded-lg bg-white px-3 py-2 text-sm font-semibold shadow hover:-translate-y-0.5 hover:shadow-md transition">Exportar CSV</button>
+        </div>
+      </div>
+
+      <!-- TABELA -->
+      <div class="mt-4 overflow-auto border border-white/60 rounded-xl bg-white/60">
+        <table class="min-w-full text-sm">
+          <thead class="bg-white/70">
+            <tr class="text-left">
+              <th class="p-3">Enviado</th>
+              <th class="p-3">Solicitante</th>
+              <th class="p-3">Unidade</th>
+              <th class="p-3">Tipo</th>
+              <th class="p-3">Detalhes</th>
+              <th class="p-3">Prazo</th>
+              <th class="p-3">Urgência</th>
+              <th class="p-3">Links</th>
+              <th class="p-3">Status</th>
+              <th class="p-3">Ações</th>
+            </tr>
+          </thead>
+          <tbody id="tbody" class="divide-y divide-slate-200 bg-white"></tbody>
+        </table>
+      </div>
+
+      <!-- MODAL APROVAÇÃO/REJEIÇÃO -->
+      <div id="modal" class="fixed inset-0 hidden items-center justify-center bg-black/40 z-50">
+        <div class="w-full max-w-lg bg-white rounded-2xl p-4 sm:p-6 shadow-2xl">
+          <h3 id="modalTitulo" class="text-lg font-bold"></h3>
+          <p class="mt-1 text-sm text-slate-600">Você pode opcionalmente adicionar uma observação.</p>
+          <textarea id="modalObs" class="mt-3 w-full min-h-[90px] rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20" placeholder="Observação (opcional)"></textarea>
+          <div class="mt-4 flex justify-end gap-2">
+            <button id="modalCancelar" class="rounded-lg border px-3 py-2 text-sm">Cancelar</button>
+            <button id="modalConfirmar" class="rounded-lg bg-primaria text-white px-3 py-2 text-sm font-semibold">Confirmar</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Firebase Auth + Lógica -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
+
+    // ======= CONFIGS =======
+    const firebaseConfig = {
+      apiKey: "AIzaSyAEZidq8mdAUKeJXvSQeE01gVOLWe_cp78",
+      authDomain: "compras-icone.firebaseapp.com",
+      projectId: "compras-icone",
+      storageBucket: "compras-iconefirebasestorage.app",
+      messagingSenderId: "831706842201",
+      appId: "1:831706842201:web:9b68ae4f98ad93c5a99d48",
+    };
+
+    const ALLOWED_DOMAIN = 'icone.g12.br';
+    // Se quiser restringir à lista de administradores específicos, preencha:
+    const ADMINS = [
+      // 'gestor@icone.g12.br',
+      // 'compras@icone.g12.br'
+    ].map(e=>e.toLowerCase());
+
+    // Mesmo endpoint já usado no formulário (Apps Script)
+    const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbwl3Z7hmhJXtJFKng8g_8lbM2agg_mozGkpTnijydj4w2NOGFbs3kFKuQcTpJWsIvhJ/exec';
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // ======= UTIL =======
+    const $ = (sel)=>document.querySelector(sel);
+    function toast(msg, type='info'){
+      const isSuccess = type==='success';
+      const isError   = type==='error';
+      Toastify({
+        text: msg, duration: 3200, close: true, gravity: 'top', position: 'right', stopOnFocus: true,
+        style: {
+          background: isSuccess ? 'linear-gradient(90deg,#16a34a,#22c55e)'
+                   : isError   ? 'linear-gradient(90deg,#dc2626,#ef4444)'
+                   : 'linear-gradient(90deg,#334155,#64748b)',
+          color:'#fff', fontWeight:'600', borderRadius:'10px', padding:'10px 16px',
+          boxShadow:'0 10px 25px -10px rgba(0,0,0,.35)'
+        }, offset: {x:8, y:10}
+      }).showToast();
+    }
+
+    function fmtDate(d){
+      if(!d) return '-';
+      try{
+        const dt = new Date(d);
+        return dt.toLocaleString('pt-BR');
+      }catch{ return d; }
+    }
+
+    function badgeStatus(s){
+      const map = {
+        pendente: 'bg-yellow-50 text-yellow-800 border-yellow-200',
+        aprovado: 'bg-green-50 text-green-800 border-green-200',
+        reprovado: 'bg-red-50 text-red-800 border-red-200'
+      };
+      return `<span class="badge ${map[s]||'bg-slate-50 text-slate-700 border-slate-200'}">${(s||'pendente').toUpperCase()}</span>`;
+    }
+
+    function humanTipo(item){
+      if(item.tipo==='servico') return `Serviço`;
+      if(item.tipo==='produto') return `Produto`;
+      return '-';
+    }
+
+    // ======= ESTADO =======
+    let currentUser = null;
+    let dadosBrutos = []; // recebido da planilha
+    let dadosFiltrados = [];
+
+    // ======= AUTENTICAÇÃO =======
+    function isAllowedEmail(email){
+      const okDomain = email?.toLowerCase().endsWith('@'+ALLOWED_DOMAIN);
+      const adminListEmpty = ADMINS.length===0;
+      const okAdmin = adminListEmpty || ADMINS.includes(email?.toLowerCase());
+      return okDomain && okAdmin;
+    }
+
+    onAuthStateChanged(auth, async (user)=>{
+      const adminEmailEl = $('#adminEmail');
+      if(!user || !isAllowedEmail(user.email)){
+        try{ await signOut(auth);}catch(e){}
+        window.location.replace('../login/index.html');
+        return;
+      }
+      currentUser = user;
+      adminEmailEl.textContent = user.email;
+      carregarLista();
+    });
+
+    $('#btnSair').addEventListener('click', async ()=>{
+      try{ await signOut(auth);}catch(e){}
+      window.location.replace('../login/index.html');
+    });
+
+    // ======= REDE =======
+    async function chamarAPI(url, opts={}){
+      // Tenta JSON normal; se falhar por CORS, tenta no-cors (assumindo sucesso)
+      try{
+        const resp = await fetch(url, opts);
+        if(resp.type==='opaque') return { ok:true, opaque:true };
+        const data = await resp.json().catch(()=>null);
+        return { ok: resp.ok && (data?.ok!==false), data };
+      }catch{
+        try{
+          await fetch(url, {...opts, mode:'no-cors'});
+          return { ok:true, opaque:true };
+        }catch(err){ return { ok:false, error: err?.message || String(err) }; }
+      }
+    }
+
+    async function carregarLista(){
+      $('#tbody').innerHTML = `<tr><td colspan="10" class="p-6 text-center text-slate-600">Carregando…</td></tr>`;
+      const url = WEBAPP_URL + '?action=list';
+      const { ok, data, error } = await chamarAPI(url);
+      if(!ok){
+        $('#tbody').innerHTML = `<tr><td colspan="10" class="p-6 text-center text-red-700">Falha ao carregar (${error||'erro'}).</td></tr>`;
+        return;
+      }
+      // Espera-se estrutura: { ok:true, items:[{...}] }
+      dadosBrutos = Array.isArray(data?.items) ? data.items : [];
+      aplicarFiltrosERender();
+      toast('Lista atualizada', 'success');
+    }
+
+    async function atualizarStatus(submissionId, novoStatus, observacao=''){
+      const body = new URLSearchParams({
+        action: 'updateStatus',
+        submissionId,
+        status: novoStatus,
+        observacao,
+        aprovador: currentUser?.email || ''
+      });
+      const { ok, error } = await chamarAPI(WEBAPP_URL, { method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8'}, body });
+      if(!ok) throw new Error(error||'Falha ao atualizar');
+    }
+
+    // ======= FILTROS =======
+    function aplicaBusca(item, termo){
+      if(!termo) return true;
+      const hay = [item.nome, item.email, item.nomeProduto, item.descricaoServico, item.quemIndicar].filter(Boolean).join(' ').toLowerCase();
+      return hay.includes(termo.toLowerCase());
+    }
+
+    function aplicarFiltrosERender(){
+      const q = $('#fBusca').value.trim();
+      const st = $('#fStatus').value;
+      const un = $('#fUnidade').value;
+      const tp = $('#fTipo').value;
+      const ur = $('#fUrgencia').value;
+
+      dadosFiltrados = dadosBrutos.filter(it=>
+        aplicaBusca(it, q)
+        && (!st || (it.status||'pendente')===st)
+        && (!un || it.unidade===un)
+        && (!tp || it.tipo===tp)
+        && (!ur || it.urgencia===ur)
+      ).sort((a,b)=> new Date(b.timestamp||0) - new Date(a.timestamp||0));
+
+      renderTabela(dadosFiltrados);
+      $('#contador').textContent = `${dadosFiltrados.length} registro(s)`;
+    }
+
+    // ======= TABELA =======
+    function renderTabela(lista){
+      const tbody = $('#tbody');
+      if(!lista.length){
+        tbody.innerHTML = `<tr><td colspan="10" class="p-6 text-center text-slate-600">Nenhum registro encontrado.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = lista.map(item=>{
+        const links = Array.isArray(item.links) ? item.links : (item.links? JSON.parse(item.links): []);
+        const prazoStr = (item.prazo==='sim' && item.dataPrazo) ? fmtDate(item.dataPrazo) : '-';
+        const detalhes = item.tipo==='produto'
+          ? `<div><div class='font-semibold'>${item.nomeProduto||'-'}</div><div class='text-xs text-slate-600'>Qtd: ${item.quantidadeProduto||'-'}</div></div>`
+          : `<div><div class='font-semibold line-clamp-2 max-w-[420px]'>${item.descricaoServico||'-'}</div>${ item.quemIndicar ? `<div class='text-xs text-slate-600 mt-0.5'>Indicação: ${item.quemIndicar}</div>`:''}</div>`;
+
+        const acoes = `
+          <div class='flex gap-2'>
+            <button data-act='aprovar' data-id='${item.submissionId}' class='rounded-lg bg-green-600 text-white px-2.5 py-1.5 text-xs font-semibold hover:opacity-90'>Aprovar</button>
+            <button data-act='reprovar' data-id='${item.submissionId}' class='rounded-lg bg-red-600 text-white px-2.5 py-1.5 text-xs font-semibold hover:opacity-90'>Reprovar</button>
+          </div>`;
+
+        const statusExtra = (item.aprovadoPor||item.aprovador||item.updatedBy) ? `<div class='text-[11px] text-slate-600 mt-0.5'>por ${(item.aprovadoPor||item.aprovador||item.updatedBy)}${ item.aprovadoEm ? ` • ${fmtDate(item.aprovadoEm)}`:''}</div>` : '';
+
+        return `<tr class='align-top'>
+          <td class='p-3 whitespace-nowrap text-slate-700'>${fmtDate(item.timestamp)}</td>
+          <td class='p-3'>
+            <div class='font-semibold'>${item.nome||'-'}</div>
+            <div class='text-xs text-slate-600'>${item.email||'-'}</div>
+          </td>
+          <td class='p-3'>U${item.unidade||'-'}</td>
+          <td class='p-3'>${humanTipo(item)}</td>
+          <td class='p-3'>${detalhes}</td>
+          <td class='p-3 whitespace-nowrap'>${prazoStr}</td>
+          <td class='p-3 uppercase'>${(item.urgencia||'-')}</td>
+          <td class='p-3'>${links.length ? links.map((l,i)=>`<a class='underline text-primaria' href='${l}' target='_blank' rel='noopener'>Link ${i+1}</a>`).join('<br/>') : '-'}</td>
+          <td class='p-3'>${badgeStatus(item.status||'pendente')}${statusExtra}${ item.observacao ? `<div class='text-xs text-slate-600 mt-0.5'>Obs: ${item.observacao}</div>`:''}</td>
+          <td class='p-3'>${acoes}</td>
+        </tr>`
+      }).join('');
+
+      // bind ações
+      tbody.querySelectorAll('button[data-act]').forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          const id = btn.getAttribute('data-id');
+          const act = btn.getAttribute('data-act');
+          abrirModal(id, act);
+        });
+      });
+    }
+
+    // ======= MODAL =======
+    let modalState = { id:null, act:null };
+    function abrirModal(id, act){
+      modalState = { id, act };
+      $('#modalTitulo').textContent = act==='aprovar' ? 'Confirmar aprovação' : 'Confirmar reprovação';
+      $('#modalObs').value='';
+      $('#modal').classList.remove('hidden');
+      $('#modal').classList.add('flex');
+    }
+    function fecharModal(){
+      $('#modal').classList.add('hidden');
+      $('#modal').classList.remove('flex');
+      modalState = { id:null, act:null };
+    }
+    $('#modalCancelar').addEventListener('click', fecharModal);
+    $('#modal').addEventListener('click', (e)=>{ if(e.target.id==='modal') fecharModal(); });
+
+    $('#modalConfirmar').addEventListener('click', async ()=>{
+      const { id, act } = modalState; if(!id||!act) return;
+      const obs = $('#modalObs').value.trim();
+      try{
+        await atualizarStatus(id, act==='aprovar' ? 'aprovado' : 'reprovado', obs);
+        // Atualiza localmente para evitar outro GET
+        const alvo = dadosBrutos.find(x=>x.submissionId===id);
+        if(alvo){
+          alvo.status = act==='aprovar' ? 'aprovado' : 'reprovado';
+          alvo.observacao = obs;
+          alvo.aprovadoPor = currentUser?.email || '';
+          alvo.aprovadoEm = new Date().toISOString();
+        }
+        aplicarFiltrosERender();
+        toast(act==='aprovar' ? 'Aprovado!' : 'Reprovado!', 'success');
+      }catch(err){
+        toast('Não foi possível atualizar: '+(err?.message||err), 'error');
+      }finally{
+        fecharModal();
+      }
+    });
+
+    // ======= CONTROLES =======
+    $('#btnFiltrar').addEventListener('click', aplicarFiltrosERender);
+    $('#btnLimpar').addEventListener('click', ()=>{
+      $('#fBusca').value=''; $('#fStatus').value=''; $('#fUnidade').value=''; $('#fTipo').value=''; $('#fUrgencia').value='';
+      aplicarFiltrosERender();
+    });
+    $('#btnAtualizar').addEventListener('click', carregarLista);
+
+    $('#btnExportar').addEventListener('click', ()=>{
+      if(!dadosFiltrados.length){ toast('Nada para exportar', 'info'); return; }
+      const cols = ['timestamp','nome','email','unidade','tipo','descricaoServico','nomeProduto','quantidadeProduto','prazo','dataPrazo','urgencia','links','status','observacao','aprovadoPor','aprovadoEm','submissionId'];
+      const linhas = [cols.join(',')].concat(
+        dadosFiltrados.map(r=> cols.map(c=>{
+          let v = r[c];
+          if(Array.isArray(v)) v = v.join(' ');
+          if(typeof v === 'string'){ v = '"'+ v.replaceAll('"','""') +'"'; }
+          return v ?? '';
+        }).join(','))
+      ).join('\n');
+      const blob = new Blob([linhas], {type:'text/csv;charset=utf-8;'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'aprovacoes.csv'; a.click();
+      URL.revokeObjectURL(url);
+    });
+
+  </script>
+
+  <!-- ============================================================
+    BACKEND (Apps Script) – Exemplo mínimo para integrar com o painel
+    Cole (ou adapte) no seu projeto do Google Apps Script que já recebe o POST.
+    Este é apenas um guia; ajuste nomes de colunas/abas conforme sua planilha.
+
+    • Action "list": retorna os registros para o painel
+    • Action "updateStatus": atualiza status/observação/aprovador do registro
+  ================================================================
+
+// == Apps Script ==
+// Supondo planilha com cabeçalhos (linha 1) e dados a partir da linha 2.
+// Cabeçalhos esperados (exemplo – alinhe com o que você já grava hoje):
+// timestamp, nome, email, unidade, prazo, dataPrazo, urgencia, tipo,
+// descricaoServico, temIndicacao, quemIndicar, nomeProduto, quantidadeProduto,
+// links, status, observacao, aprovadoPor, aprovadoEm, submissionId
+
+function doGet(e){
+  const action = (e.parameter.action||'').toLowerCase();
+  if(action==='list') return listar_(e);
+  return ContentService.createTextOutput(JSON.stringify({ ok:false, error:'Ação inválida' })).setMimeType(ContentService.MimeType.JSON);
+}
+
+function doPost(e){
+  const params = e.parameter || {};
+  const action = (params.action||'').toLowerCase();
+  if(action==='updatestatus') return atualizarStatus_(params);
+  // (continua aceitando o POST do formulário existente – seu código atual)
+  // ... seu handler atual aqui ...
+  return ContentService.createTextOutput(JSON.stringify({ ok:true })).setMimeType(ContentService.MimeType.JSON);
+}
+
+function getSheet_(){
+  const ss = SpreadsheetApp.openById('COLOQUE_AQUI_O_ID_DA_SUA_PLANILHA');
+  return ss.getSheetByName('Pedidos'); // ajuste o nome
+}
+
+function listar_(){
+  const sh = getSheet_();
+  const rows = sh.getDataRange().getValues();
+  const head = rows.shift();
+  const idx = {}; head.forEach((h,i)=> idx[String(h).trim()] = i);
+  const items = rows.filter(r=> r[idx['submissionId']] ).map(r=> ({
+    timestamp: asISO_(r[idx['timestamp']]),
+    nome: r[idx['nome']]||'',
+    email: r[idx['email']]||'',
+    unidade: String(r[idx['unidade']]||''),
+    prazo: (r[idx['prazo']]||'nao'),
+    dataPrazo: asISO_(r[idx['dataPrazo']]),
+    urgencia: (r[idx['urgencia']]||''),
+    tipo: (r[idx['tipo']]||''),
+    descricaoServico: r[idx['descricaoServico']]||'',
+    temIndicacao: r[idx['temIndicacao']]||'',
+    quemIndicar: r[idx['quemIndicar']]||'',
+    nomeProduto: r[idx['nomeProduto']]||'',
+    quantidadeProduto: r[idx['quantidadeProduto']]||'',
+    links: safeParse_(r[idx['links']]),
+    status: (r[idx['status']]||'pendente'),
+    observacao: r[idx['observacao']]||'',
+    aprovadoPor: r[idx['aprovadoPor']]||'',
+    aprovadoEm: asISO_(r[idx['aprovadoEm']]),
+    submissionId: r[idx['submissionId']]||'',
+  }));
+  return ContentService.createTextOutput(JSON.stringify({ ok:true, items })).setMimeType(ContentService.MimeType.JSON);
+}
+
+function atualizarStatus_(p){
+  const sh = getSheet_();
+  const id = p.submissionId;
+  if(!id) return json_({ ok:false, error:'submissionId obrigatório' });
+  const status = (p.status||'').toLowerCase();
+  if(['aprovado','reprovado','pendente'].indexOf(status)<0){
+    return json_({ ok:false, error:'status inválido' });
+  }
+  const obs = p.observacao||'';
+  const aprovador = p.aprovador||'';
+
+  const data = sh.getDataRange().getValues();
+  const head = data.shift();
+  const idxId = head.indexOf('submissionId');
+  const idxSt = head.indexOf('status');
+  const idxObs= head.indexOf('observacao');
+  const idxBy = head.indexOf('aprovadoPor');
+  const idxAt = head.indexOf('aprovadoEm');
+
+  for(let i=0;i<data.length;i++){
+    if(String(data[i][idxId])===String(id)){
+      const row = i+2;
+      sh.getRange(row, idxSt+1).setValue(status);
+      sh.getRange(row, idxObs+1).setValue(obs);
+      sh.getRange(row, idxBy+1).setValue(aprovador);
+      sh.getRange(row, idxAt+1).setValue(new Date());
+      return json_({ ok:true });
+    }
+  }
+  return json_({ ok:false, error:'Registro não encontrado' });
+}
+
+function json_(obj){
+  return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
+}
+
+function safeParse_(v){
+  try{ return typeof v==='string' ? JSON.parse(v) : (Array.isArray(v)? v : []);}catch(e){ return []; }
+}
+function asISO_(val){
+  if(!val) return '';
+  if(val instanceof Date) return new Date(val).toISOString();
+  const t = Date.parse(val); return isNaN(t)? String(val): new Date(t).toISOString();
+}
+
+// ============================================================ -->
+
+</body>
+</html>
