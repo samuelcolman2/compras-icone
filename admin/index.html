@@ -281,7 +281,7 @@ onAuthStateChanged(auth, async (user) => {
   if (!isAdmin) {
     await signOut(auth).catch(()=>{});
     alert('Acesso restrito a administradores.');
-    window.location.replace('../compras-icone-main/login/index.html');
+    window.location.replace('../login/index.html');
     return;
   }
 
@@ -293,7 +293,7 @@ onAuthStateChanged(auth, async (user) => {
 
   $('#btnSair').addEventListener('click', async ()=>{
     try{ await signOut(auth);}catch(e){}
-    window.location.replace('../compras-icone-main/login/index.html');
+    window.location.replace('../login/index.html');
   });
 
   // ======= REDE =======
