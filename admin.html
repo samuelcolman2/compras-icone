@@ -293,7 +293,7 @@ onAuthStateChanged(auth, async (user) => {
 
   $('#btnSair').addEventListener('click', async ()=>{
     try{ await signOut(auth);}catch(e){}
-    window.location.replace('../');
+    window.location.replace('index.html');
   });
 
   // ======= REDE =======
