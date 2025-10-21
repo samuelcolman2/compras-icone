@@ -37,11 +37,26 @@
 
 <body class="min-h-screen bg-gradient-to-br from-orange-50 via-white to-rose-50 text-black antialiased">
 
-  <header class="w-full max-w-4xl mx-auto pt-8 pb-4 px-4 text-center">
-    <img class="mx-auto w-14 drop-shadow-md hover:scale-[1.02] transition-transform" 
-      src="https://iconecolegioecurso.com.br/wp-content/uploads/2022/08/xlogo_icone_site.png.pagespeed.ic_.QgXP3GszLC.webp" 
-      alt="Logo Ícone">
-  </header>
+<header class="w-full max-w-4xl mx-auto pt-8 pb-4 px-4 flex justify-between items-center">
+  <img class="w-14 drop-shadow-md hover:scale-[1.02] transition-transform" 
+    src="https://iconecolegioecurso.com.br/wp-content/uploads/2022/08/xlogo_icone_site.png.pagespeed.ic_.QgXP3GszLC.webp" 
+    alt="Logo Ícone">
+
+  <div class="flex items-center gap-2">
+    <!-- BOTÃO ADMIN (só aparece se for admin) -->
+    <button id="btnAdmin"
+      style="display:none"
+      class="rounded-xl bg-white text-black font-semibold px-4 py-2 shadow hover:-translate-y-0.5 transition">
+      Admin
+    </button>
+
+    <!-- BOTÃO SAIR -->
+    <button id="btnSair"
+      class="rounded-xl bg-[#FFF] text-black font-semibold px-4 py-2 shadow hover:-translate-y-0.5 transition">
+      Sair
+    </button>
+  </div>
+</header>
 
   <main class="w-full px-4 pb-16">
     <div class="relative max-w-4xl mx-auto">
@@ -176,7 +191,7 @@
     </div>
   </main>
 
-  <!-- Firebase Auth -->
+  <!-- Firebase Auth + Checagem de Admin -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
@@ -193,335 +208,380 @@
     const ALLOWED_DOMAIN = 'icone.g12.br';
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
+    
+
+    // 👉 Use o MESMO endpoint do Apps Script (POST de envio) para o GET do isadmin:
+    const GAS_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbx7yj9WjWaUnXg5IlfJVZk9NmNqGWjNn2gDOncDVQvTSEvPbw9lgyIiREw6dfskeF4c/exec';
+    
 
     const isAllowedEmail = (email) => email?.toLowerCase().endsWith('@' + ALLOWED_DOMAIN);
 
     const inputNome  = document.getElementById('nome');
     const inputEmail = document.getElementById('email');
+    const btnSair    = document.getElementById('btnSair');
+    const btnAdmin   = document.getElementById('btnAdmin');
 
+    async function checkIsAdmin(email){
+      try{
+        const url = `${GAS_WEBAPP_URL}?action=isadmin&email=${encodeURIComponent(email)}`;
+        const resp = await fetch(url, { method: 'GET' });
+        // Se CORS estiver ok no Apps Script, isso retorna JSON:
+        const data = await resp.json().catch(()=>null);
+        return !!(data && data.isAdmin);
+      }catch(_){
+        return false; // fallback seguro: se falhar, não mostra admin
+      }
+    }
+
+    // ===== BOTÕES =====
+    btnSair?.addEventListener('click', async () => {
+      try {
+        await signOut(auth);
+        window.location.replace('../login/index.html');
+      } catch (err) {
+        console.error('Erro ao sair:', err);
+        alert('Erro ao sair. Tente novamente.');
+      }
+    });
+
+    btnAdmin?.addEventListener('click', () => {
+      // ajuste o caminho se necessário
+      window.location.href = '../admin/index.html';
+    });
+
+    // ===== VERIFICAÇÃO DE LOGIN + ADMIN =====
     onAuthStateChanged(auth, async (user) => {
       if (!user || !isAllowedEmail(user.email)) {
         try { await signOut(auth); } catch(e) {}
         window.location.replace('../login/index.html');
         return;
       }
+
+      // Preenche campos travados
       inputEmail.value = user.email;
       inputEmail.readOnly = true;
       if (!inputNome.value) inputNome.value = user.displayName || '';
+
+      // Checa admin e mostra/oculta o botão
+      const isAdmin = await checkIsAdmin(user.email);
+      btnAdmin.style.display = isAdmin ? 'inline-flex' : 'none';
+
+      // (opcional) redirecionar não-admin para outra página:
+      // if (!isAdmin) window.location.replace('../login/index.html');
     });
   </script>
 
   <!-- Lógica do formulário + envio para Google Sheets -->
-<script>
-  const form = document.getElementById('formulario');
+  <script>
+    const form = document.getElementById('formulario');
 
-  // Prazo
-  const radiosPrazo = document.getElementsByName('prazo');
-  const prazoCampos = document.getElementById('prazoCampos');
-  const inputDataPrazo = document.getElementById('dataPrazo');
+    // Prazo
+    const radiosPrazo = document.getElementsByName('prazo');
+    const prazoCampos = document.getElementById('prazoCampos');
+    const inputDataPrazo = document.getElementById('dataPrazo');
 
-  // Tipo
-  const selectTipo = document.getElementById('tipo');
+    // Tipo
+    const selectTipo = document.getElementById('tipo');
 
-  // Serviço
-  const servicoCampos = document.getElementById('servicoCampos');
-  const descricaoServico = document.getElementById('descricaoServico');
-  const temIndicacaoGroup = document.getElementById('temIndicacaoGroup');
-  const indicacaoQuem = document.getElementById('indicacaoQuem');
-  const quemIndicar = document.getElementById('quemIndicar');
+    // Serviço
+    const servicoCampos = document.getElementById('servicoCampos');
+    const descricaoServico = document.getElementById('descricaoServico');
+    const temIndicacaoGroup = document.getElementById('temIndicacaoGroup');
+    const indicacaoQuem = document.getElementById('indicacaoQuem');
+    const quemIndicar = document.getElementById('quemIndicar');
 
-  // Produto
-  const produtoCampos = document.getElementById('produtoCampos');
-  const nomeProduto = document.getElementById('nomeProduto');
-  const quantidadeProduto = document.getElementById('quantidadeProduto');
+    // Produto
+    const produtoCampos = document.getElementById('produtoCampos');
+    const nomeProduto = document.getElementById('nomeProduto');
+    const quantidadeProduto = document.getElementById('quantidadeProduto');
 
-  // Links
-  const temLinkGroup = document.getElementById('temLinkGroup');
-  const linkCampos = document.getElementById('linkCampos');
-  const listaLinks = document.getElementById('listaLinks');
-  const btnAddLink = document.getElementById('adicionarLink');
+    // Links
+    const temLinkGroup = document.getElementById('temLinkGroup');
+    const linkCampos = document.getElementById('linkCampos');
+    const listaLinks = document.getElementById('listaLinks');
+    const btnAddLink = document.getElementById('adicionarLink');
 
-  let linkCount = 0;
-  const maxLinks = 3;
+    let linkCount = 0;
+    const maxLinks = 3;
 
-  // trava anti duplo-clique
-  let isSubmitting = false;
+    // trava anti duplo-clique
+    let isSubmitting = false;
 
-  // Toast helper
-  function toast(msg, type = 'info') {
-    const isSuccess = type === 'success';
-    const isError   = type === 'error';
-    Toastify({
-      text: msg,
-      duration: 3500,
-      close: true,
-      gravity: "top",
-      position: "right",
-      stopOnFocus: true,
-      style: {
-        background: isSuccess 
-          ? "linear-gradient(90deg,#16a34a,#22c55e)"
-          : isError 
-          ? "linear-gradient(90deg,#dc2626,#ef4444)"
-          : "linear-gradient(90deg,#334155,#64748b)",
-        color: "#ffffff",
-        fontWeight: "600",
-        boxShadow: "0 10px 25px -10px rgba(0,0,0,.35)",
-        borderRadius: "10px",
-        padding: "10px 16px",
-      },
-      offset: { x: 8, y: 10 },
-    }).showToast();
-  }
-
-  function atualizarBotaoAddLink() {
-    if (!btnAddLink) return;
-    btnAddLink.style.display = linkCount >= maxLinks ? "none" : "inline-flex";
-  }
-
-  function criarCampoLink() {
-    linkCount++;
-    const div = document.createElement('div');
-    div.className = 'flex items-center gap-2';
-
-    if (linkCount === 1) {
-      div.innerHTML = `<input type="url" name="linkProduto${linkCount}" placeholder="Cole o link ${linkCount}" required class="flex-1 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20 transition"/>`;
-    } else {
-      div.innerHTML = `
-        <input type="url" name="linkProduto${linkCount}" placeholder="Cole o link ${linkCount}" required class="flex-1 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20 transition"/>
-        <button type="button" class="grid place-items-center rounded-full w-7 h-7 bg-white text-primaria border border-primaria/30 shadow hover:scale-105 active:scale-100 transition remove-link" aria-label="Remover link">&times;</button>
-      `;
-      div.querySelector('.remove-link').addEventListener('click', () => {
-        div.remove();
-        linkCount--;
-        atualizarBotaoAddLink();
-        atualizarPlaceholders();
-      });
+    // Toast helper
+    function toast(msg, type = 'info') {
+      const isSuccess = type === 'success';
+      const isError   = type === 'error';
+      Toastify({
+        text: msg,
+        duration: 3500,
+        close: true,
+        gravity: "top",
+        position: "right",
+        stopOnFocus: true,
+        style: {
+          background: isSuccess 
+            ? "linear-gradient(90deg,#16a34a,#22c55e)"
+            : isError 
+            ? "linear-gradient(90deg,#dc2626,#ef4444)"
+            : "linear-gradient(90deg,#334155,#64748b)",
+          color: "#ffffff",
+          fontWeight: "600",
+          boxShadow: "0 10px 25px -10px rgba(0,0,0,.35)",
+          borderRadius: "10px",
+          padding: "10px 16px",
+        },
+        offset: { x: 8, y: 10 },
+      }).showToast();
     }
-    listaLinks.appendChild(div);
-    atualizarBotaoAddLink();
-  }
 
-  function atualizarPlaceholders() {
-    const inputs = listaLinks.querySelectorAll('input[type="url"]');
-    inputs.forEach((input, index) => input.placeholder = `Cole o link ${index + 1}`);
-  }
-
-  btnAddLink?.addEventListener('click', () => {
-    if (linkCount < maxLinks) {
-      criarCampoLink();
-      atualizarPlaceholders();
+    function atualizarBotaoAddLink() {
+      if (!btnAddLink) return;
+      btnAddLink.style.display = linkCount >= maxLinks ? "none" : "inline-flex";
     }
-  });
 
-  function atualizarPrazo(){
-    const selecionado = [...radiosPrazo].find(r=>r.checked)?.value;
-    if(selecionado==='sim'){
-      prazoCampos.classList.remove('hidden');
-      inputDataPrazo.required = true;
-    }else{
-      prazoCampos.classList.add('hidden');
-      inputDataPrazo.required = false;
-      inputDataPrazo.value = '';
-    }
-  }
-  radiosPrazo.forEach(r=>r.addEventListener('change', atualizarPrazo));
-  atualizarPrazo();
+    function criarCampoLink() {
+      linkCount++;
+      const div = document.createElement('div');
+      div.className = 'flex items-center gap-2';
 
-  function atualizarTipo(){
-    if(selectTipo.value==='servico'){
-      servicoCampos.classList.remove('hidden');
-      descricaoServico.required = true;
-
-      produtoCampos.classList.add('hidden');
-      nomeProduto.required = false; nomeProduto.value='';
-      quantidadeProduto.required = false; quantidadeProduto.value='';
-      document.querySelector('input[name="temLink"][value="nao"]').checked = true;
-      linkCampos.classList.add('hidden');
-      listaLinks.innerHTML=''; linkCount=0; atualizarBotaoAddLink();
-
-    }else if(selectTipo.value==='produto'){
-      produtoCampos.classList.remove('hidden');
-      nomeProduto.required = true;
-      quantidadeProduto.required = true;
-
-      servicoCampos.classList.add('hidden');
-      descricaoServico.required = false; descricaoServico.value='';
-      document.querySelector('input[name="temIndicacao"][value="nao"]').checked = true;
-      indicacaoQuem.classList.add('hidden');
-      quemIndicar.required = false; quemIndicar.value='';
-
-    }else{
-      servicoCampos.classList.add('hidden');
-      produtoCampos.classList.add('hidden');
-    }
-  }
-  selectTipo.addEventListener('change', atualizarTipo);
-  atualizarTipo();
-
-  function atualizarIndicacao(){
-    const temIndicacao = document.querySelector('input[name="temIndicacao"]:checked')?.value;
-    if(temIndicacao==='sim'){
-      indicacaoQuem.classList.remove('hidden');
-      quemIndicar.required = false; // ajuste para true se quiser exigir
-    }else{
-      indicacaoQuem.classList.add('hidden');
-      quemIndicar.required = false;
-      quemIndicar.value = '';
-    }
-  }
-  temIndicacaoGroup.addEventListener('change', atualizarIndicacao);
-
-  function atualizarLink(){
-    const temLink = document.querySelector('input[name="temLink"]:checked')?.value;
-    if(temLink==='sim'){
-      linkCampos.classList.remove('hidden');
-      if(linkCount===0) criarCampoLink();
-    }else{
-      linkCampos.classList.add('hidden');
-      listaLinks.innerHTML='';
-      linkCount=0;
+      if (linkCount === 1) {
+        div.innerHTML = `<input type="url" name="linkProduto${linkCount}" placeholder="Cole o link ${linkCount}" required class="flex-1 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20 transition"/>`;
+      } else {
+        div.innerHTML = `
+          <input type="url" name="linkProduto${linkCount}" placeholder="Cole o link ${linkCount}" required class="flex-1 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20 transition"/>
+          <button type="button" class="grid place-items-center rounded-full w-7 h-7 bg-white text-primaria border border-primaria/30 shadow hover:scale-105 active:scale-100 transition remove-link" aria-label="Remover link">&times;</button>
+        `;
+        div.querySelector('.remove-link').addEventListener('click', () => {
+          div.remove();
+          linkCount--;
+          atualizarBotaoAddLink();
+          atualizarPlaceholders();
+        });
+      }
+      listaLinks.appendChild(div);
       atualizarBotaoAddLink();
     }
-  }
-  temLinkGroup.addEventListener('change', atualizarLink);
 
-  // ======== INTEGRAÇÃO COM GOOGLE SHEETS (Apps Script) ========
-  const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbwl3Z7hmhJXtJFKng8g_8lbM2agg_mozGkpTnijydj4w2NOGFbs3kFKuQcTpJWsIvhJ/exec';
+    function atualizarPlaceholders() {
+      const inputs = listaLinks.querySelectorAll('input[type="url"]');
+      inputs.forEach((input, index) => input.placeholder = `Cole o link ${index + 1}`);
+    }
 
-  function coletarLinks() {
-    const inputs = listaLinks.querySelectorAll('input[type="url"]');
-    const arr = [];
-    inputs.forEach(i => {
-      const v = i.value.trim();
-      if (v) arr.push(v);
+    btnAddLink?.addEventListener('click', () => {
+      if (linkCount < maxLinks) {
+        criarCampoLink();
+        atualizarPlaceholders();
+      }
     });
-    return arr;
-  }
 
-  function desabilitarBotao(submitBtn, desabilitar) {
-    if (!submitBtn) return;
-    submitBtn.disabled = desabilitar;
-    submitBtn.style.opacity = desabilitar ? '0.7' : '1';
-    submitBtn.style.cursor  = desabilitar ? 'not-allowed' : 'pointer';
-  }
-
-  form.addEventListener('submit', async function(e){
-    e.preventDefault();
-
-    if (isSubmitting) return; // trava dupla submissão
-    isSubmitting = true;
-
-    const submitBtn = form.querySelector('button[type="submit"]');
-
-    const nome = document.getElementById('nome').value.trim();
-    const email = document.getElementById('email').value.trim();
-    const unidade = document.getElementById('unidade').value;
-    const urgencia = document.getElementById('urgencia').value;
-    const prazoSelecionado = [...radiosPrazo].find(r=>r.checked)?.value;
-    const dataPrazo = inputDataPrazo.value;
-    const tipo = selectTipo.value;
-
-    // Validações
-    if(!nome || !email || !unidade || !urgencia || !tipo){
-      toast('Preencha todos os campos obrigatórios.', 'error'); isSubmitting=false; return;
-    }
-    if(prazoSelecionado==='sim' && !dataPrazo){
-      toast('Por favor, selecione a data e hora do prazo.', 'error'); isSubmitting=false; return;
-    }
-    if(tipo==='servico' && !descricaoServico.value.trim()){
-      toast('Descreva o serviço.', 'error'); isSubmitting=false; return;
-    }
-    if(tipo==='produto'){
-      if(!nomeProduto.value.trim()){
-        toast('Informe o nome do produto.', 'error'); isSubmitting=false; return;
-      }
-      if(!quantidadeProduto.value || Number(quantidadeProduto.value) < 1){
-        toast('Informe a quantidade (mínimo 1).', 'error'); isSubmitting=false; return;
+    function atualizarPrazo(){
+      const selecionado = [...radiosPrazo].find(r=>r.checked)?.value;
+      if(selecionado==='sim'){
+        prazoCampos.classList.remove('hidden');
+        inputDataPrazo.required = true;
+      }else{
+        prazoCampos.classList.add('hidden');
+        inputDataPrazo.required = false;
+        inputDataPrazo.value = '';
       }
     }
+    radiosPrazo.forEach(r=>r.addEventListener('change', atualizarPrazo));
+    atualizarPrazo();
 
-    const payload = {
-      nome,
-      email,
-      unidade,
-      prazo: prazoSelecionado,
-      dataPrazo, // "YYYY-MM-DDTHH:mm"
-      urgencia,
-      tipo,
-      descricaoServico: (tipo==='servico') ? (descricaoServico.value.trim() || '') : '',
-      temIndicacao: (tipo==='servico') ? (document.querySelector('input[name="temIndicacao"]:checked')?.value || 'nao') : '',
-      quemIndicar: (tipo==='servico') ? (quemIndicar.value.trim() || '') : '',
-      nomeProduto: (tipo==='produto') ? (nomeProduto.value.trim() || '') : '',
-      quantidadeProduto: (tipo==='produto') ? (quantidadeProduto.value || '') : '',
-      links: (tipo==='produto' && document.querySelector('input[name="temLink"]:checked')?.value === 'sim')
-        ? JSON.stringify(coletarLinks())
-        : JSON.stringify([])
-    };
+    function atualizarTipo(){
+      if(selectTipo.value==='servico'){
+        servicoCampos.classList.remove('hidden');
+        descricaoServico.required = true;
 
-    // ID único por envio (idempotência no servidor)
-    payload.submissionId = (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2));
+        produtoCampos.classList.add('hidden');
+        nomeProduto.required = false; nomeProduto.value='';
+        quantidadeProduto.required = false; quantidadeProduto.value='';
+        document.querySelector('input[name="temLink"][value="nao"]').checked = true;
+        linkCampos.classList.add('hidden');
+        listaLinks.innerHTML=''; linkCount=0; atualizarBotaoAddLink();
 
-    const body = new URLSearchParams(payload);
+      }else if(selectTipo.value==='produto'){
+        produtoCampos.classList.remove('hidden');
+        nomeProduto.required = true;
+        quantidadeProduto.required = true;
 
-    try {
-      desabilitarBotao(submitBtn, true);
+        servicoCampos.classList.add('hidden');
+        descricaoServico.required = false; descricaoServico.value='';
+        document.querySelector('input[name="temIndicacao"][value="nao"]').checked = true;
+        indicacaoQuem.classList.add('hidden');
+        quemIndicar.required = false; quemIndicar.value='';
 
-      let ok = false;
-      let parseOk = false;
+      }else{
+        servicoCampos.classList.add('hidden');
+        produtoCampos.classList.add('hidden');
+      }
+    }
+    selectTipo.addEventListener('change', atualizarTipo);
+    atualizarTipo();
+
+    function atualizarIndicacao(){
+      const temIndicacao = document.querySelector('input[name="temIndicacao"]:checked')?.value;
+      if(temIndicacao==='sim'){
+        indicacaoQuem.classList.remove('hidden');
+        quemIndicar.required = false; // mude para true se quiser exigir
+      }else{
+        indicacaoQuem.classList.add('hidden');
+        quemIndicar.required = false;
+        quemIndicar.value = '';
+      }
+    }
+    temIndicacaoGroup.addEventListener('change', atualizarIndicacao);
+
+    function atualizarLink(){
+      const temLink = document.querySelector('input[name="temLink"]:checked')?.value;
+      if(temLink==='sim'){
+        linkCampos.classList.remove('hidden');
+        if(linkCount===0) criarCampoLink();
+      }else{
+        linkCampos.classList.add('hidden');
+        listaLinks.innerHTML='';
+        linkCount=0;
+        atualizarBotaoAddLink();
+      }
+    }
+    temLinkGroup.addEventListener('change', atualizarLink);
+
+    // ======== INTEGRAÇÃO COM GOOGLE SHEETS (Apps Script) ========
+    const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbz1glqhz6S1Nbm_LjP2c7-tShMkgUUf693UvekuWNBO_kJPsIDcusKg7PRFqG3Uf-sa/exec';
+
+    function coletarLinks() {
+      const inputs = listaLinks.querySelectorAll('input[type="url"]');
+      const arr = [];
+      inputs.forEach(i => {
+        const v = i.value.trim();
+        if (v) arr.push(v);
+      });
+      return arr;
+    }
+
+    function desabilitarBotao(submitBtn, desabilitar) {
+      if (!submitBtn) return;
+      submitBtn.disabled = desabilitar;
+      submitBtn.style.opacity = desabilitar ? '0.7' : '1';
+      submitBtn.style.cursor  = desabilitar ? 'not-allowed' : 'pointer';
+    }
+
+    form.addEventListener('submit', async function(e){
+      e.preventDefault();
+
+      if (isSubmitting) return; // trava dupla submissão
+      isSubmitting = true;
+
+      const submitBtn = form.querySelector('button[type="submit"]');
+
+      const nome = document.getElementById('nome').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const unidade = document.getElementById('unidade').value;
+      const urgencia = document.getElementById('urgencia').value;
+      const prazoSelecionado = [...radiosPrazo].find(r=>r.checked)?.value;
+      const dataPrazo = inputDataPrazo.value;
+      const tipo = selectTipo.value;
+
+      // Validações
+      if(!nome || !email || !unidade || !urgencia || !tipo){
+        toast('Preencha todos os campos obrigatórios.', 'error'); isSubmitting=false; return;
+      }
+      if(prazoSelecionado==='sim' && !dataPrazo){
+        toast('Por favor, selecione a data e hora do prazo.', 'error'); isSubmitting=false; return;
+      }
+      if(tipo==='servico' && !descricaoServico.value.trim()){
+        toast('Descreva o serviço.', 'error'); isSubmitting=false; return;
+      }
+      if(tipo==='produto'){
+        if(!nomeProduto.value.trim()){
+          toast('Informe o nome do produto.', 'error'); isSubmitting=false; return;
+        }
+        if(!quantidadeProduto.value || Number(quantidadeProduto.value) < 1){
+          toast('Informe a quantidade (mínimo 1).', 'error'); isSubmitting=false; return;
+        }
+      }
+
+      const payload = {
+        nome,
+        email,
+        unidade,
+        prazo: prazoSelecionado,
+        dataPrazo, // "YYYY-MM-DDTHH:mm"
+        urgencia,
+        tipo,
+        descricaoServico: (tipo==='servico') ? (descricaoServico.value.trim() || '') : '',
+        temIndicacao: (tipo==='servico') ? (document.querySelector('input[name="temIndicacao"]:checked')?.value || 'nao') : '',
+        quemIndicar: (tipo==='servico') ? (quemIndicar.value.trim() || '') : '',
+        nomeProduto: (tipo==='produto') ? (nomeProduto.value.trim() || '') : '',
+        quantidadeProduto: (tipo==='produto') ? (quantidadeProduto.value || '') : '',
+        links: (tipo==='produto' && document.querySelector('input[name="temLink"]:checked')?.value === 'sim')
+          ? JSON.stringify(coletarLinks())
+          : JSON.stringify([])
+      };
+
+      // ID único por envio (idempotência no servidor)
+      payload.submissionId = (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2));
+
+      const body = new URLSearchParams(payload);
 
       try {
-        const resp = await fetch(WEBAPP_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
-          body
-        });
+        desabilitarBotao(submitBtn, true);
 
-        // Se a resposta for opaqua (ex.: por CORS), considere sucesso
-        if (resp.type === 'opaque') {
-          ok = true;
-        } else {
-          let data = null;
-          try { data = await resp.json(); parseOk = true; } catch (_){}
-          ok = resp.ok && (parseOk ? (data?.ok !== false) : true);
-        }
-      } catch (networkErr) {
-        // Fallback só em erro de rede real
+        let ok = false;
+        let parseOk = false;
+
         try {
-          await fetch(WEBAPP_URL, {
+          const resp = await fetch(WEBAPP_URL, {
             method: 'POST',
-            mode: 'no-cors',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
             body
           });
-          ok = true;
-        } catch (_) {
-          ok = false;
+
+          // Se a resposta for opaqua (ex.: por CORS), considere sucesso
+          if (resp.type === 'opaque') {
+            ok = true;
+          } else {
+            let data = null;
+            try { data = await resp.json(); parseOk = true; } catch (_){}
+            ok = resp.ok && (parseOk ? (data?.ok !== false) : true);
+          }
+        } catch (networkErr) {
+          // Fallback só em erro de rede real
+          try {
+            await fetch(WEBAPP_URL, {
+              method: 'POST',
+              mode: 'no-cors',
+              headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+              body
+            });
+            ok = true;
+          } catch (_) {
+            ok = false;
+          }
         }
+
+        if (!ok) throw new Error('Falha ao enviar');
+
+        // Sucesso
+        toast('Pedido enviado com sucesso!', 'success');
+
+        // Reset UI
+        form.reset();
+        linkCount = 0; listaLinks.innerHTML = ''; atualizarBotaoAddLink();
+        document.querySelector('input[name="prazo"][value="nao"]').checked = true;
+        document.querySelector('input[name="temIndicacao"][value="nao"]').checked = true;
+        document.querySelector('input[name="temLink"][value="nao"]').checked = true;
+        atualizarPrazo(); atualizarTipo(); atualizarIndicacao(); atualizarLink();
+
+      } catch (err) {
+        console.error(err);
+        toast(`Erro ao enviar: ${err.message || err}`, 'error');
+      } finally {
+        desabilitarBotao(submitBtn, false);
+        isSubmitting = false;
       }
-
-      if (!ok) throw new Error('Falha ao enviar');
-
-      // Sucesso
-      toast('Pedido enviado com sucesso!', 'success');
-
-      // Reset UI
-      form.reset();
-      linkCount = 0; listaLinks.innerHTML = ''; atualizarBotaoAddLink();
-      document.querySelector('input[name="prazo"][value="nao"]').checked = true;
-      document.querySelector('input[name="temIndicacao"][value="nao"]').checked = true;
-      document.querySelector('input[name="temLink"][value="nao"]').checked = true;
-      atualizarPrazo(); atualizarTipo(); atualizarIndicacao(); atualizarLink();
-
-    } catch (err) {
-      console.error(err);
-      toast(`Erro ao enviar: ${err.message || err}`, 'error');
-    } finally {
-      desabilitarBotao(submitBtn, false);
-      isSubmitting = false;
-    }
-  });
-</script>
+    });
+  </script>
 
 </body>
 </html>
