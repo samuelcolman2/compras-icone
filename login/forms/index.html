@@ -217,8 +217,7 @@
   ].map(e => e.toLowerCase()));
 
   // === URL de destino do botão Admin ===
-  const ADMIN_DEST_URL = '../../admin/';
-
+const ADMIN_DEST_URL = '/admin/';
   const isAllowedEmail = (email) => email?.toLowerCase().endsWith('@' + ALLOWED_DOMAIN);
 
   const inputNome  = document.getElementById('nome');
@@ -230,7 +229,7 @@
   btnSair?.addEventListener('click', async () => {
     try {
       await signOut(auth);
-      window.location.replace('../');
+      window.location.replace('/');
     } catch (err) {
       console.error('Erro ao sair:', err);
       alert('Erro ao sair. Tente novamente.');
