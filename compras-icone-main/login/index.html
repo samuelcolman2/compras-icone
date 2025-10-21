@@ -109,80 +109,144 @@
   </main>
 
   <!-- Firebase Script -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+  import {
+    getAuth,
+    GoogleAuthProvider,
+    signInWithPopup,
+    signInWithRedirect,
+    getRedirectResult,
+    signOut,
+    onAuthStateChanged
+  } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyAEZidq8mdAUKeJXvSQeE01gVOLWe_cp78",
-      authDomain: "compras-icone.firebaseapp.com",
-      projectId: "compras-icone",
-      storageBucket: "compras-icone.firebasestorage.app",
-      messagingSenderId: "831706842201",
-      appId: "1:831706842201:web:9b68ae4f98ad93c5a99d48",
-    };
+  const firebaseConfig = {
+    apiKey: "AIzaSyAEZidq8mdAUKeJXvSQeE01gVOLWe_cp78",
+    authDomain: "compras-icone.firebaseapp.com",
+    projectId: "compras-icone",
+    storageBucket: "compras-icone.firebasestorage.app",
+    messagingSenderId: "831706842201",
+    appId: "1:831706842201:web:9b68ae4f98ad93c5a99d48",
+  };
 
-    const ALLOWED_DOMAIN = 'icone.g12.br';
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const provider = new GoogleAuthProvider();
-    provider.setCustomParameters({ prompt: "select_account", hd: ALLOWED_DOMAIN });
+  const ALLOWED_DOMAIN = 'icone.g12.br';
+  const FORMS_URL = '../forms/index.html'; // confira o nome do arquivo!
 
-    const googleBtn = document.getElementById('googleBtn');
-    const profile = document.getElementById('profile');
-    const avatar = document.getElementById('avatar');
-    const displayName = document.getElementById('displayName');
-    const notice = document.getElementById('notice');
-    const signOutBtn = document.getElementById('signOutBtn');
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  auth.languageCode = 'pt'; // opcional: mensagens do Google em pt
 
-    function isAllowedEmail(email){ return email?.toLowerCase().endsWith('@' + ALLOWED_DOMAIN); }
+  const provider = new GoogleAuthProvider();
+  provider.setCustomParameters({ prompt: "select_account", hd: ALLOWED_DOMAIN });
 
-    googleBtn.addEventListener('click', async()=>{
-      notice.textContent = '';
-      try{
-        const result = await signInWithPopup(auth, provider);
-        const user = result.user;
-        if(!isAllowedEmail(user.email)){
-          await signOut(auth);
-          notice.textContent = 'Acesso negado. Use sua conta @' + ALLOWED_DOMAIN;
-          notice.className = 'notice err';
-          return;
-        }
-        notice.textContent = 'Login realizado com sucesso!';
-        notice.className = 'notice ok';
+  const googleBtn = document.getElementById('googleBtn');
+  const profile = document.getElementById('profile');
+  const avatar = document.getElementById('avatar');
+  const displayName = document.getElementById('displayName');
+  const notice = document.getElementById('notice');
+  const signOutBtn = document.getElementById('signOutBtn');
 
-        // >>> REDIRECIONA PARA FORMS APÓS LOGIN VÁLIDO
-        window.location.href = '../forms/index.html';
-      }catch(e){
-        notice.textContent = e.message;
-        notice.className = 'notice err';
+  const isAllowedEmail = (email) => email?.toLowerCase().endsWith('@' + ALLOWED_DOMAIN);
+
+  function showMsg(text, type = '') {
+    notice.textContent = text || '';
+    notice.className = 'notice' + (type ? ' ' + type : '');
+  }
+
+  function friendlyError(code, message) {
+    switch (code) {
+      case 'auth/popup-blocked': return 'Popup bloqueado. Tente novamente ou use outro navegador.';
+      case 'auth/popup-closed-by-user': return 'Popup fechado antes de concluir.';
+      case 'auth/cancelled-popup-request': return 'Tentativa de login cancelada.';
+      case 'auth/account-exists-with-different-credential':
+        return 'Essa conta já existe com outra forma de login.';
+      default: return message || 'Falha no login.';
+    }
+  }
+
+  async function doRedirect() {
+    // garante que a página de destino existe
+    window.location.replace(FORMS_URL);
+  }
+
+  googleBtn.addEventListener('click', async () => {
+    showMsg('');
+    googleBtn.disabled = true;
+    googleBtn.style.opacity = '0.7';
+
+    try {
+      // 1) tenta popup
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+
+      if (!isAllowedEmail(user.email)) {
+        await signOut(auth);
+        showMsg('Acesso negado. Use sua conta @' + ALLOWED_DOMAIN, 'err');
+      } else {
+        showMsg('Login realizado com sucesso!', 'ok');
+        await doRedirect();
       }
-    });
+    } catch (e) {
+      // 2) fallback para redirect se for erro clássico de popup
+      if (e?.code === 'auth/popup-blocked') {
+        try {
+          await signInWithRedirect(auth, provider);
+          return; // o fluxo continua após o redirect
+        } catch (e2) {
+          showMsg(friendlyError(e2.code, e2.message), 'err');
+        }
+      } else {
+        showMsg(friendlyError(e.code, e.message), 'err');
+      }
+    } finally {
+      googleBtn.disabled = false;
+      googleBtn.style.opacity = '1';
+    }
+  });
 
-    signOutBtn.addEventListener('click', async()=>{
-      await signOut(auth);
+  signOutBtn.addEventListener('click', async () => {
+    await signOut(auth);
+    profile.style.display='none';
+    googleBtn.style.display='flex';
+  });
+
+  // Trata o retorno do signInWithRedirect (se tiver acontecido)
+  getRedirectResult(auth).then((result) => {
+    if (!result) return;
+    const user = result.user;
+    if (!user) return;
+
+    if (!isAllowedEmail(user.email)) {
+      signOut(auth);
+      showMsg('Acesso negado. Use sua conta @' + ALLOWED_DOMAIN, 'err');
+    } else {
+      showMsg('Login realizado com sucesso!', 'ok');
+      doRedirect();
+    }
+  }).catch(e => {
+    showMsg(friendlyError(e.code, e.message), 'err');
+  });
+
+  // Se já estiver autenticado e autorizado, pula o login e vai direto aos forms
+  onAuthStateChanged(auth, (user) => {
+    if (user && isAllowedEmail(user.email)) {
+      doRedirect();
+      return;
+    }
+    // estado visual
+    if (user) {
+      if (!isAllowedEmail(user.email)) { signOut(auth); return; }
+      profile.style.display='flex';
+      googleBtn.style.display='none';
+      avatar.src = user.photoURL || '';
+      displayName.textContent = user.displayName || user.email || '';
+    } else {
       profile.style.display='none';
       googleBtn.style.display='flex';
-    });
+    }
+  });
+</script>
 
-    // Se já estiver autenticado e autorizado, pula o login e vai direto aos forms
-    onAuthStateChanged(auth, user=>{
-      if(user && isAllowedEmail(user.email)){
-        window.location.replace('../forms/index.html');
-        return;
-      }
-      // estado visual
-      if(user){
-        if(!isAllowedEmail(user.email)){ signOut(auth); return; }
-        profile.style.display='flex';
-        googleBtn.style.display='none';
-        avatar.src = user.photoURL;
-        displayName.textContent = user.displayName;
-      }else{
-        profile.style.display='none';
-        googleBtn.style.display='flex';
-      }
-    });
-  </script>
 </body>
 </html>

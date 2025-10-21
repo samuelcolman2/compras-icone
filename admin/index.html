@@ -196,8 +196,11 @@
   };
 
   const ALLOWED_DOMAIN = 'icone.g12.br';
-  const ADMINS = [].map(e=>e.toLowerCase());
-
+const ADMINS = new Set([
+  'samuel.colman@icone.g12.br',
+  'pedrolucas@icone.g12.br',
+  'filipemarques@icone.g12.br',
+].map(e => e.toLowerCase()));
   const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbwl3Z7hmhJXtJFKng8g_8lbM2agg_mozGkpTnijydj4w2NOGFbs3kFKuQcTpJWsIvhJ/exec';
 
   const app = initializeApp(firebaseConfig);
@@ -255,28 +258,42 @@
   let activeTab = 'pendentes'; // 'pendentes' | 'historico'
 
   // ======= AUTENTICAÇÃO =======
-  function isAllowedEmail(email){
-    const okDomain = email?.toLowerCase().endsWith('@'+ALLOWED_DOMAIN);
-    const adminListEmpty = ADMINS.length===0;
-    const okAdmin = adminListEmpty || ADMINS.includes(email?.toLowerCase());
-    return okDomain && okAdmin;
+const isDomain = (email) => email?.toLowerCase().endsWith('@' + ALLOWED_DOMAIN);
+
+onAuthStateChanged(auth, async (user) => {
+  const adminEmailEl = $('#adminEmail');
+
+  // 1) Precisa estar logado
+  if (!user) {
+    window.location.replace('../login/index.html');
+    return;
   }
 
-  onAuthStateChanged(auth, async (user)=>{
-    const adminEmailEl = $('#adminEmail');
-    if(!user || !isAllowedEmail(user.email)){
-      try{ await signOut(auth);}catch(e){}
-      window.location.replace('../login/index.html');
-      return;
-    }
-    currentUser = user;
-    adminEmailEl.textContent = user.email;
-    carregarLista();
-  });
+  // 2) Precisa ser do domínio
+  if (!isDomain(user.email)) {
+    await signOut(auth).catch(()=>{});
+    window.location.replace('../login/index.html');
+    return;
+  }
+
+  // 3) Precisa estar na lista de admins
+  const isAdmin = ADMINS.has(user.email.toLowerCase());
+  if (!isAdmin) {
+    await signOut(auth).catch(()=>{});
+    alert('Acesso restrito a administradores.');
+    window.location.replace('../compras-icone-main/login/index.html');
+    return;
+  }
+
+  currentUser = user;
+  adminEmailEl.textContent = user.email;
+  carregarLista();
+});
+
 
   $('#btnSair').addEventListener('click', async ()=>{
     try{ await signOut(auth);}catch(e){}
-    window.location.replace('../login/index.html');
+    window.location.replace('../compras-icone-main/login/index.html');
   });
 
   // ======= REDE =======

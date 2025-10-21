@@ -192,84 +192,75 @@
   </main>
 
   <!-- Firebase Auth + Checagem de Admin -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyAEZidq8mdAUKeJXvSQeE01gVOLWe_cp78",
-      authDomain: "compras-icone.firebaseapp.com",
-      projectId: "compras-icone",
-      storageBucket: "compras-icone.firebasestorage.app",
-      messagingSenderId: "831706842201",
-      appId: "1:831706842201:web:9b68ae4f98ad93c5a99d48",
-    };
+  const firebaseConfig = {
+    apiKey: "AIzaSyAEZidq8mdAUKeJXvSQeE01gVOLWe_cp78",
+    authDomain: "compras-icone.firebaseapp.com",
+    projectId: "compras-icone",
+    storageBucket: "compras-icone.firebasestorage.app",
+    messagingSenderId: "831706842201",
+    appId: "1:831706842201:web:9b68ae4f98ad93c5a99d48",
+  };
 
-    const ALLOWED_DOMAIN = 'icone.g12.br';
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    
+  const ALLOWED_DOMAIN = 'icone.g12.br';
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
 
-    // 👉 Use o MESMO endpoint do Apps Script (POST de envio) para o GET do isadmin:
-    const GAS_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbx7yj9WjWaUnXg5IlfJVZk9NmNqGWjNn2gDOncDVQvTSEvPbw9lgyIiREw6dfskeF4c/exec';
-    
+  // === Lista fixa de admins ===
+  const ADMIN_EMAILS = new Set([
+    'samuel.colman@icone.g12.br',
+    'pedrolucas@icone.g12.br',
+    'filipemarques@icone.g12.br',
+  ].map(e => e.toLowerCase()));
 
-    const isAllowedEmail = (email) => email?.toLowerCase().endsWith('@' + ALLOWED_DOMAIN);
+  // === URL de destino do botão Admin ===
+  const ADMIN_DEST_URL = '../../admin/';
 
-    const inputNome  = document.getElementById('nome');
-    const inputEmail = document.getElementById('email');
-    const btnSair    = document.getElementById('btnSair');
-    const btnAdmin   = document.getElementById('btnAdmin');
+  const isAllowedEmail = (email) => email?.toLowerCase().endsWith('@' + ALLOWED_DOMAIN);
 
-    async function checkIsAdmin(email){
-      try{
-        const url = `${GAS_WEBAPP_URL}?action=isadmin&email=${encodeURIComponent(email)}`;
-        const resp = await fetch(url, { method: 'GET' });
-        // Se CORS estiver ok no Apps Script, isso retorna JSON:
-        const data = await resp.json().catch(()=>null);
-        return !!(data && data.isAdmin);
-      }catch(_){
-        return false; // fallback seguro: se falhar, não mostra admin
-      }
+  const inputNome  = document.getElementById('nome');
+  const inputEmail = document.getElementById('email');
+  const btnSair    = document.getElementById('btnSair');
+  const btnAdmin   = document.getElementById('btnAdmin');
+
+  // ===== BOTÕES =====
+  btnSair?.addEventListener('click', async () => {
+    try {
+      await signOut(auth);
+      window.location.replace('../login/index.html');
+    } catch (err) {
+      console.error('Erro ao sair:', err);
+      alert('Erro ao sair. Tente novamente.');
+    }
+  });
+
+  btnAdmin?.addEventListener('click', () => {
+    // Redireciona para o site de admin
+    window.open(ADMIN_DEST_URL, '_blank'); // ou use window.location.href se quiser na mesma aba
+  });
+
+  // ===== VERIFICAÇÃO DE LOGIN + ADMIN =====
+  onAuthStateChanged(auth, async (user) => {
+    if (!user || !isAllowedEmail(user.email)) {
+      try { await signOut(auth); } catch(e) {}
+      window.location.replace('../login/index.html');
+      return;
     }
 
-    // ===== BOTÕES =====
-    btnSair?.addEventListener('click', async () => {
-      try {
-        await signOut(auth);
-        window.location.replace('../login/index.html');
-      } catch (err) {
-        console.error('Erro ao sair:', err);
-        alert('Erro ao sair. Tente novamente.');
-      }
-    });
+    // Preenche campos automáticos
+    inputEmail.value = user.email;
+    inputEmail.readOnly = true;
+    if (!inputNome.value) inputNome.value = user.displayName || '';
 
-    btnAdmin?.addEventListener('click', () => {
-      // ajuste o caminho se necessário
-      window.location.href = '../admin/index.html';
-    });
+    // Checa se o usuário está na lista de admins
+    const isAdmin = ADMIN_EMAILS.has(user.email.toLowerCase());
+    btnAdmin.style.display = isAdmin ? 'inline-flex' : 'none';
+  });
+</script>
 
-    // ===== VERIFICAÇÃO DE LOGIN + ADMIN =====
-    onAuthStateChanged(auth, async (user) => {
-      if (!user || !isAllowedEmail(user.email)) {
-        try { await signOut(auth); } catch(e) {}
-        window.location.replace('../login/index.html');
-        return;
-      }
-
-      // Preenche campos travados
-      inputEmail.value = user.email;
-      inputEmail.readOnly = true;
-      if (!inputNome.value) inputNome.value = user.displayName || '';
-
-      // Checa admin e mostra/oculta o botão
-      const isAdmin = await checkIsAdmin(user.email);
-      btnAdmin.style.display = isAdmin ? 'inline-flex' : 'none';
-
-      // (opcional) redirecionar não-admin para outra página:
-      // if (!isAdmin) window.location.replace('../login/index.html');
-    });
-  </script>
 
   <!-- Lógica do formulário + envio para Google Sheets -->
   <script>
