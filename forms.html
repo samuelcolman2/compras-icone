@@ -2,13 +2,30 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
   <title>Formulário - Ícone Colégio e Curso</title>
 
+  <!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Poppins (form) -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<!-- Inter (navbar Cantina) -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<!-- Roboto -->
+<link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
+
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- Poppins (form) -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <!-- Inter (navbar Cantina) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
   <link rel="shortcut icon" href="https://storage.googleapis.com/ecdt-logo-saida/1ebe52af502e25d3521cb9dad62bb72f6bc1c347353cdda5fa381ef8627a9eb8/COLEGIO-E-CURSO-ICONE.webp" type="image/x-icon">
+
   <script src="https://cdn.tailwindcss.com"></script>
 
   <!-- Toastify -->
@@ -21,71 +38,166 @@
         extend: {
           colors: { primaria: '#F1663C' },
           boxShadow: { glow: '0 0 0 3px rgba(241,102,60,0.15), 0 10px 25px -5px rgba(0,0,0,0.25)' },
+          screens: { xs: '380px' }
         }
       }
     }
   </script>
 
-  <style>
-    html { scroll-behavior: smooth; }
-    body { font-family: 'Poppins', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; color: #000 !important; }
-    * { color: #000 !important; }
-    .toastify, .toastify * { color: #fff !important; }
-    .toastify .toast-close { color: #fff !important; opacity: 0.9; }
-  </style>
+<style>
+  /* ===== Base ===== */
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Roboto', system-ui, -apple-system, Segoe UI, Poppins, Arial, sans-serif;
+    color: #000;
+  }
+  * { color: #000; }
+  .toastify, .toastify * { color: #fff !important; }
+  .toastify .toast-close { color: #fff !important; opacity: 0.9; }
+
+  /* ===== Header Cantina (escopo isolado) ===== */
+  :root{
+    --cantina-primary:#FD7F08;
+    --cantina-secondary:#253237;
+    --cantina-text:#FD7F08;
+    --cantina-border:#e2e8f0;
+  }
+  nav.cantina-nav{
+    position:sticky; top:0; z-index:50;
+    background:var(--cantina-secondary);
+    border-bottom:3px solid var(--cantina-primary);
+    color:var(--cantina-text);
+    font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+  }
+  nav.cantina-nav .cantina-container{
+    max-width:min(98vw, 1400px); margin:0 auto; padding:0 12px;
+    height:96px; display:flex; align-items:center; justify-content:space-between;
+  }
+  nav.cantina-nav a{ display:flex; align-items:center; text-decoration:none; }
+  nav.cantina-nav img{ height:64px; width:auto; }
+  nav.cantina-nav .brand{ display:flex; align-items:center; gap:12px; color:var(--cantina-text); height:100%; }
+  nav.cantina-nav .brand .divider{ width:2px; height:70%; align-self:center; background:var(--cantina-primary); border-radius:2px; }
+  nav.cantina-nav .brand .title{
+    font-weight:800; letter-spacing:.5px;
+    font-size:clamp(18px, 3.8vw, 32px);
+    line-height:1.15;
+    white-space:normal; word-break:keep-all;
+  }
+  nav.cantina-nav .actions{ display:flex; gap:8px; flex-wrap:wrap; }
+  nav.cantina-nav .btn{
+    padding:10px 12px; border-radius:12px; border:1px solid var(--cantina-border);
+    background:#fff; color:#000; cursor:pointer; transition:transform .15s ease, box-shadow .15s ease;
+    font-weight:600;
+  }
+  nav.cantina-nav .btn:hover{ transform:translateY(-1px); box-shadow:0 2px 10px rgba(2,8,23,.06); }
+  nav.cantina-nav .menu-toggle{
+    display:none;
+    border:1px solid var(--cantina-border);
+    background:#fff; color:#000; border-radius:10px;
+    padding:8px; cursor:pointer;
+  }
+  nav.cantina-nav .menu-toggle:focus-visible,
+  nav.cantina-nav .btn:focus-visible{
+    outline:2px solid var(--cantina-primary);
+    outline-offset:2px;
+  }
+
+  /* ===== Mobile (<=640px): header estável, hambúrguer menor e dropdown ancorado ===== */
+  @media (max-width: 640px){
+    nav.cantina-nav .cantina-container{
+      height:72px;
+      position:relative;
+    }
+    nav.cantina-nav img{ height:48px; }
+    nav.cantina-nav .brand{
+      flex:1;
+      min-width:0;
+    }
+    nav.cantina-nav .menu-toggle{
+      display:inline-flex; align-items:center; justify-content:center;
+      width:40px; height:40px;
+      padding:6px; border-radius:10px;
+    }
+    nav.cantina-nav .menu-toggle svg{
+      width:18px; height:18px;
+    }
+    nav.cantina-nav .actions{
+      position:absolute; right:12px;
+      top:calc(100% + 8px); z-index:60;
+      display:none; flex-direction:column; gap:6px;
+      background:#ffffff; border:1px solid var(--cantina-border); border-radius:12px;
+      padding:10px; width:min(78vw, 280px);
+      box-shadow:0 12px 30px rgba(2,8,23,.18);
+    }
+    nav.cantina-nav .actions.open{ display:flex; }
+    nav.cantina-nav .actions .btn{ width:100%; justify-content:center; }
+  }
+
+  /* ===== Mini ajuste de tipografia do título para telas muito pequenas ===== */
+  @media (max-width: 400px){
+    nav.cantina-nav .brand .title{
+      font-size:clamp(16px, 5vw, 22px);
+    }
+  }
+</style>
+
 </head>
 
-<body class="min-h-screen bg-gradient-to-br from-orange-50 via-white to-rose-50 text-black antialiased">
+<body class="min-h-screen text-white antialiased" style="background: var(--cantina-secondary);">
 
-<header class="w-full max-w-4xl mx-auto pt-8 pb-4 px-4 flex justify-between items-center">
-  <img class="w-14 drop-shadow-md hover:scale-[1.02] transition-transform" 
-    src="https://iconecolegioecurso.com.br/wp-content/uploads/2022/08/xlogo_icone_site.png.pagespeed.ic_.QgXP3GszLC.webp" 
-    alt="Logo Ícone">
+  <nav class="cantina-nav">
+    <div class="cantina-container">
+      <a class="brand" href="#">
+        <img src="https://iconecolegioecurso.com.br/wp-content/uploads/2022/08/xlogo_icone_site.png.pagespeed.ic_.QgXP3GszLC.webp"
+             alt="Logo Ícone Colégio e Curso"
+             onerror="this.onerror=null;this.src='https://placehold.co/150x50/eeeeee/333333?text=Logo';">
+        <span class="divider" aria-hidden="true"></span>
+        <span class="title text-[#FD7F08]">formulário de compras</span>      </a>
 
-  <div class="flex items-center gap-2">
-    <!-- BOTÃO ADMIN (só aparece se for admin) -->
-    <button id="btnAdmin"
-      style="display:none"
-      class="rounded-xl bg-white text-black font-semibold px-4 py-2 shadow hover:-translate-y-0.5 transition">
-      Admin
-    </button>
+      <!-- Botão hambúrguer (aparece só no mobile via CSS) -->
+      <button id="menuToggle" class="menu-toggle" aria-label="Abrir menu" aria-expanded="false" aria-controls="menuActions">
+        <!-- Ícone corrigido: usa STROKE ao invés de FILL -->
+        <svg xmlns="http://www.w3.org/2000/svg" class="size-6" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
 
-    <!-- BOTÃO SAIR -->
-    <button id="btnSair"
-      class="rounded-xl bg-[#FFF] text-black font-semibold px-4 py-2 shadow hover:-translate-y-0.5 transition">
-      Sair
-    </button>
-  </div>
-</header>
+      <!-- Ações (dropdown no mobile; inline no desktop) -->
+      <div id="menuActions" class="actions">
+        <button id="btnAdmin" style="display:none" class="btn">Admin</button>
+        <button id="btnSair" class="btn">Sair</button>
+      </div>
+    </div>
+  </nav>
 
-  <main class="w-full px-4 pb-16">
-    <div class="relative max-w-4xl mx-auto">
+  <!-- Main -->
+  <main class="w-full px-4 sm:px-6 pb-16 mt-6 sm:mt-8">
+    <div class="relative max-w-5xl mx-auto">
 
       <!-- Aura decorativa -->
-      <div class="absolute inset-0 -z-10 blur-3xl opacity-30 pointer-events-none" aria-hidden="true">
-        <div class="w-72 h-72 bg-primaria/30 rounded-full absolute -top-10 -left-10"></div>
-        <div class="w-72 h-72 bg-orange-300/30 rounded-full absolute bottom-0 right-0"></div>
+      <div class="pointer-events-none absolute inset-0 -z-10 hidden sm:block blur-3xl opacity-30" aria-hidden="true">
+        <div class="w-56 h-56 lg:w-72 lg:h-72 bg-primaria/30 rounded-full absolute -top-10 -left-10"></div>
+        <div class="w-56 h-56 lg:w-72 lg:h-72 bg-orange-300/30 rounded-full absolute bottom-0 right-0"></div>
       </div>
 
       <form id="formulario" novalidate
-        class="bg-[#F1663C] backdrop-blur-xl border border-white/60 shadow-2xl shadow-glow rounded-2xl p-6 sm:p-8 md:p-10 transition-[transform,box-shadow] hover:shadow-glow hover:-translate-y-0.5">
+            class="mx-auto bg-[#F1663C] backdrop-blur-xl border border-white/60 shadow-2xl shadow-glow rounded-xl sm:rounded-2xl p-4 xs:p-6 sm:p-8 md:p-10 transition-[transform,box-shadow] hover:shadow-glow hover:-translate-y-0.5 max-w-3xl lg:max-w-4xl">
 
-        <h2 class="text-2xl sm:text-3xl font-bold text-center mb-8 tracking-tight">Formulário</h2>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 md:gap-x-10 gap-y-4">
           <!-- COLUNA ESQUERDA -->
           <div class="col-esq">
             <label for="nome" class="font-semibold mb-1 block">Nome</label>
             <input type="text" id="nome" name="nome" placeholder="Digite seu nome" required
-              class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none ring-0 focus:border-primaria focus:ring-4 focus:ring-primaria/20 transition" />
+                   class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm sm:text-base outline-none ring-0 focus:border-primaria focus:ring-4 focus:ring-primaria/20 transition" />
 
             <label for="email" class="font-semibold mb-1 block mt-2">E-mail</label>
             <input type="email" id="email" name="email" placeholder="Digite seu e-mail" required
-              class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none ring-0 focus:border-primaria focus:ring-4 focus:ring-primaria/20 transition" />
+                   class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm sm:text-base outline-none ring-0 focus:border-primaria focus:ring-4 focus:ring-primaria/20 transition" />
 
             <label for="unidade" class="font-semibold mb-1 block mt-2">Selecione a unidade</label>
             <select id="unidade" name="unidade" required
-              class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20 transition">
+                    class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm sm:text-base outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20 transition">
               <option value="">Escolha uma unidade</option>
               <option value="1">Unidade 1</option>
               <option value="2">Unidade 2</option>
@@ -96,7 +208,7 @@
             </select>
 
             <p class="font-semibold mt-2">Possui prazo?</p>
-            <div class="flex items-center gap-4 text-sm">
+            <div class="flex flex-wrap items-center gap-4 text-sm sm:text-base">
               <label class="flex items-center gap-2 cursor-pointer select-none">
                 <input type="radio" name="prazo" value="sim" class="accent-primaria"> <span>Sim</span>
               </label>
@@ -108,12 +220,12 @@
             <div id="prazoCampos" class="hidden mt-2">
               <label for="dataPrazo" class="font-semibold mb-1 block">Data e hora do prazo</label>
               <input type="datetime-local" id="dataPrazo" name="dataPrazo"
-                class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20 transition" />
+                     class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm sm:text-base outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20 transition" />
             </div>
 
             <label for="urgencia" class="font-semibold mb-1 block mt-2">Grau de urgência</label>
             <select id="urgencia" name="urgencia" required
-              class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20 transition">
+                    class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm sm:text-base outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20 transition">
               <option value="">Selecione o grau</option>
               <option value="baixa">Baixa</option>
               <option value="media">Média</option>
@@ -126,7 +238,7 @@
           <div class="col-dir md:pl-6 md:border-l md:border-white/40">
             <label for="tipo" class="font-semibold mb-1 block">Tipo</label>
             <select id="tipo" name="tipo" required
-              class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20 transition">
+                    class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm sm:text-base outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20 transition">
               <option value="">Selecione uma opção</option>
               <option value="servico">Serviço</option>
               <option value="produto">Produto</option>
@@ -135,10 +247,10 @@
             <div id="servicoCampos" class="hidden mt-2">
               <label for="descricaoServico" class="font-semibold mb-1 block">Descrição do serviço</label>
               <textarea id="descricaoServico" name="descricaoServico" placeholder="Descreva o serviço a ser realizado"
-                class="w-full min-h-[90px] rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20 transition resize-y"></textarea>
+                        class="w-full min-h-[90px] rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm sm:text-base outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20 transition resize-y"></textarea>
 
               <p class="font-semibold mt-2">Tem alguém para indicar?</p>
-              <div class="flex items-center gap-4 text-sm" id="temIndicacaoGroup">
+              <div class="flex flex-wrap items-center gap-4 text-sm sm:text-base" id="temIndicacaoGroup">
                 <label class="flex items-center gap-2 cursor-pointer select-none">
                   <input type="radio" name="temIndicacao" value="sim" class="accent-primaria"> <span>Sim</span>
                 </label>
@@ -150,21 +262,21 @@
               <div id="indicacaoQuem" class="hidden mt-2">
                 <label for="quemIndicar" class="font-semibold mb-1 block">Quem?</label>
                 <input type="text" id="quemIndicar" name="quemIndicar" placeholder="Nome e/ou contato da indicação"
-                  class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20 transition" />
+                       class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm sm:text-base outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20 transition" />
               </div>
             </div>
 
             <div id="produtoCampos" class="hidden mt-2">
               <label for="nomeProduto" class="font-semibold mb-1 block">Produto (nome)</label>
               <input type="text" id="nomeProduto" name="nomeProduto" placeholder="Ex.: Caneca, Banner..."
-                class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20 transition" />
+                     class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm sm:text-base outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20 transition" />
 
               <label for="quantidadeProduto" class="font-semibold mb-1 block mt-2">Quantidade</label>
               <input type="number" id="quantidadeProduto" name="quantidadeProduto" min="1" step="1" placeholder="Ex.: 100"
-                class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20 transition" />
+                     class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm sm:text-base outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20 transition" />
 
               <p class="font-semibold mt-2">Tem algum link?</p>
-              <div class="flex items-center gap-4 text-sm" id="temLinkGroup">
+              <div class="flex flex-wrap items-center gap-4 text-sm sm:text-base" id="temLinkGroup">
                 <label class="flex items-center gap-2 cursor-pointer select-none">
                   <input type="radio" name="temLink" value="sim" class="accent-primaria"> <span>Sim</span>
                 </label>
@@ -175,15 +287,15 @@
 
               <div id="linkCampos" class="hidden mt-2">
                 <div id="listaLinks" class="space-y-2"></div>
-                <button type="button" class="small-btn mt-2 inline-flex items-center gap-2 rounded-lg bg-white px-3 py-2 text-sm font-semibold shadow hover:-translate-y-0.5 hover:shadow-md active:translate-y-0 transition" id="adicionarLink">+ Adicionar outro link</button>
+                <button type="button" class="small-btn mt-2 inline-flex w-full xs:w-auto justify-center items-center gap-2 rounded-lg bg-white px-3 py-2 text-sm font-semibold shadow hover:-translate-y-0.5 hover:shadow-md active:translate-y-0 transition" id="adicionarLink">+ Adicionar outro link</button>
               </div>
             </div>
           </div>
         </div>
 
         <button type="submit"
-          class="group mt-6 w-full rounded-xl bg-white text-black font-semibold px-5 py-3 shadow-lg shadow-primaria/30 ring-0 outline-none transition hover:-translate-y-0.5 hover:shadow-xl focus:ring-4 focus:ring-primaria/30">
-          <span class="inline-flex items-center gap-2">Enviar
+                class="group mt-6 w-full rounded-xl bg-white text-black font-semibold px-5 py-3 shadow-lg shadow-primaria/30 ring-0 outline-none transition hover:-translate-y-0.5 hover:shadow-xl focus-visible:ring-4 focus-visible:ring-primaria/30">
+          <span class="inline-flex items-center gap-2 justify-center">Enviar
             <svg class="size-5 transition-transform group-hover:translate-x-0.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.25 8.25L21 12l-3.75 3.75M21 12H3" /></svg>
           </span>
         </button>
@@ -192,74 +304,72 @@
   </main>
 
   <!-- Firebase Auth + Checagem de Admin -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyAEZidq8mdAUKeJXvSQeE01gVOLWe_cp78",
-    authDomain: "compras-icone.firebaseapp.com",
-    projectId: "compras-icone",
-    storageBucket: "compras-icone.firebasestorage.app",
-    messagingSenderId: "831706842201",
-    appId: "1:831706842201:web:9b68ae4f98ad93c5a99d48",
-  };
+    const firebaseConfig = {
+      apiKey: "AIzaSyAEZidq8mdAUKeJXvSQeE01gVOLWe_cp78",
+      authDomain: "compras-icone.firebaseapp.com",
+      projectId: "compras-icone",
+      storageBucket: "compras-icone.firebasestorage.app",
+      messagingSenderId: "831706842201",
+      appId: "1:831706842201:web:9b68ae4f98ad93c5a99d48",
+    };
 
-  const ALLOWED_DOMAIN = 'icone.g12.br';
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
+    const ALLOWED_DOMAIN = 'icone.g12.br';
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
 
-  // === Lista fixa de admins ===
-  const ADMIN_EMAILS = new Set([
-    'samuel.colman@icone.g12.br',
-    'pedrolucas@icone.g12.br',
-    'filipemarques@icone.g12.br',
-  ].map(e => e.toLowerCase()));
+    // === Lista fixa de admins ===
+    const ADMIN_EMAILS = new Set([
+      'samuel.colman@icone.g12.br',
+      'pedrolucas@icone.g12.br',
+      'filipemarques@icone.g12.br',
+    ].map(e => e.toLowerCase()));
 
-  // === URL de destino do botão Admin ===
-const ADMIN_DEST_URL = 'admin.html';
-  const isAllowedEmail = (email) => email?.toLowerCase().endsWith('@' + ALLOWED_DOMAIN);
+    // === URL de destino do botão Admin ===
+    const ADMIN_DEST_URL = 'admin.html';
+    const isAllowedEmail = (email) => email?.toLowerCase().endsWith('@' + ALLOWED_DOMAIN);
 
-  const inputNome  = document.getElementById('nome');
-  const inputEmail = document.getElementById('email');
-  const btnSair    = document.getElementById('btnSair');
-  const btnAdmin   = document.getElementById('btnAdmin');
+    const inputNome   = document.getElementById('nome');
+    const inputEmail  = document.getElementById('email');
+    const btnSair     = document.getElementById('btnSair');
+    const btnAdmin    = document.getElementById('btnAdmin');
 
-  // ===== BOTÕES =====
-  btnSair?.addEventListener('click', async () => {
-    try {
-      await signOut(auth);
-      window.location.replace('/');
-    } catch (err) {
-      console.error('Erro ao sair:', err);
-      alert('Erro ao sair. Tente novamente.');
-    }
-  });
+    // ===== BOTÕES =====
+    btnSair?.addEventListener('click', async () => {
+      try {
+        await signOut(auth);
+        window.location.replace('/');
+      } catch (err) {
+        console.error('Erro ao sair:', err);
+        alert('Erro ao sair. Tente novamente.');
+      }
+    });
 
-  btnAdmin?.addEventListener('click', () => {
-    // Redireciona para o site de admin
-    window.open(ADMIN_DEST_URL, '_blank'); // ou use window.location.href se quiser na mesma aba
-  });
+    btnAdmin?.addEventListener('click', () => {
+      window.open(ADMIN_DEST_URL, '_blank');
+    });
 
-  // ===== VERIFICAÇÃO DE LOGIN + ADMIN =====
-  onAuthStateChanged(auth, async (user) => {
-    if (!user || !isAllowedEmail(user.email)) {
-      try { await signOut(auth); } catch(e) {}
-      window.location.replace('index.html');
-      return;
-    }
+    // ===== VERIFICAÇÃO DE LOGIN + ADMIN =====
+    onAuthStateChanged(auth, async (user) => {
+      if (!user || !isAllowedEmail(user.email)) {
+        try { await signOut(auth); } catch(e) {}
+        window.location.replace('index.html');
+        return;
+      }
 
-    // Preenche campos automáticos
-    inputEmail.value = user.email;
-    inputEmail.readOnly = true;
-    if (!inputNome.value) inputNome.value = user.displayName || '';
+      // Preenche campos automáticos
+      inputEmail.value = user.email;
+      inputEmail.readOnly = true;
+      if (!inputNome.value) inputNome.value = user.displayName || '';
 
-    // Checa se o usuário está na lista de admins
-    const isAdmin = ADMIN_EMAILS.has(user.email.toLowerCase());
-    btnAdmin.style.display = isAdmin ? 'inline-flex' : 'none';
-  });
-</script>
-
+      // Checa se o usuário está na lista de admins
+      const isAdmin = ADMIN_EMAILS.has(user.email.toLowerCase());
+      btnAdmin.style.display = isAdmin ? 'inline-flex' : 'none';
+    });
+  </script>
 
   <!-- Lógica do formulário + envio para Google Sheets -->
   <script>
@@ -309,9 +419,9 @@ const ADMIN_DEST_URL = 'admin.html';
         position: "right",
         stopOnFocus: true,
         style: {
-          background: isSuccess 
+          background: isSuccess
             ? "linear-gradient(90deg,#16a34a,#22c55e)"
-            : isError 
+            : isError
             ? "linear-gradient(90deg,#dc2626,#ef4444)"
             : "linear-gradient(90deg,#334155,#64748b)",
           color: "#ffffff",
@@ -335,10 +445,10 @@ const ADMIN_DEST_URL = 'admin.html';
       div.className = 'flex items-center gap-2';
 
       if (linkCount === 1) {
-        div.innerHTML = `<input type="url" name="linkProduto${linkCount}" placeholder="Cole o link ${linkCount}" required class="flex-1 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20 transition"/>`;
+        div.innerHTML = `<input type="url" name="linkProduto${linkCount}" placeholder="Cole o link ${linkCount}" required class="flex-1 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm sm:text-base outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20 transition"/>`;
       } else {
         div.innerHTML = `
-          <input type="url" name="linkProduto${linkCount}" placeholder="Cole o link ${linkCount}" required class="flex-1 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20 transition"/>
+          <input type="url" name="linkProduto${linkCount}" placeholder="Cole o link ${linkCount}" required class="flex-1 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm sm:text-base outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20 transition"/>
           <button type="button" class="grid place-items-center rounded-full w-7 h-7 bg-white text-primaria border border-primaria/30 shadow hover:scale-105 active:scale-100 transition remove-link" aria-label="Remover link">&times;</button>
         `;
         div.querySelector('.remove-link').addEventListener('click', () => {
@@ -571,6 +681,37 @@ const ADMIN_DEST_URL = 'admin.html';
         isSubmitting = false;
       }
     });
+
+    // Toggle do menu mobile
+    (function(){
+      const menuToggle = document.getElementById('menuToggle');
+      const menuActions = document.getElementById('menuActions');
+
+      if(menuToggle && menuActions){
+        menuToggle.addEventListener('click', () => {
+          const isOpen = menuActions.classList.toggle('open');
+          menuToggle.setAttribute('aria-expanded', String(isOpen));
+        });
+
+        // fecha ao clicar fora
+        document.addEventListener('click', (e) => {
+          if(!menuActions.classList.contains('open')) return;
+          const clickedInside = menuActions.contains(e.target) || menuToggle.contains(e.target);
+          if(!clickedInside){
+            menuActions.classList.remove('open');
+            menuToggle.setAttribute('aria-expanded', 'false');
+          }
+        });
+
+        // garante que ao voltar para desktop o menu feche
+        window.addEventListener('resize', () => {
+          if(window.innerWidth > 640 && menuActions.classList.contains('open')){
+            menuActions.classList.remove('open');
+            menuToggle.setAttribute('aria-expanded', 'false');
+          }
+        });
+      }
+    })();
   </script>
 
 </body>
