@@ -6,23 +6,14 @@
   <title>Formulário - Ícone Colégio e Curso</title>
 
   <!-- Fonts -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<!-- Poppins (form) -->
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-<!-- Inter (navbar Cantina) -->
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<!-- Roboto -->
-<link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-
-
-  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <!-- Poppins (form) -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <!-- Inter (navbar Cantina) -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Roboto -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 
   <link rel="shortcut icon" href="https://storage.googleapis.com/ecdt-logo-saida/1ebe52af502e25d3521cb9dad62bb72f6bc1c347353cdda5fa381ef8627a9eb8/COLEGIO-E-CURSO-ICONE.webp" type="image/x-icon">
 
@@ -44,7 +35,7 @@
     }
   </script>
 
-<style>
+  <style>
   /* ===== Base ===== */
   html { scroll-behavior: smooth; }
   body {
@@ -139,8 +130,7 @@
       font-size:clamp(16px, 5vw, 22px);
     }
   }
-</style>
-
+  </style>
 </head>
 
 <body class="min-h-screen text-white antialiased" style="background: var(--cantina-secondary);">
@@ -152,7 +142,8 @@
              alt="Logo Ícone Colégio e Curso"
              onerror="this.onerror=null;this.src='https://placehold.co/150x50/eeeeee/333333?text=Logo';">
         <span class="divider" aria-hidden="true"></span>
-        <span class="title text-[#FD7F08]">formulário de compras</span>      </a>
+        <span class="title text-[#FD7F08]">FORMULÁRIO DE COMPRAS</span>
+      </a>
 
       <!-- Botão hambúrguer (aparece só no mobile via CSS) -->
       <button id="menuToggle" class="menu-toggle" aria-label="Abrir menu" aria-expanded="false" aria-controls="menuActions">
@@ -170,6 +161,10 @@
     </div>
   </nav>
 
+  <!-- Anchors ocultos para navegar por HREF -->
+  <a id="hrefLogin" href="/login/" style="display:none;"></a>
+  <a id="hrefAdmin" href="/admin/" style="display:none;"></a>
+
   <!-- Main -->
   <main class="w-full px-4 sm:px-6 pb-16 mt-6 sm:mt-8">
     <div class="relative max-w-5xl mx-auto">
@@ -182,7 +177,6 @@
 
       <form id="formulario" novalidate
             class="mx-auto bg-[#F1663C] backdrop-blur-xl border border-white/60 shadow-2xl shadow-glow rounded-xl sm:rounded-2xl p-4 xs:p-6 sm:p-8 md:p-10 transition-[transform,box-shadow] hover:shadow-glow hover:-translate-y-0.5 max-w-3xl lg:max-w-4xl">
-
 
         <div class="grid grid-cols-1 md:grid-cols-2 md:gap-x-10 gap-y-4">
           <!-- COLUNA ESQUERDA -->
@@ -328,8 +322,6 @@
       'filipemarques@icone.g12.br',
     ].map(e => e.toLowerCase()));
 
-    // === URL de destino do botão Admin ===
-    const ADMIN_DEST_URL = 'admin.html';
     const isAllowedEmail = (email) => email?.toLowerCase().endsWith('@' + ALLOWED_DOMAIN);
 
     const inputNome   = document.getElementById('nome');
@@ -337,26 +329,38 @@
     const btnSair     = document.getElementById('btnSair');
     const btnAdmin    = document.getElementById('btnAdmin');
 
+    const hrefLogin   = document.getElementById('hrefLogin');
+    const hrefAdmin   = document.getElementById('hrefAdmin');
+
     // ===== BOTÕES =====
-    btnSair?.addEventListener('click', async () => {
+    btnSair?.addEventListener('click', async (e) => {
+      e.preventDefault();
       try {
         await signOut(auth);
-        window.location.replace('/');
       } catch (err) {
         console.error('Erro ao sair:', err);
         alert('Erro ao sair. Tente novamente.');
+      } finally {
+        // Redireciona por HREF
+        if (hrefLogin) hrefLogin.click();
+        else location.href = '/login/';
       }
     });
 
-    btnAdmin?.addEventListener('click', () => {
-      window.open(ADMIN_DEST_URL, '_blank');
+    btnAdmin?.addEventListener('click', (e) => {
+      e.preventDefault();
+      // Redireciona por HREF (abre na mesma aba)
+      if (hrefAdmin) hrefAdmin.click();
+      else location.href = '/admin/';
     });
 
     // ===== VERIFICAÇÃO DE LOGIN + ADMIN =====
     onAuthStateChanged(auth, async (user) => {
       if (!user || !isAllowedEmail(user.email)) {
         try { await signOut(auth); } catch(e) {}
-        window.location.replace('index.html');
+        // Redireciona por HREF para /login/
+        if (hrefLogin) hrefLogin.click();
+        else location.href = '/login/';
         return;
       }
 
@@ -365,7 +369,7 @@
       inputEmail.readOnly = true;
       if (!inputNome.value) inputNome.value = user.displayName || '';
 
-      // Checa se o usuário está na lista de admins
+      // Checa se o usuário é admin
       const isAdmin = ADMIN_EMAILS.has(user.email.toLowerCase());
       btnAdmin.style.display = isAdmin ? 'inline-flex' : 'none';
     });

@@ -109,7 +109,6 @@
 
     /* ===== Layout do conteúdo central (login) ===== */
     .page{
-      /* Cria um espaço abaixo do header fixo e centraliza o conteúdo */
       flex:1;
       display:flex; flex-direction:column; align-items:center; justify-content:center;
       padding:24px 12px 48px;
@@ -183,12 +182,10 @@
 
   <!-- ===== Conteúdo da página (centralizado) ===== -->
   <div class="page">
-    <!-- Logo fora do box -->
-
-
     <main class="card">
       <h1>Área de Acesso</h1>
 
+      <!-- Botão que inicia o login -->
       <button id="googleBtn" class="google-btn">
         <svg class="google-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" aria-hidden="true">
           <path fill="#FFC107" d="M44.5 20H24v8.5h11.8C34.9 33.9 30.1 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.2-6.2C34.5 4.5 29.5 2.5 24 2.5 12.2 2.5 2.5 12.2 2.5 24S12.2 45.5 24 45.5 45.5 35.8 45.5 24c0-1.4-.1-2.7-.4-4z"/>
@@ -198,6 +195,9 @@
         </svg>
         Entrar com Google
       </button>
+
+      <!-- Link real (href) para a pasta /forms/, fica oculto e é clicado após login -->
+      <a id="goForms" class="google-btn" href="/forms/" style="display:none; margin-top:12px;">Ir para os formulários</a>
 
       <div id="notice" class="notice"></div>
 
@@ -244,7 +244,7 @@
     })();
   </script>
 
-  <!-- ===== Firebase Script (inalterado) ===== -->
+  <!-- ===== Firebase Script ===== -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
     import {
@@ -267,7 +267,7 @@
     };
 
     const ALLOWED_DOMAIN = 'icone.g12.br';
-    const FORMS_URL = 'forms.html';
+    const FORMS_URL = '/forms/';
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
@@ -277,6 +277,7 @@
     provider.setCustomParameters({ prompt: "select_account", hd: ALLOWED_DOMAIN });
 
     const googleBtn = document.getElementById('googleBtn');
+    const goFormsLink = document.getElementById('goForms');
     const profile = document.getElementById('profile');
     const avatar = document.getElementById('avatar');
     const displayName = document.getElementById('displayName');
@@ -301,8 +302,13 @@
       }
     }
 
-    async function doRedirect() {
-      window.location.replace(FORMS_URL);
+    // Navegação via HREF (sem window.location.replace)
+    function goToForms() {
+      if (goFormsLink) {
+        goFormsLink.click(); // usa o href real
+      } else {
+        location.href = FORMS_URL; // fallback
+      }
     }
 
     googleBtn.addEventListener('click', async () => {
@@ -319,7 +325,7 @@
           showMsg('Acesso negado. Use sua conta @' + ALLOWED_DOMAIN, 'err');
         } else {
           showMsg('Login realizado com sucesso!', 'ok');
-          await doRedirect();
+          goToForms();
         }
       } catch (e) {
         if (e?.code === 'auth/popup-blocked') {
@@ -342,6 +348,7 @@
       await signOut(auth);
       profile.style.display='none';
       googleBtn.style.display='flex';
+      if (goFormsLink) goFormsLink.style.display = 'none';
     });
 
     getRedirectResult(auth).then((result) => {
@@ -354,7 +361,7 @@
         showMsg('Acesso negado. Use sua conta @' + ALLOWED_DOMAIN, 'err');
       } else {
         showMsg('Login realizado com sucesso!', 'ok');
-        doRedirect();
+        goToForms();
       }
     }).catch(e => {
       showMsg(friendlyError(e.code, e.message), 'err');
@@ -362,18 +369,21 @@
 
     onAuthStateChanged(auth, (user) => {
       if (user && isAllowedEmail(user.email)) {
-        doRedirect();
+        // Se o usuário já está autenticado e permitido, manda para /forms/
+        goToForms();
         return;
       }
       if (user) {
         if (!isAllowedEmail(user.email)) { signOut(auth); return; }
         profile.style.display='flex';
         googleBtn.style.display='none';
+        if (goFormsLink) goFormsLink.style.display = 'flex';
         avatar.src = user.photoURL || '';
         displayName.textContent = user.displayName || user.email || '';
       } else {
         profile.style.display='none';
         googleBtn.style.display='flex';
+        if (goFormsLink) goFormsLink.style.display = 'none';
       }
     });
   </script>
