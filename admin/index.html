@@ -405,6 +405,31 @@
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
 
+  // LOGOUT de verdade no botão "Sair"
+const btnSair = document.getElementById('btnSair');
+if (btnSair) {
+  btnSair.addEventListener('click', async (e) => {
+    e.preventDefault();
+
+    // feedback opcional
+    btnSair.setAttribute('aria-busy', 'true');
+    btnSair.style.pointerEvents = 'none';
+    btnSair.textContent = 'Saindo…';
+
+    try {
+      await signOut(auth);
+      // limpa resíduos (opcional)
+      try { sessionStorage.clear(); } catch {}
+      try { localStorage.removeItem('firebase:host:*'); } catch {}
+    } finally {
+      // use caminho que faz sentido para seu projeto:
+      // se este arquivo está em /admin/, "../index.html" leva para a raiz
+      window.location.replace('../index.html');
+    }
+  });
+}
+
+
   // ======= UTIL =======
   const $  = (sel)=>document.querySelector(sel);
   const $$ = (sel)=>Array.from(document.querySelectorAll(sel));
