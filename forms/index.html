@@ -162,7 +162,7 @@
   </nav>
 
   <!-- Anchors ocultos para navegar por HREF -->
-  <a id="hrefLogin" href="/login/" style="display:none;"></a>
+  <a id="hrefLogin" href="login.html" style="display:none;"></a>
   <a id="hrefAdmin" href="/admin/" style="display:none;"></a>
 
   <!-- Main -->
@@ -343,7 +343,7 @@
       } finally {
         // Redireciona por HREF
         if (hrefLogin) hrefLogin.click();
-        else location.href = '/login/';
+        else location.href = 'login.html';
       }
     });
 
@@ -360,7 +360,7 @@
         try { await signOut(auth); } catch(e) {}
         // Redireciona por HREF para /login/
         if (hrefLogin) hrefLogin.click();
-        else location.href = '/login/';
+        else location.href = 'login.html';
         return;
       }
 

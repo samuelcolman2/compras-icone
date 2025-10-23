@@ -230,7 +230,7 @@
       <!-- Ações -->
       <div id="menuActions" class="actions">
         <!-- Alterado: botão -> link para a pasta login -->
-        <a id="btnSair" class="btn" href="../login/index.html" rel="noopener">Sair</a>
+        <a id="btnSair" class="btn" href="index.html" rel="noopener">Sair</a>
       </div>
     </div>
   </nav>
@@ -350,7 +350,6 @@
     </div>
   </main>
 
-  <!-- Toggle do menu da navbar (igual ao login) -->
   <script>
     (function(){
       const menuToggle  = document.getElementById('menuToggle');
@@ -466,14 +465,14 @@
 
     // 1) Precisa estar logado
     if (!user) {
-      window.location.replace('../login/index.html');
+      window.location.replace('index.html');
       return;
     }
 
     // 2) Precisa ser do domínio
     if (!isDomain(user.email)) {
       await signOut(auth).catch(()=>{});
-      window.location.replace('../login/index.html');
+      window.location.replace('index.html');
       return;
     }
 
@@ -482,7 +481,7 @@
     if (!isAdmin) {
       await signOut(auth).catch(()=>{});
       alert('Acesso restrito a administradores.');
-      window.location.replace('../login/index.html');
+      window.location.replace('index.html');
       return;
     }
 
@@ -490,18 +489,6 @@
     if (adminEmailEl) adminEmailEl.textContent = user.email;
     carregarLista();
   });
-
-  /* Removido o listener antigo do botão Sair que fazia window.location.replace()
-     Agora o link <a id="btnSair" href="../login/index.html">Sair</a> cuida da navegação.
-     Se você quiser deslogar de fato no Firebase antes de sair, opcionalmente pode
-     interceptar o clique assim:
-     
-     document.getElementById('btnSair')?.addEventListener('click', async (e)=>{
-       e.preventDefault();
-       try { await signOut(auth); } catch(e) {}
-       window.location.href = '../login/index.html';
-     });
-  */
 
   // ======= REDE ======= 
   async function chamarAPI(url, opts={}){
