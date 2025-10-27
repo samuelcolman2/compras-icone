@@ -8,48 +8,48 @@
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <!-- Inter (navbar + página) -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <link rel="shortcut icon" href="https://storage.googleapis.com/ecdt-logo-saida/1ebe52af502e25d3521cb9dad62bb72f6bc1c347353cdda5fa381ef8627a9eb8/COLEGIO-E-CURSO-ICONE.webp" type="image/x-icon">
 
+  <!-- toastify -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+
   <style>
-    /* ===== Variáveis (inclui as do header Cantina) ===== */
     :root{
-      --brand:#F1663C;        /* laranja Ícone (já usado no card do login) */
+      --brand:#FD7F08;
       --white:#FFFFFF;
       --ok:#22c55e;
       --danger:#ef4444;
 
-      /* Cantina */
       --cantina-primary:#FD7F08;
-      --cantina-secondary:#253237; /* fundo da página */
+      --cantina-secondary:#253237;
       --cantina-text:#FD7F08;
       --cantina-border:#e2e8f0;
+
+      --input-border:#d1d5db;
     }
 
     * { box-sizing: border-box; }
     html { scroll-behavior: smooth; }
 
-    /* ===== Body agora com o mesmo fundo do formulário ===== */
     body{
       margin:0;
       background:var(--cantina-secondary);
       color:#fff;
       font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
       min-height:100vh;
-
-      /* centraliza o conteúdo verticalmente, respeitando o header fixo */
       display:flex; flex-direction:column;
     }
 
-    /* ===== Header Cantina (mesmo layout/estilo da 1ª página) ===== */
+    /* ===== Header ===== */
     nav.cantina-nav{
       position:sticky; top:0; z-index:50;
       background:var(--cantina-secondary);
       border-bottom:3px solid var(--cantina-primary);
       color:var(--cantina-text);
-      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
     }
     nav.cantina-nav .cantina-container{
       max-width:min(98vw, 1400px); margin:0 auto; padding:0 12px;
@@ -107,64 +107,506 @@
       nav.cantina-nav .brand .title{ font-size:clamp(16px, 5vw, 22px); }
     }
 
-    /* ===== Layout do conteúdo central (login) ===== */
+    /* ===== Conteúdo da página ===== */
     .page{
       flex:1;
       display:flex; flex-direction:column; align-items:center; justify-content:center;
       padding:24px 12px 48px;
     }
 
-    .logo-top { margin-bottom: 24px; text-align: center; }
-    .logo-top img { height: 130px; filter: drop-shadow(0 8px 20px rgba(241,102,60,.25)); }
-
-    .card {
-      background-color: var(--brand);
-      border-radius: 16px;
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
-      padding: 40px 32px;
-      width: 100%;
-      max-width: 420px;
-      text-align: center;
-      color: var(--white);
+    /* Card branco */
+    .card{
+      background:#fff;
+      color:#111;
+      border:1px solid var(--cantina-border);
+      border-radius:16px;
+      box-shadow:0 12px 30px rgba(2,8,23,.18);
+      padding:32px 28px;
+      width:100%;
+      max-width:420px;
+      text-align:left;
     }
 
-    h1 { font-size: 22px; font-weight: 700; margin-bottom: 24px; color: var(--white); }
-
-    .google-btn {
-      width: 100%; padding: 14px; border: none; border-radius: 8px;
-      font-size: 15px; font-weight: 600; color: var(--brand); background: var(--white);
-      display: flex; align-items: center; justify-content: center; gap: 10px;
-      cursor: pointer; transition: all 0.2s ease;
-    }
-    .google-btn:hover { filter: brightness(0.95); transform: translateY(-1px); }
-
-    .google-icon { width: 20px; height: 20px; }
-
-    .notice { font-size: 13px; margin-top: 16px; color: var(--white); min-height: 18px; }
-    .ok { color: var(--ok); }
-    .err { color: var(--danger); }
-
-    .profile {
-      display: none; align-items: center; justify-content: space-between;
-      background: rgba(255,255,255,0.15); border-radius: 10px; padding: 10px 14px;
-      margin-top: 18px; color: var(--white);
-    }
-    .avatar {
-      height: 40px; width: 40px; border-radius: 50%; object-fit: cover;
-      border: 2px solid rgba(255,255,255,0.4);
-    }
-    .signout {
-      background: none; border: 1px solid rgba(255,255,255,0.3);
-      border-radius: 8px; color: var(--white); padding: 6px 12px; cursor: pointer;
+    h1{
+      font-size:22px;
+      font-weight:800;
+      margin:0 0 16px 0;
+      color:var(--cantina-secondary);
     }
 
-    .legal { color: var(--white); font-size: 12px; margin-top: 20px; }
-    .legal a { color: var(--white); text-decoration: underline; }
+    /* campos */
+    .fields{
+      display:grid;
+      gap:20px;
+      margin-top:10px;
+    }
+
+    .field{
+      display:grid;
+      gap:6px;
+    }
+
+    .field-topline{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+    }
+
+    .field-topline label{
+      font-size:13px;
+      font-weight:600;
+      color:var(--cantina-secondary);
+      line-height:1.2;
+    }
+
+    .forgot-wrapper{
+      text-align:right;
+      margin-top:4px;
+    }
+
+    .link-muted{
+      background:none;
+      border:none;
+      padding:0;
+      font-size:12px;
+      font-weight:600;
+      line-height:1.2;
+      color:#2563eb;
+      text-decoration:none;
+      cursor:pointer;
+    }
+    .link-muted:hover{ text-decoration:underline; }
+
+    /* inputs */
+    .field input{
+      width:100%;
+      padding:12px;
+      border-radius:10px;
+      border:1px solid var(--input-border);
+      background:#fff;
+      color:#111;
+      font-size:15px;
+      outline:none;
+      transition:border-color .2s ease, box-shadow .2s ease;
+    }
+    .field input:focus{
+      border-color:var(--cantina-primary);
+      box-shadow:0 0 0 3px rgba(253,127,8,.20);
+    }
+
+    /* senha + olhinho */
+    .password-wrapper{
+      position:relative;
+    }
+    .password-wrapper input{
+      padding-right:44px;
+    }
+    .toggle-password{
+      position:absolute;
+      top:50%;
+      right:10px;
+      transform:translateY(-50%);
+      background:none;
+      border:0;
+      padding:6px;
+      border-radius:8px;
+      line-height:0;
+      cursor:pointer;
+      color:#6b7280;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .toggle-password:focus-visible{
+      outline:2px solid var(--cantina-primary);
+      outline-offset:2px;
+    }
+    .toggle-password svg{
+      width:20px;
+      height:20px;
+    }
+
+    .primary-btn{
+      width:100%;
+      padding:12px 14px;
+      border:none;
+      border-radius:8px;
+      font-size:15px;
+      font-weight:700;
+      background:var(--brand);
+      color:#fff;
+      cursor:pointer;
+      transition:filter .2s ease, transform .15s ease;
+      margin-top:4px;
+    }
+    .primary-btn:hover{
+      filter:brightness(.95);
+      transform:translateY(-1px);
+    }
+
+    .or{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      margin:16px 0 12px;
+      color:#6b7280;
+      font-weight:600;
+      font-size:12px;
+      text-transform:uppercase;
+    }
+    .or::before,
+    .or::after{
+      content:"";
+      height:1px;
+      flex:1;
+      background:#e5e7eb;
+    }
+
+    .google-btn{
+      width:100%;
+      padding:12px 14px;
+      border-radius:8px;
+      border:1px solid #e5e7eb;
+      background:#fff;
+      color:#111;
+      font-size:15px;
+      font-weight:700;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      cursor:pointer;
+      transition:filter .2s ease, transform .15s ease;
+    }
+    .google-btn:hover{
+      filter:brightness(.98);
+      transform:translateY(-1px);
+    }
+    .google-icon{
+      width:20px;
+      height:20px;
+    }
+
+    .notice{
+      font-size:13px;
+      margin-top:12px;
+      color:var(--cantina-secondary);
+      min-height:18px;
+    }
+    .ok{ color:var(--ok); }
+    .err{ color:var(--danger); }
+
+    .profile{
+      display:none;
+      align-items:center;
+      justify-content:space-between;
+      background:#f3f4f6;
+      border-radius:10px;
+      padding:10px 14px;
+      margin-top:16px;
+      color:#111;
+      gap:10px;
+    }
+    .avatar{
+      height:40px;
+      width:40px;
+      border-radius:50%;
+      object-fit:cover;
+      border:2px solid rgba(0,0,0,0.1);
+      background:#fff;
+    }
+    .signout{
+      background:none;
+      border:1px solid #e5e7eb;
+      border-radius:8px;
+      color:#111;
+      padding:6px 12px;
+      cursor:pointer;
+      font-size:13px;
+      font-weight:600;
+    }
+
+    .signup-hint{
+      margin-top:16px;
+      text-align:center;
+      font-size:13px;
+      color:#6b7280;
+    }
+    .signup-hint button{
+      background:none;
+      border:none;
+      padding:0;
+      font-size:13px;
+      font-weight:700;
+      color:#2563eb;
+      text-decoration:none;
+      cursor:pointer;
+    }
+    .signup-hint button:hover{
+      text-decoration:underline;
+    }
+
+    /* ===== Modal base ===== */
+    .modal-backdrop{
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,.6);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:16px;
+      z-index:100;
+    }
+    .modal-backdrop.open{ display:flex; }
+
+    .modal{
+      width:min(520px, 100%);
+      background:#fff;
+      color:#111;
+      border-radius:14px;
+      box-shadow:0 20px 60px rgba(0,0,0,.35);
+    }
+    .modal header{
+      padding:18px 20px;
+      border-bottom:1px solid #e5e7eb;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+    }
+    .modal header h2{
+      margin:0;
+      font-size:18px;
+      font-weight:800;
+    }
+
+    .modal .close{
+      appearance:none;
+      background:none;
+      border:none;
+      cursor:pointer;
+      font-size:22px;
+      line-height:1;
+      color:var(--danger);
+      border-radius:8px;
+      padding:2px 6px;
+      transition:background .15s ease, transform .1s ease, opacity .15s ease;
+    }
+    .modal .close:hover{
+      background:rgba(239,68,68,.12);
+      transform:scale(1.05);
+    }
+    .modal .close:focus-visible{
+      outline:2px solid rgba(239,68,68,.6);
+      outline-offset:2px;
+    }
+
+    .modal .content{
+      padding:18px 20px;
+    }
+    .modal .grid{
+      display:grid;
+      gap:10px;
+    }
+    .modal .actions{
+      padding:16px 20px;
+      border-top:1px solid #e5e7eb;
+      display:flex;
+      gap:10px;
+      justify-content:flex-end;
+    }
+    .modal .actions .btn{
+      padding:10px 14px;
+      border-radius:10px;
+      border:1px solid #e5e7eb;
+      cursor:pointer;
+      font-weight:700;
+      background:#fff;
+    }
+    .modal .actions .btn.primary{
+      background:var(--brand);
+      color:#fff;
+      border-color:var(--brand);
+    }
+    .modal .hint{
+      font-size:12px;
+      color:#565;
+      margin-top:2px;
+    }
+    .modal .error{
+      font-size:13px;
+      color:var(--danger);
+      min-height:18px;
+    }
+    .modal .ok-msg{
+      font-size:13px;
+      color:var(--ok);
+      min-height:18px;
+    }
+
+    .modal .field input{
+      border:1px solid var(--input-border);
+      background:#fff;
+    }
+    .modal .field input:focus{
+      border-color:var(--cantina-primary);
+      box-shadow:0 0 0 3px rgba(253,127,8,.25);
+    }
+
+    @media (max-width:420px){
+      .link-muted{ font-size:12px; }
+    }
+
+/* ======== ESTILOS DO BOX DE REDEFINIÇÃO (ESQUECI A SENHA) ======== */
+.pwreset-backdrop{
+  position:fixed;
+  inset:0;
+  /* camada escura semi-transparente + blur no fundo */
+  background:rgba(0,0,0,.4);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:16px;
+  z-index:100; /* acima do resto */
+}
+.pwreset-backdrop.open{
+  display:flex;
+}
+
+.pwreset-card{
+  background:#fff;
+  color:#111;
+  border-radius:14px;
+  box-shadow:0 20px 60px rgba(0,0,0,.25);
+  width:min(420px,100%);
+  border:1px solid var(--cantina-border);
+  padding:32px 28px;
+  text-align:left;
+  font-family:inherit;
+}
+
+.pwreset-header{
+  text-align:center;
+  margin-bottom:24px;
+}
+.pwreset-header h2{
+  margin:0 0 8px 0;
+  font-size:24px;
+  line-height:1.2;
+  font-weight:800;
+  color:#111827; /* gray-900 */
+}
+.pwreset-header p{
+  margin:0;
+  font-size:14px;
+  line-height:1.4;
+  color:#4b5563; /* gray-600 */
+  max-width:260px;
+  margin-left:auto;
+  margin-right:auto;
+}
+
+.pwreset-field{
+  margin-bottom:16px;
+}
+.pwreset-label{
+  display:block;
+  font-size:13px;
+  font-weight:600;
+  color:#253237;
+  line-height:1.2;
+  margin-bottom:6px;
+}
+.pwreset-input{
+  width:100%;
+  padding:12px 14px;
+  border-radius:10px;
+  border:1px solid var(--input-border);
+  background:#fff;
+  color:#111;
+  font-size:15px;
+  outline:none;
+  box-shadow:0 1px 2px rgba(0,0,0,.05);
+  transition:border-color .2s ease, box-shadow .2s ease;
+}
+.pwreset-input:focus{
+  border-color:var(--cantina-primary);
+  box-shadow:0 0 0 3px rgba(253,127,8,.25);
+}
+
+.pwreset-error{
+  font-size:13px;
+  color:var(--danger);
+  min-height:18px;
+  margin-bottom:4px;
+}
+.pwreset-ok{
+  font-size:13px;
+  color:var(--ok);
+  min-height:18px;
+  margin-bottom:8px;
+}
+
+.pwreset-btn{
+  width:100%;
+  padding:12px 14px;
+  border:none;
+  border-radius:8px;
+  font-size:15px;
+  font-weight:700;
+  background:var(--cantina-primary); /* laranja */
+  color:#fff;
+  cursor:pointer;
+  transition:filter .2s ease, transform .15s ease;
+  box-shadow:0 4px 10px rgba(0,0,0,.15);
+}
+.pwreset-btn:hover{
+  filter:brightness(.95);
+  transform:translateY(-1px);
+}
+
+.pwreset-havecode{
+  display:block;
+  background:none;
+  border:none;
+  padding:0;
+  font-size:12px;
+  font-weight:600;
+  line-height:1.2;
+  color:#2563eb;
+  text-decoration:none;
+  cursor:pointer;
+  margin:12px auto 0 auto;
+}
+.pwreset-havecode:hover{
+  text-decoration:underline;
+}
+
+.pwreset-back{
+  text-align:center;
+  margin-top:20px;
+}
+.pwreset-backlink{
+  background:none;
+  border:none;
+  padding:0;
+  font-size:14px;
+  font-weight:600;
+  line-height:1.2;
+  color:var(--cantina-primary);
+  cursor:pointer;
+  text-decoration:none;
+}
+.pwreset-backlink:hover{
+  text-decoration:underline;
+}
+
   </style>
 </head>
 <body>
 
-  <!-- ===== Header (idêntico ao da página de formulário) ===== -->
+  <!-- ===== Header ===== -->
   <nav class="cantina-nav" aria-label="Barra superior">
     <div class="cantina-container">
       <a class="brand" href="#">
@@ -174,45 +616,279 @@
         <span class="divider" aria-hidden="true"></span>
         <span class="title">Formulário de Compras</span>
       </a>
-
-      <!-- Ações (mantido vazio no login; você pode adicionar links se quiser) -->
       <div id="menuActions" class="actions"></div>
     </div>
   </nav>
 
-  <!-- ===== Conteúdo da página (centralizado) ===== -->
+  <!-- ===== Conteúdo ===== -->
   <div class="page">
-    <main class="card">
-      <h1>Área de Acesso</h1>
+    <main class="card" role="main">
+      <h1>Login</h1>
 
-      <!-- Botão que inicia o login -->
-      <button id="googleBtn" class="google-btn">
+      <!-- ===== Login com Email/Senha ===== -->
+      <div class="fields" aria-label="Login com email e senha">
+        <!-- E-mail -->
+        <div class="field">
+          <div class="field-topline">
+            <label for="emailInput">Email</label>
+          </div>
+          <input id="emailInput" type="email" inputmode="email" autocomplete="email" placeholder="seuemail@exemplo.com" required />
+        </div>
+
+        <!-- Senha -->
+        <div class="field">
+          <div class="field-topline">
+            <label for="passwordInput">Senha</label>
+          </div>
+
+          <div class="password-wrapper">
+            <input id="passwordInput" type="password" autocomplete="current-password" placeholder="********" required />
+
+            <button id="togglePasswordBtn" class="toggle-password" type="button" aria-label="Mostrar senha" aria-pressed="false">
+              <svg id="iconEye" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+
+              <svg id="iconEyeOff" style="display:none" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.4 18.4 0 0 1 5.06-5.94"/>
+                <path d="M9.88 9.88A3 3 0 0 0 12 15a3 3 0 0 0 2.12-5.12"/>
+                <path d="M1 1l22 22"/>
+                <path d="M14.12 14.12 20 20"/>
+                <path d="M9.88 9.88L4 4"/>
+                <path d="M22.94 11.06A18.5 18.5 0 0 0 17 6.1"/>
+              </svg>
+            </button>
+          </div>
+
+          <div class="forgot-wrapper">
+            <button id="resetPasswordBtn" class="link-muted" type="button">
+              Esqueceu a senha?
+            </button>
+          </div>
+        </div>
+
+        <!-- Botão principal -->
+        <button id="emailSignInBtn" class="primary-btn" type="button">
+          Entrar
+        </button>
+      </div>
+
+      <!-- divisor OU -->
+      <div class="or" aria-hidden="true">OU</div>
+
+      <!-- Botão Google -->
+      <button id="googleBtn" class="google-btn" type="button">
         <svg class="google-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" aria-hidden="true">
           <path fill="#FFC107" d="M44.5 20H24v8.5h11.8C34.9 33.9 30.1 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.2-6.2C34.5 4.5 29.5 2.5 24 2.5 12.2 2.5 2.5 12.2 2.5 24S12.2 45.5 24 45.5 45.5 35.8 45.5 24c0-1.4-.1-2.7-.4-4z"/>
           <path fill="#34A853" d="M6.3 33.3l7-5.4C15.1 31.9 19.5 34 24 34c4 0 7.5-1.4 10.2-3.8l6.9 5.6C38.5 40.6 31.9 43.5 24 43.5 14.8 43.5 7.2 38.8 6.3 33.3z"/>
           <path fill="#EA4335" d="M34.2 19.3C33 16.4 29.5 14 24 14c-4.7 0-8.7 2.9-10.7 6.3l-7-5.1C9.2 7.2 16 2.5 24 2.5c5.5 0 10.5 2 14.1 5.7l-6 5.1z"/>
           <path fill="#4285F4" d="M44.5 24c0-1.4-.1-2.7-.4-4H24v8.5h11.8c-.6 3.6-2.3 6.2-4.7 8.1l6.9 5.6c4-3.7 6.5-9.2 6.5-16.2z"/>
         </svg>
-        Entrar com Google
+        Entrar com o Google
       </button>
 
-      <a id="goForms" class="google-btn" href="/forms/" style="display:none; margin-top:12px;">Ir para os formulários</a>
+      <!-- Link para formulários -->
+      <a id="goForms" class="google-btn" href="/forms/" style="display:none; margin-top:12px; text-decoration:none; font-weight:600; justify-content:center;">
+        Ir para os formulários
+      </a>
 
+      <!-- Mensagem de status -->
       <div id="notice" class="notice"></div>
 
+      <!-- Perfil logado -->
       <div id="profile" class="profile">
         <img id="avatar" class="avatar" alt="Foto do usuário" />
-        <span id="displayName"></span>
-        <button id="signOutBtn" class="signout">Sair</button>
+        <span id="displayName" style="flex:1; font-size:14px; font-weight:600; min-width:0;"></span>
+        <button id="signOutBtn" class="signout" type="button">Sair</button>
       </div>
 
-      <p class="legal">
-        Ao continuar, você concorda com nossos <a href="#">Termos</a> e <a href="#">Política de Privacidade</a>.
-      </p>
+      <!-- Criar conta -->
+      <div class="signup-hint">
+        Não tem uma conta?
+        <button id="emailSignUpBtn" type="button">Crie uma aqui</button>
+      </div>
     </main>
   </div>
 
-  <!-- ===== Toggle do menu (mesmo comportamento da 1ª página) ===== -->
+  <!-- ===== Modal de Cadastro ===== -->
+  <div id="signUpModal" class="modal-backdrop" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="signUpTitle">
+      <header>
+        <h2 id="signUpTitle">Criar conta</h2>
+        <button id="signUpClose" class="close" aria-label="Fechar">×</button>
+      </header>
+      <div class="content">
+        <div class="grid">
+          <label class="field" for="signUpEmail">
+            <span class="field-topline" style="font-size:13px; font-weight:600; color:var(--cantina-secondary); line-height:1.2;">
+              E-mail
+            </span>
+            <input id="signUpEmail" type="email" inputmode="email" autocomplete="email" placeholder="email@exemplo.com" required />
+          </label>
+          <label class="field" for="signUpPassword">
+            <span class="field-topline" style="font-size:13px; font-weight:600; color:var(--cantina-secondary); line-height:1.2;">
+              Senha
+            </span>
+            <div class="password-wrapper">
+              <input id="signUpPassword" type="password" autocomplete="new-password" placeholder="Mínimo 6 caracteres" required />
+              <button class="toggle-password" data-target="signUpPassword" type="button" aria-label="Mostrar senha" aria-pressed="false">
+                <svg class="icon-eye" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+                <svg class="icon-eye-off" style="display:none" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.4 18.4 0 0 1 5.06-5.94"/>
+                  <path d="M9.88 9.88A3 3 0 0 0 12 15a3 3 0 0 0 2.12-5.12"/>
+                  <path d="M1 1l22 22"/>
+                  <path d="M14.12 14.12 20 20"/>
+                  <path d="M9.88 9.88L4 4"/>
+                  <path d="M22.94 11.06A18.5 18.5 0 0 0 17 6.1"/>
+                </svg>
+              </button>
+            </div>
+          </label>
+          <label class="field" for="signUpConfirm">
+            <span class="field-topline" style="font-size:13px; font-weight:600; color:var(--cantina-secondary); line-height:1.2;">
+              Confirmar senha
+            </span>
+            <div class="password-wrapper">
+              <input id="signUpConfirm" type="password" autocomplete="new-password" placeholder="Repita a senha" required />
+              <button class="toggle-password" data-target="signUpConfirm" type="button" aria-label="Mostrar senha" aria-pressed="false">
+                <svg class="icon-eye" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+                <svg class="icon-eye-off" style="display:none" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.4 18.4 0 0 1 5.06-5.94"/>
+                  <path d="M9.88 9.88A3 3 0 0 0 12 15a3 3 0 0 0 2.12-5.12"/>
+                  <path d="M1 1l22 22"/>
+                  <path d="M14.12 14.12 20 20"/>
+                  <path d="M9.88 9.88L4 4"/>
+                  <path d="M22.94 11.06A18.5 18.5 0 0 0 17 6.1"/>
+                </svg>
+              </button>
+            </div>
+          </label>
+          <div id="signUpError" class="error"></div>
+          <div class="hint">Use um e-mail válido. Você poderá redefinir a senha depois.</div>
+        </div>
+      </div>
+      <div class="actions">
+        <button id="signUpCancel" class="btn" type="button">Cancelar</button>
+        <button id="signUpCreate" class="btn primary" type="button">Criar conta</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== BOX DE REDEFINIÇÃO DE SENHA (1ª etapa) ===== -->
+  <div id="resetWrapper" class="pwreset-backdrop" aria-hidden="true">
+    <div class="pwreset-card" role="dialog" aria-modal="true" aria-labelledby="pwresetTitle">
+      <div class="pwreset-header">
+        <h2 id="pwresetTitle">Redefinir Senha</h2>
+        <p>Esqueceu sua senha? Sem problemas. Digite seu e-mail abaixo.</p>
+      </div>
+
+      <div class="pwreset-field">
+        <label class="pwreset-label" for="resetEmail">Endereço de E-mail</label>
+        <input
+          id="resetEmail"
+          class="pwreset-input"
+          type="email"
+          inputmode="email"
+          autocomplete="email"
+          placeholder="email@exemplo.com"
+          required
+        />
+      </div>
+
+      <div id="resetError" class="pwreset-error"></div>
+      <div id="resetOk" class="pwreset-ok"></div>
+
+      <button id="resetSend" class="pwreset-btn" type="button">
+        Enviar Link de Redefinição
+      </button>
+
+      <button id="iHaveCodeBtn" type="button" class="pwreset-havecode">
+        Já tenho o código
+      </button>
+
+      <div class="pwreset-back">
+        <button id="resetCloseLink" type="button" class="pwreset-backlink">
+          &larr; Voltar para o Login
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Modal Definir Nova Senha (2ª etapa) ===== -->
+  <div id="newPasswordModal" class="modal-backdrop" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="newPasswordTitle">
+      <header>
+        <h2 id="newPasswordTitle">Definir nova senha</h2>
+        <button id="newPwdClose" class="close" aria-label="Fechar">×</button>
+      </header>
+
+      <div class="content">
+        <div class="grid">
+
+          <label class="field" for="newPwdEmail">
+            <span class="field-topline" style="font-size:13px;font-weight:600;color:var(--cantina-secondary);line-height:1.2;">
+              E-mail
+            </span>
+            <input id="newPwdEmail" type="email" placeholder="email@exemplo.com" required />
+          </label>
+
+          <label class="field" for="resetCodeInput">
+            <span class="field-topline" style="font-size:13px;font-weight:600;color:var(--cantina-secondary);line-height:1.2;">
+              Código recebido no e-mail
+            </span>
+            <input
+              id="resetCodeInput"
+              type="number"
+              inputmode="numeric"
+              pattern="\d*"
+              step="1"
+              min="0"
+              placeholder="Ex: 123456"
+              required
+            />
+          </label>
+
+          <label class="field" for="newPwd1">
+            <span class="field-topline" style="font-size:13px;font-weight:600;color:var(--cantina-secondary);line-height:1.2;">
+              Nova senha
+            </span>
+            <div class="password-wrapper">
+              <input id="newPwd1" type="password" placeholder="Sua nova senha" required />
+            </div>
+          </label>
+
+          <label class="field" for="newPwd2">
+            <span class="field-topline" style="font-size:13px;font-weight:600;color:var(--cantina-secondary);line-height:1.2;">
+              Confirmar nova senha
+            </span>
+            <div class="password-wrapper">
+              <input id="newPwd2" type="password" placeholder="Repita a nova senha" required />
+            </div>
+          </label>
+
+          <div id="newPwdError" class="error"></div>
+          <div id="newPwdOk" class="ok-msg"></div>
+
+          <div class="hint">Use o código que você recebeu por e-mail e defina sua nova senha.</div>
+
+        </div>
+      </div>
+
+      <div class="actions">
+        <button id="newPwdCancel" class="btn" type="button">Cancelar</button>
+        <button id="newPwdSave" class="btn primary" type="button">Salvar nova senha</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Toggle de menu (responsivo do header) ===== -->
   <script>
     (function(){
       const menuToggle = document.getElementById('menuToggle');
@@ -243,148 +919,723 @@
     })();
   </script>
 
-  <!-- ===== Firebase Script ===== -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-    import {
-      getAuth,
-      GoogleAuthProvider,
-      signInWithPopup,
-      signInWithRedirect,
-      getRedirectResult,
-      signOut,
-      onAuthStateChanged
-    } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
+  <!-- ===== Script do olhinho de senha ===== -->
+  <script>
+    (function(){
+      const toggleBtn = document.getElementById('togglePasswordBtn');
+      const pwdInput = document.getElementById('passwordInput');
+      const iconEye = document.getElementById('iconEye');
+      const iconEyeOff = document.getElementById('iconEyeOff');
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyAEZidq8mdAUKeJXvSQeE01gVOLWe_cp78",
-      authDomain: "compras-icone.firebaseapp.com",
-      projectId: "compras-icone",
-      storageBucket: "compras-icone.firebasestorage.app",
-      messagingSenderId: "831706842201",
-      appId: "1:831706842201:web:9b68ae4f98ad93c5a99d48",
-    };
-
-    const ALLOWED_DOMAIN = 'icone.g12.br';
-    const FORMS_URL = '/forms/';
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    auth.languageCode = 'pt';
-
-    const provider = new GoogleAuthProvider();
-    provider.setCustomParameters({ prompt: "select_account", hd: ALLOWED_DOMAIN });
-
-    const googleBtn = document.getElementById('googleBtn');
-    const goFormsLink = document.getElementById('goForms');
-    const profile = document.getElementById('profile');
-    const avatar = document.getElementById('avatar');
-    const displayName = document.getElementById('displayName');
-    const notice = document.getElementById('notice');
-    const signOutBtn = document.getElementById('signOutBtn');
-
-    const isAllowedEmail = (email) => email?.toLowerCase().endsWith('@' + ALLOWED_DOMAIN);
-
-    function showMsg(text, type = '') {
-      notice.textContent = text || '';
-      notice.className = 'notice' + (type ? ' ' + type : '');
-    }
-
-    function friendlyError(code, message) {
-      switch (code) {
-        case 'auth/popup-blocked': return 'Popup bloqueado. Tente novamente ou use outro navegador.';
-        case 'auth/popup-closed-by-user': return 'Popup fechado antes de concluir.';
-        case 'auth/cancelled-popup-request': return 'Tentativa de login cancelada.';
-        case 'auth/account-exists-with-different-credential':
-          return 'Essa conta já existe com outra forma de login.';
-        default: return message || 'Falha no login.';
-      }
-    }
-
-    // Navegação via HREF (sem window.location.replace)
-    function goToForms() {
-      if (goFormsLink) {
-        goFormsLink.click(); // usa o href real
-      } else {
-        location.href = FORMS_URL; // fallback
-      }
-    }
-
-    googleBtn.addEventListener('click', async () => {
-      showMsg('');
-      googleBtn.disabled = true;
-      googleBtn.style.opacity = '0.7';
-
-      try {
-        const result = await signInWithPopup(auth, provider);
-        const user = result.user;
-
-        if (!isAllowedEmail(user.email)) {
-          await signOut(auth);
-          showMsg('Acesso negado. Use sua conta @' + ALLOWED_DOMAIN, 'err');
-        } else {
-          showMsg('Login realizado com sucesso!', 'ok');
-          goToForms();
+      function toggleVisibility(inputEl, btnEl, eyeOnEl, eyeOffEl){
+        const isHidden = inputEl.type === 'password';
+        inputEl.type = isHidden ? 'text' : 'password';
+        btnEl.setAttribute('aria-pressed', isHidden ? 'true' : 'false');
+        btnEl.setAttribute('aria-label', isHidden ? 'Esconder senha' : 'Mostrar senha');
+        if(eyeOnEl && eyeOffEl){
+          eyeOnEl.style.display = isHidden ? 'none' : '';
+          eyeOffEl.style.display = isHidden ? '' : 'none';
         }
-      } catch (e) {
-        if (e?.code === 'auth/popup-blocked') {
-          try {
-            await signInWithRedirect(auth, provider);
-            return;
-          } catch (e2) {
-            showMsg(friendlyError(e2.code, e2.message), 'err');
-          }
-        } else {
-          showMsg(friendlyError(e.code, e.message), 'err');
-        }
-      } finally {
-        googleBtn.disabled = false;
-        googleBtn.style.opacity = '1';
       }
-    });
 
-    signOutBtn.addEventListener('click', async () => {
-      await signOut(auth);
-      profile.style.display='none';
-      googleBtn.style.display='flex';
-      if (goFormsLink) goFormsLink.style.display = 'none';
-    });
-
-    getRedirectResult(auth).then((result) => {
-      if (!result) return;
-      const user = result.user;
-      if (!user) return;
-
-      if (!isAllowedEmail(user.email)) {
-        signOut(auth);
-        showMsg('Acesso negado. Use sua conta @' + ALLOWED_DOMAIN, 'err');
-      } else {
-        showMsg('Login realizado com sucesso!', 'ok');
-        goToForms();
+      if(toggleBtn && pwdInput){
+        toggleBtn.addEventListener('click', () => {
+          toggleVisibility(pwdInput, toggleBtn, iconEye, iconEyeOff);
+        });
       }
-    }).catch(e => {
-      showMsg(friendlyError(e.code, e.message), 'err');
-    });
 
-    onAuthStateChanged(auth, (user) => {
-      if (user && isAllowedEmail(user.email)) {
-        // Se o usuário já está autenticado e permitido, manda para /forms/
-        goToForms();
-        return;
-      }
-      if (user) {
-        if (!isAllowedEmail(user.email)) { signOut(auth); return; }
-        profile.style.display='flex';
-        googleBtn.style.display='none';
-        if (goFormsLink) goFormsLink.style.display = 'flex';
-        avatar.src = user.photoURL || '';
-        displayName.textContent = user.displayName || user.email || '';
-      } else {
-        profile.style.display='none';
-        googleBtn.style.display='flex';
-        if (goFormsLink) goFormsLink.style.display = 'none';
-      }
-    });
+      document.querySelectorAll('.toggle-password[data-target]').forEach(btn=>{
+        const targetId = btn.getAttribute('data-target');
+        const inputEl = document.getElementById(targetId);
+        if(!inputEl) return;
+
+        const eyeOnEl = btn.querySelector('.icon-eye');
+        const eyeOffEl = btn.querySelector('.icon-eye-off');
+
+        btn.addEventListener('click', ()=>{
+          toggleVisibility(inputEl, btn, eyeOnEl, eyeOffEl);
+        });
+      });
+    })();
   </script>
+
+  <!-- ===== Firebase + Lógica ===== -->
+<script type="module">
+  // ===== IMPORTS FIREBASE =====
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+  import {
+    getDatabase,
+    ref,
+    child,
+    get,
+    set
+  } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-database.js";
+
+  // Auth (NOVO)
+  import {
+    getAuth,
+    signInWithPopup,
+    GoogleAuthProvider,
+    signOut as firebaseSignOut
+  } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
+
+  // ========= CONFIG FIREBASE =========
+  const firebaseConfig = {
+    apiKey: "AIzaSyAEZidq8mdAUKeJXvSQeE01gVOLWe_cp78",
+    authDomain: "compras-icone.firebaseapp.com",
+    projectId: "compras-icone",
+    storageBucket: "compras-icone.firebasestorage.app",
+    messagingSenderId: "831706842201",
+    appId: "1:831706842201:web:9b68ae4f98ad93c5a99d48",
+    databaseURL: "https://compras-icone-default-rtdb.firebaseio.com",
+    measurementId: "G-S2D8SRFESJ"
+  };
+
+  // rota de destino após login
+  const FORMS_URL = "/forms/";
+
+  // base do Apps Script
+  const APPSCRIPT_BASE_URL = "https://script.google.com/macros/s/AKfycbzYMSJCkVocTAm1n9ul390foOSXCStPM8C9ZMbjwLdd1LqJk8tfanZRSjq6ZsbyGBtx/exec";
+
+  // ========= INIT FIREBASE =========
+  const app = initializeApp(firebaseConfig);
+  const db  = getDatabase(app);
+  const auth = getAuth(app);
+  const provider = new GoogleAuthProvider();
+  provider.setCustomParameters({
+    prompt: 'select_account'
+  });
+
+  // ========= DOM HELPERS =========
+  const $ = (id) => document.getElementById(id);
+
+  const googleBtn        = $('googleBtn');
+  const goFormsLink      = $('goForms');
+  const profile          = $('profile');
+  const avatar           = $('avatar');
+  const displayName      = $('displayName');
+  const notice           = $('notice');
+  const signOutBtn       = $('signOutBtn');
+
+  const emailInput       = $('emailInput');
+  const passwordInput    = $('passwordInput');
+  const emailSignInBtn   = $('emailSignInBtn');
+  const emailSignUpBtn   = $('emailSignUpBtn');
+  const resetPasswordBtn = $('resetPasswordBtn');
+
+  // modal cadastro
+  const signUpModal      = $('signUpModal');
+  const signUpClose      = $('signUpClose');
+  const signUpCancel     = $('signUpCancel');
+  const signUpCreate     = $('signUpCreate');
+  const signUpEmail      = $('signUpEmail');
+  const signUpPassword   = $('signUpPassword');
+  const signUpConfirm    = $('signUpConfirm');
+  const signUpError      = $('signUpError');
+
+  // BOX reset (1ª etapa)
+  const resetWrapper     = $('resetWrapper');
+  const resetCloseLink   = $('resetCloseLink');
+  const resetSend        = $('resetSend');
+  const resetEmail       = $('resetEmail');
+  const resetError       = $('resetError');
+  const resetOk          = $('resetOk');
+  const iHaveCodeBtn     = $('iHaveCodeBtn');
+
+  // modal nova senha (2ª etapa)
+  const newPasswordModal = $('newPasswordModal');
+  const newPwdClose      = $('newPwdClose');
+  const newPwdCancel     = $('newPwdCancel');
+  const newPwdSave       = $('newPwdSave');
+
+  const newPwdEmail      = $('newPwdEmail');
+  const resetCodeInput   = $('resetCodeInput');
+  const newPwd1          = $('newPwd1');
+  const newPwd2          = $('newPwd2');
+  const newPwdError      = $('newPwdError');
+  const newPwdOk         = $('newPwdOk');
+
+  let lastResetEmailRequested = "";
+
+  // ========= FUNÇÕES UTIL =========
+
+  // 1. Hash SHA-256 no browser (para o login/cadastro manual)
+  async function sha256(text) {
+    const enc = new TextEncoder().encode(text);
+    const buf = await crypto.subtle.digest('SHA-256', enc);
+    const hashArray = Array.from(new Uint8Array(buf));
+    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    return hashHex;
+  }
+
+  // 2. Sanitiza e-mail para chave no RTDB
+  function sanitizeEmail(email){
+    return email
+      .replace(/\./g, ',')
+      .replace(/#/g, '_')
+      .replace(/\$/g, '_')
+      .replace(/\[/g, '_')
+      .replace(/\]/g, '_');
+  }
+
+  // 3. Helpers visuais
+  function showMsg(text, type = '') {
+    notice.textContent = text || '';
+    notice.className = 'notice' + (type ? ' ' + type : '');
+
+    
+  }
+
+  function showToast(message, type = "ok") {
+  // cores: verde sucesso, vermelho erro, laranja neutro
+  const bgByType = {
+    ok:    "linear-gradient(to right, #22c55e, #16a34a)",    // verde
+    err:   "linear-gradient(to right, #ef4444, #dc2626)",    // vermelho
+    info:  "linear-gradient(to right, #FD7F08, #ea580c)"     // laranja
+  };
+
+  Toastify({
+    text: message,
+    duration: 4000,
+    close: true,
+    gravity: "top",        // top ou bottom
+    position: "right",     // left / center / right
+    stopOnFocus: true,
+    style: {
+      background: bgByType[type] || bgByType.info,
+      borderRadius: "10px",
+      boxShadow: "0 12px 30px rgba(0,0,0,.25)",
+      fontWeight: "600",
+      fontSize: "14px",
+      color: "#fff",
+      padding: "12px 14px",
+      maxWidth: "90vw"
+    }
+  }).showToast();
+}
+
+
+  function setBusy(el, busy) {
+    if(!el) return;
+    el.disabled = !!busy;
+    el.style.opacity = busy ? '0.7' : '1';
+    el.style.pointerEvents = busy ? 'none' : 'auto';
+  }
+
+  function goToForms() {
+    if (goFormsLink) {
+      goFormsLink.click();
+    } else {
+      location.href = FORMS_URL;
+    }
+  }
+
+  // 4. Sessão local (localStorage)
+  function saveSession(userObj){
+    localStorage.setItem('sessionUser', JSON.stringify(userObj));
+  }
+  function loadSessionFromStorage(){
+    try {
+      const raw = localStorage.getItem('sessionUser');
+      if(!raw) return null;
+      return JSON.parse(raw);
+    } catch(e){
+      return null;
+    }
+  }
+  function clearSession(){
+    localStorage.removeItem('sessionUser');
+  }
+
+  // 5. Atualiza UI logado/deslogado
+  function setLoggedInUI(user){
+    if(user){
+      profile.style.display='flex';
+      if (googleBtn)   googleBtn.style.display='none';
+      if (goFormsLink) goFormsLink.style.display='flex';
+
+      avatar.src = user.photoURL || '';
+      displayName.textContent = user.displayName || user.email || '';
+    } else {
+      profile.style.display='none';
+      if (googleBtn)   googleBtn.style.display='flex';
+      if (goFormsLink) goFormsLink.style.display='none';
+
+      showMsg('');
+    }
+  }
+
+  // ========= CRUD DE USUÁRIO (LOGIN MANUAL) =========
+
+  // Criar conta (manual)
+  async function createAccount(email, plainPassword){
+    if(!email) throw new Error('Informe um e-mail válido.');
+    if(!plainPassword || plainPassword.length < 6){
+      throw new Error('A senha deve ter pelo menos 6 caracteres.');
+    }
+
+    const key = sanitizeEmail(email);
+    const userRef = ref(db, 'users/' + key);
+
+    // já existe?
+    const snap = await get(userRef);
+    if(snap.exists()){
+      throw new Error('Já existe uma conta para este e-mail.');
+    }
+
+    // gera hash
+    const passwordHash = await sha256(plainPassword);
+
+    // grava usuário no Realtime Database
+    await set(userRef, {
+      email: email,
+      passwordHash: passwordHash,
+      displayName: email,
+      createdAt: Date.now()
+    });
+
+    // retorna objeto de sessão
+    return {
+      email,
+      displayName: email,
+      photoURL: '',
+      provider: 'password'
+    };
+  }
+
+  // Login manual comparando hash salvo
+  async function loginWithEmailPassword(email, plainPassword){
+    if(!email || !plainPassword){
+      throw new Error('Preencha e-mail e senha.');
+    }
+
+    const key = sanitizeEmail(email);
+    const userRef = child(ref(db, 'users'), key);
+    const snap = await get(userRef);
+
+    if(!snap.exists()){
+      throw new Error('Usuário não encontrado.');
+    }
+
+    const data = snap.val();
+    const enteredHash = await sha256(plainPassword);
+
+    if(data.passwordHash !== enteredHash){
+      throw new Error('Senha incorreta.');
+    }
+
+    return {
+      email: data.email,
+      displayName: data.displayName || data.email,
+      photoURL: data.photoURL || '',
+      provider: 'password'
+    };
+  }
+
+  // ========= GOOGLE SIGN-IN =========
+
+  async function handleGoogleSignIn(){
+    showMsg('');
+    setBusy(googleBtn, true);
+
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const gUser = result.user; // objeto Firebase Auth User
+
+      const sessionUser = {
+        email: gUser.email || '',
+        displayName: gUser.displayName || gUser.email || '',
+        photoURL: gUser.photoURL || '',
+        provider: 'google'
+      };
+
+      // Sincroniza no RTDB se não existir
+      if (sessionUser.email) {
+        const key = sanitizeEmail(sessionUser.email);
+        const userRef = ref(db, 'users/' + key);
+        const snap = await get(userRef);
+        if(!snap.exists()){
+          await set(userRef, {
+            email: sessionUser.email,
+            displayName: sessionUser.displayName,
+            photoURL: sessionUser.photoURL,
+            provider: 'google',
+            createdAt: Date.now()
+          });
+        }
+      }
+
+      saveSession(sessionUser);
+      setLoggedInUI(sessionUser);
+      showMsg('Login com Google realizado!', 'ok');
+      goToForms();
+
+    } catch (err){
+      console.error(err);
+      showMsg('Falha no login com Google.', 'err');
+    } finally {
+      setBusy(googleBtn, false);
+    }
+  }
+
+  // ========= APPS SCRIPT (RECUPERAR SENHA) =========
+
+  // Chama o Apps Script via JSONP pra evitar CORS
+  function callAppScriptJSONP(paramsObj) {
+    return new Promise((resolve, reject) => {
+      const cbName = "__appsCb_" + Date.now() + "_" + Math.random().toString(36).slice(2);
+
+      const query = Object.entries(paramsObj)
+        .map(([k,v]) => k + "=" + encodeURIComponent(v))
+        .join("&");
+
+      const script = document.createElement("script");
+      script.src = APPSCRIPT_BASE_URL + "?" + query + "&callback=" + cbName;
+      script.async = true;
+
+      window[cbName] = (data) => {
+        delete window[cbName];
+        script.remove();
+        resolve(data);
+      };
+
+      script.onerror = () => {
+        delete window[cbName];
+        script.remove();
+        reject(new Error("Falha na requisição ao servidor."));
+      };
+
+      document.body.appendChild(script);
+    });
+  }
+
+  // Passo 1: pedir código por e-mail
+  async function requestPasswordReset(email){
+    if(!email){
+      throw new Error('Informe seu e-mail.');
+    }
+
+    const data = await callAppScriptJSONP({
+      action: 'requestReset',
+      email: email
+    });
+
+    if (!data || data.ok !== true) {
+      throw new Error(data && data.msg ? data.msg : 'Falha ao solicitar redefinição.');
+    }
+
+    return data.msg || 'Solicitação enviada! Verifique seu e-mail.';
+  }
+
+  // Passo 2: confirmar código e salvar nova senha
+  async function confirmNewPasswordOnServer(email, code, newPassword){
+    const data = await callAppScriptJSONP({
+      action: 'confirmReset',
+      email: email,
+      code: code,
+      newPassword: newPassword
+    });
+
+    if (!data) {
+      return { ok:false, msg:'Resposta inválida do servidor.' };
+    }
+    return data;
+  }
+
+  // ========= HANDLERS DE UI =========
+
+  // Login manual (email/senha)
+  async function handleEmailSignIn(){
+    const email = emailInput.value.trim();
+    const password = passwordInput.value;
+
+    showMsg('');
+    setBusy(emailSignInBtn, true);
+
+    try {
+      const user = await loginWithEmailPassword(email, password);
+      saveSession(user);
+      setLoggedInUI(user);
+      showMsg('Login realizado com sucesso!', 'ok');
+      goToForms();
+    } catch(e){
+      showMsg(e.message || 'Erro ao entrar.', 'err');
+    } finally {
+      setBusy(emailSignInBtn, false);
+    }
+  }
+  emailSignInBtn.addEventListener('click', handleEmailSignIn);
+
+  // Cadastro (modal abrir/fechar)
+  function openSignUp(){
+    signUpModal.classList.add('open');
+    signUpModal.setAttribute('aria-hidden','false');
+    signUpError.textContent='';
+    signUpEmail.focus();
+  }
+  function closeSignUp(){
+    signUpModal.classList.remove('open');
+    signUpModal.setAttribute('aria-hidden','true');
+    signUpError.textContent='';
+    signUpEmail.value='';
+    signUpPassword.value='';
+    signUpConfirm.value='';
+  }
+  function validateSignUpFields(){
+    const email = signUpEmail.value.trim();
+    const pass  = signUpPassword.value;
+    const conf  = signUpConfirm.value;
+    if (!email) return 'Informe um e-mail válido.';
+    if (!pass || pass.length < 6) return 'A senha deve ter pelo menos 6 caracteres.';
+    if (pass !== conf) return 'As senhas não conferem.';
+    return '';
+  }
+
+  async function handleCreateAccount(){
+    const err = validateSignUpFields();
+    if (err){
+      signUpError.textContent = err;
+      return;
+    }
+
+    setBusy(signUpCreate, true);
+    signUpError.textContent='';
+
+    const email = signUpEmail.value.trim();
+    const password = signUpPassword.value;
+
+    try {
+      const newUser = await createAccount(email, password);
+
+      closeSignUp();
+      saveSession(newUser);
+      setLoggedInUI(newUser);
+
+      showMsg('Conta criada! Redirecionando…', 'ok');
+      goToForms();
+    } catch (e){
+      signUpError.textContent = e.message || 'Erro ao criar conta.';
+    } finally {
+      setBusy(signUpCreate, false);
+    }
+  }
+
+  emailSignUpBtn.addEventListener('click', openSignUp);
+  signUpClose.addEventListener('click', closeSignUp);
+  signUpCancel.addEventListener('click', closeSignUp);
+  signUpCreate.addEventListener('click', handleCreateAccount);
+
+  signUpModal.addEventListener('click', (e)=>{
+    if (e.target === signUpModal) closeSignUp();
+  });
+  document.addEventListener('keydown', (e)=>{
+    if(e.key==='Escape' && signUpModal.classList.contains('open')) closeSignUp();
+  });
+
+  // Reset senha (1ª etapa) - novo layout tipo card central
+  function openReset(){
+    resetWrapper.classList.add('open');
+    resetWrapper.setAttribute('aria-hidden','false');
+    resetOk.textContent='';
+    resetError.textContent='';
+
+    if (emailInput.value){
+      resetEmail.value=emailInput.value;
+    }
+    resetEmail.focus();
+  }
+  function closeReset(){
+    resetWrapper.classList.remove('open');
+    resetWrapper.setAttribute('aria-hidden','true');
+    resetOk.textContent='';
+    resetError.textContent='';
+    resetEmail.value='';
+  }
+
+  async function handleResetSend(){
+    const email = resetEmail.value.trim();
+    resetOk.textContent='';
+    resetError.textContent='';
+
+    if(!email){
+      resetError.textContent = 'Informe seu e-mail.';
+      // também mostra toast de erro
+      showToast('Informe seu e-mail.', 'err');
+      return;
+    }
+
+    setBusy(resetSend, true);
+    try{
+      const msg = await requestPasswordReset(email);
+
+      // salva pra próxima etapa (2ª etapa)
+      lastResetEmailRequested = email;
+
+      // limpar mensagens inline (opcionalmente esconder o texto verde antigo)
+      resetOk.textContent='';
+      resetError.textContent='';
+
+      // 🔔 Toast de sucesso em vez de "Solicitação enviada! Verifique seu e-mail."
+      showToast(msg || 'Solicitação enviada! Verifique seu e-mail.', 'ok');
+
+    }catch(e){
+      const errMsg = e.message || 'Erro ao solicitar redefinição.';
+      resetError.textContent = errMsg;
+
+      // 🔔 Toast de erro
+      showToast(errMsg, 'err');
+    }finally{
+      setBusy(resetSend, false);
+    }
+  }
+
+
+  resetPasswordBtn.addEventListener('click', openReset);
+  resetSend.addEventListener('click', handleResetSend);
+  resetCloseLink.addEventListener('click', closeReset);
+
+  resetWrapper.addEventListener('click', (e)=>{
+    if (e.target === resetWrapper) closeReset();
+  });
+  document.addEventListener('keydown', (e)=>{
+    if(e.key==='Escape' && resetWrapper.classList.contains('open')) closeReset();
+  });
+
+  // abrir modal "já tenho código"
+  if (iHaveCodeBtn){
+    iHaveCodeBtn.addEventListener('click', () => {
+      closeReset();
+      openNewPwdModal();
+    });
+  }
+
+  // Modal "nova senha" (2ª etapa)
+  function openNewPwdModal(){
+    newPasswordModal.classList.add('open');
+    newPasswordModal.setAttribute('aria-hidden','false');
+
+    // prioridade: e-mail que pediu reset
+    if (lastResetEmailRequested) {
+      newPwdEmail.value = lastResetEmailRequested;
+    } else if (resetEmail.value) {
+      newPwdEmail.value = resetEmail.value;
+    } else if (emailInput.value) {
+      newPwdEmail.value = emailInput.value;
+    } else {
+      newPwdEmail.value = "";
+    }
+
+    newPwdError.textContent='';
+    newPwdOk.textContent='';
+    resetCodeInput.value='';
+    newPwd1.value='';
+    newPwd2.value='';
+
+    resetCodeInput.focus();
+  }
+
+  function closeNewPwdModal(){
+    newPasswordModal.classList.remove('open');
+    newPasswordModal.setAttribute('aria-hidden','true');
+    newPwdError.textContent='';
+    newPwdOk.textContent='';
+  }
+
+  async function confirmNewPassword(){
+    const email = newPwdEmail.value.trim().toLowerCase();
+    const code  = Number(resetCodeInput.value); // number
+    const p1    = newPwd1.value;
+    const p2    = newPwd2.value;
+
+    newPwdError.textContent='';
+    newPwdOk.textContent='';
+
+    if(!email){
+      newPwdError.textContent = 'Informe o e-mail.';
+      return;
+    }
+    if (!Number.isFinite(code)) {
+      newPwdError.textContent = 'Informe o código.';
+      return;
+    }
+
+    if(!p1 || p1.length < 6){
+      newPwdError.textContent = 'Senha deve ter pelo menos 6 caracteres.';
+      return;
+    }
+    if(p1 !== p2){
+      newPwdError.textContent = 'As senhas não conferem.';
+      return;
+    }
+
+    try{
+      const data = await confirmNewPasswordOnServer(email, code, p1);
+      console.log('RESPOSTA APPS SCRIPT:', data);
+
+      if(data.ok){
+        newPwdOk.textContent = data.msg || 'Senha atualizada!';
+
+        // tenta logar automaticamente
+        try {
+          const user = await loginWithEmailPassword(email, p1);
+          saveSession(user);
+          setLoggedInUI(user);
+          showMsg('Senha alterada e login realizado!', 'ok');
+          closeNewPwdModal();
+          goToForms();
+        } catch(e){
+          // se falhar login automático, ok
+        }
+
+      } else {
+        newPwdError.textContent = data.msg || 'Não foi possível atualizar.';
+      }
+    }catch(err){
+      newPwdError.textContent = 'Erro de rede.';
+    }
+  }
+
+  newPwdClose.addEventListener('click', closeNewPwdModal);
+  newPwdCancel.addEventListener('click', closeNewPwdModal);
+  newPwdSave.addEventListener('click', confirmNewPassword);
+
+  newPasswordModal.addEventListener('click', (e)=>{
+    if(e.target === newPasswordModal) closeNewPwdModal();
+  });
+  document.addEventListener('keydown', (e)=>{
+    if(e.key==='Escape' && newPasswordModal.classList.contains('open')) closeNewPwdModal();
+  });
+
+  // Logout
+  async function handleSignOut(){
+    clearSession();
+
+    try {
+      await firebaseSignOut(auth);
+    } catch(e){
+      // ok se falhar
+    }
+
+    setLoggedInUI(null);
+    showMsg('Você saiu da conta.');
+  }
+  if (signOutBtn){
+    signOutBtn.addEventListener('click', handleSignOut);
+  }
+
+  // Google login
+  if (googleBtn){
+    googleBtn.addEventListener('click', handleGoogleSignIn);
+  }
+
+  // ========= BOOT =========
+  (function init(){
+    const sessionUser = loadSessionFromStorage();
+    setLoggedInUI(sessionUser);
+  })();
+
+</script>
+
+
 </body>
 </html>

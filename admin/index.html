@@ -422,37 +422,47 @@
     'samuel.colman@icone.g12.br',
     'solucoes.financeiro@icone.g12.br'
   ].map(e => e.toLowerCase()));
-  const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzGd-7iP9i6LUDkLGWtkFYPJRzQ7AjOOHaiVl4SbQZPedB5ouKbsqAv4kZffEC8zzxO/exec';
+
+  const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbxwD-Bbg16WxYX8rIB0gsP-4uyV8fnTc78FG-1tLDfT4c1Nl62Fpn-KXP1BJcXycTOb/exec';
 
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
 
-  // LOGOUT de verdade no botão "Sair"
-const btnSair = document.getElementById('btnSair');
-if (btnSair) {
-  btnSair.addEventListener('click', async (e) => {
-    e.preventDefault();
-
-    // feedback opcional
-    btnSair.setAttribute('aria-busy', 'true');
-    btnSair.style.pointerEvents = 'none';
-    btnSair.textContent = 'Saindo…';
-
+  // ======= FUNÇÃO DE LOGOUT COMPLETO =======
+  async function doLogout() {
     try {
       await signOut(auth);
-      // limpa resíduos (opcional)
-      try { sessionStorage.clear(); } catch {}
-      try { localStorage.removeItem('firebase:host:*'); } catch {}
-    } finally {
-      // use caminho que faz sentido para seu projeto:
-      // se este arquivo está em /admin/, "../index.html" leva para a raiz
-      window.location.replace('../index.html');
+    } catch (err) {
+      console.warn('Erro no signOut Firebase:', err);
     }
-  });
-}
 
+    // limpa qualquer dado local de sessão que possa manter o usuário "preso"
+    try { sessionStorage.clear(); } catch {}
+    try { localStorage.removeItem('sessionUser'); } catch {}           // mesmo nome usado no formulário
+    try { localStorage.removeItem('firebase:host:*'); } catch {}       // lixo do SDK em alguns browsers
+    try { localStorage.removeItem('firebase:authUser'); } catch {}     // variação comum
+    try { localStorage.removeItem('firebase:authUser:${firebaseConfig.apiKey}:[DEFAULT]'); } catch {}
 
-  // ======= UTIL ======= 
+    // manda pro login fora da pasta /admin
+    window.location.replace('../index.html');
+  }
+
+  // ======= BOTÃO "SAIR" NA NAVBAR =======
+  const btnSair = document.getElementById('btnSair');
+  if (btnSair) {
+    btnSair.addEventListener('click', async (e) => {
+      e.preventDefault();
+
+      // feedback visual rápido
+      btnSair.setAttribute('aria-busy', 'true');
+      btnSair.style.pointerEvents = 'none';
+      btnSair.textContent = 'Saindo…';
+
+      await doLogout();
+    });
+  }
+
+  // ======= UTIL =======
   const $  = (sel)=>document.querySelector(sel);
   const $$ = (sel)=>Array.from(document.querySelectorAll(sel));
 
@@ -460,14 +470,25 @@ if (btnSair) {
     const isSuccess = type==='success';
     const isError   = type==='error';
     Toastify({
-      text: msg, duration: 3200, close: true, gravity: 'top', position: 'right', stopOnFocus: true,
+      text: msg,
+      duration: 3200,
+      close: true,
+      gravity: 'top',
+      position: 'right',
+      stopOnFocus: true,
       style: {
-        background: isSuccess ? 'linear-gradient(90deg,#16a34a,#22c55e)'
-                 : isError   ? 'linear-gradient(90deg,#dc2626,#ef4444)'
-                 : 'linear-gradient(90deg,#334155,#64748b)',
-        color:'#fff', fontWeight:'600', borderRadius:'10px', padding:'10px 16px',
+        background: isSuccess
+          ? 'linear-gradient(90deg,#16a34a,#22c55e)'
+          : isError
+          ? 'linear-gradient(90deg,#dc2626,#ef4444)'
+          : 'linear-gradient(90deg,#334155,#64748b)',
+        color:'#fff',
+        fontWeight:'600',
+        borderRadius:'10px',
+        padding:'10px 16px',
         boxShadow:'0 10px 25px -10px rgba(0,0,0,.35)'
-      }, offset: {x:8, y:10}
+      },
+      offset: {x:8, y:10}
     }).showToast();
   }
 
@@ -487,10 +508,19 @@ if (btnSair) {
     return `<span class="${base} ${map[s]||'bg-slate-50 text-slate-700 border-slate-200'}">${(s||'pendente').toUpperCase()}</span>`;
   }
 
-  const debounce = (fn, wait=250)=>{ let t; return (...args)=>{ clearTimeout(t); t=setTimeout(()=>fn(...args), wait); }; };
+  const debounce = (fn, wait=250)=>{
+    let t;
+    return (...args)=>{
+      clearTimeout(t);
+      t=setTimeout(()=>fn(...args), wait);
+    };
+  };
 
-  // normaliza (remove acento/caixa) p/ busca
-  const norm = (s)=> String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+  const norm = (s)=>
+    String(s||'')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g,'')
+      .toLowerCase();
 
   function humanTipo(item){
     if(item.tipo==='servico') return `Serviço`;
@@ -498,95 +528,139 @@ if (btnSair) {
     return '-';
   }
 
-  // ======= ESTADO ======= 
+  // ======= ESTADO =======
   let currentUser = null;
-  let dadosBrutos = [];     // recebido da planilha (todos)
-  let dadosFiltrados = [];  // filtrados da aba ativa
+  let dadosBrutos = [];     // vindo da planilha
+  let dadosFiltrados = [];  // versão filtrada
   let activeTab = 'pendentes'; // 'pendentes' | 'historico'
 
-  // ======= AUTENTICAÇÃO =======  
+  // ======= AUTENTICAÇÃO / AUTORIZAÇÃO =======
   const isDomain = (email) => email?.toLowerCase().endsWith('@' + ALLOWED_DOMAIN);
 
   onAuthStateChanged(auth, async (user) => {
     const adminEmailEl = $('#adminEmail');
 
-    // 1) Precisa estar logado
+    // 1) Não logado -> manda pro login e para tudo
     if (!user) {
-      window.location.replace('./index.html');
+      // já garante limpeza local (evita ficar com lixo salvo se abrir /admin direto depois)
+      await doLogout();
       return;
     }
 
-    // 2) Precisa ser do domínio
+    // 2) Domínio errado -> desloga e sai
     if (!isDomain(user.email)) {
-      await signOut(auth).catch(()=>{});
-      window.location.replace('./index.html');
+      await doLogout();
       return;
     }
 
-    // 3) Precisa estar na lista de admins
+    // 3) Não está na lista de admins -> desloga e sai
     const isAdmin = ADMINS.has(user.email.toLowerCase());
     if (!isAdmin) {
-      await signOut(auth).catch(()=>{});
       alert('Acesso restrito a administradores.');
-      window.location.replace('./index.html');
+      await doLogout();
       return;
     }
 
+    // 4) Autorizado
     currentUser = user;
     if (adminEmailEl) adminEmailEl.textContent = user.email;
+
     carregarLista();
   });
 
-  // ======= REDE =======  
-  async function chamarAPI(url, opts={}){
-    try{
-      const resp = await fetch(url, opts);
-      if(resp.type==='opaque') return { ok:true, opaque:true };
-      const data = await resp.json().catch(()=>null);
-      return { ok: resp.ok && (data?.ok!==false), data };
-    }catch{
-      try{
-        await fetch(url, {...opts, mode:'no-cors'});
-        return { ok:true, opaque:true };
-      }catch(err){ return { ok:false, error: err?.message || String(err) }; }
-    }
-  }
+  // ======= CHAMADAS REDE =======
+async function chamarAPI(url, opts={}) {
+  console.log('[chamarAPI] →', url, opts);
 
-  async function carregarLista(){
-    $('#tbody').innerHTML = `<tr><td colspan="10" class="p-6 text-center text-slate-600">Carregando…</td></tr>`;
-    const url = WEBAPP_URL + '?action=list&email=' + encodeURIComponent(currentUser.email);
-    const { ok, data, error } = await chamarAPI(url);
-    if(!ok){
-      const msg = data?.error === 'forbidden'
-        ? 'Sem permissão para acessar. Fale com o administrador.'
-        : `Falha ao carregar (${error||'erro'}).`;
-      $('#tbody').innerHTML = `<tr><td colspan="10" class="p-6 text-center text-red-700">${msg}</td></tr>`;
-      return;
+  try {
+    const resp = await fetch(url, opts);
+    console.log('[chamarAPI] status:', resp.status, 'type:', resp.type);
+
+    if (resp.type === 'opaque') {
+      console.warn('[chamarAPI] resposta opaqua (provável CORS bloqueado)');
+      return { ok:true, opaque:true };
     }
 
-    dadosBrutos = Array.isArray(data?.items) ? data.items : [];
-    refreshCounters();
-    aplicarFiltrosERender();
-    toast('Lista atualizada', 'success');
+    const data = await resp.json().catch(err => {
+      console.error('[chamarAPI] erro parse json:', err);
+      return null;
+    });
+
+    console.log('[chamarAPI] data:', data);
+    return {
+      ok: resp.ok && (data?.ok !== false),
+      data
+    };
+
+  } catch (err) {
+    console.error('[chamarAPI] falhou geral:', err);
+
+    // fallback no-cors
+    try {
+      await fetch(url, { ...opts, mode:'no-cors' });
+      console.warn('[chamarAPI] fallback no-cors usado, resposta não legível');
+      return { ok:true, opaque:true };
+    } catch (err2) {
+      console.error('[chamarAPI] fallback também falhou:', err2);
+      return { ok:false, error: err2?.message || String(err2) };
+    }
+  }
+}
+
+async function carregarLista(){
+  $('#tbody').innerHTML = `<tr><td colspan="10" class="p-6 text-center text-slate-600">Carregando…</td></tr>`;
+
+  const url = WEBAPP_URL + '?action=list&email=' + encodeURIComponent(currentUser.email);
+
+  console.log('[carregarLista] fetchando', url);
+
+  const { ok, data, error, opaque } = await chamarAPI(url);
+
+  console.log('[carregarLista] retorno =>', {ok, data, error, opaque});
+
+  if(opaque){
+    $('#tbody').innerHTML = `
+      <tr><td colspan="10" class="p-6 text-center text-red-700">
+        O navegador bloqueou a resposta (CORS).<br>
+        Isso é limitação do Apps Script rodando público.
+      </td></tr>`;
+    return;
   }
 
+  if(!ok){
+    const msg = data?.error === 'forbidden'
+      ? 'Sem permissão para acessar. Fale com o administrador.'
+      : `Falha ao carregar (${error||'erro'}).`;
+    $('#tbody').innerHTML = `<tr><td colspan="10" class="p-6 text-center text-red-700">${msg}</td></tr>`;
+    return;
+  }
 
-    async function atualizarStatus(submissionId, novoStatus, observacao='', extraNotify=''){
+  dadosBrutos = Array.isArray(data?.items) ? data.items : [];
+  refreshCounters();
+  aplicarFiltrosERender();
+  toast('Lista atualizada', 'success');
+}
+
+  async function atualizarStatus(submissionId, novoStatus, observacao='', extraNotify=''){
     const body = new URLSearchParams({
       action: 'updatestatus',
       submissionId,
       status: novoStatus,
       observacao,
-      aprovador: currentUser?.email || '', 
+      aprovador: currentUser?.email || '',
       extraNotify
     });
-    const { ok, error } = await chamarAPI(WEBAPP_URL, { method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8'}, body });
+
+    const { ok, error } = await chamarAPI(WEBAPP_URL, {
+      method:'POST',
+      headers:{'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8'},
+      body
+    });
+
     if(!ok) throw new Error(error||'Falha ao atualizar');
   }
 
-  /* =======================
-     PAGINAÇÃO (3 por página)
-     ======================= */
+  // ======= PAGINAÇÃO =======
   let page = 1;
   const pageSize = 3;
 
@@ -596,12 +670,16 @@ if (btnSair) {
     if (page > totalPages) page = totalPages;
     if (page < 1) page = 1;
     const start = (page - 1) * pageSize;
-    return { rows: list.slice(start, start + pageSize), total, totalPages };
+    return {
+      rows: list.slice(start, start + pageSize),
+      total,
+      totalPages
+    };
   }
 
   function goToPage(n){
     page = n;
-    aplicarFiltrosERender(true); // mantém filtros/aba, só troca a página
+    aplicarFiltrosERender(true); // mantém filtros/aba
   }
 
   function renderPaginacao(totalPages, total){
@@ -641,7 +719,6 @@ if (btnSair) {
       </div>
     `;
 
-    // listeners
     el.querySelectorAll('button[data-page]').forEach(b=>{
       b.addEventListener('click', ()=>{
         const p = parseInt(b.getAttribute('data-page'), 10);
@@ -650,51 +727,64 @@ if (btnSair) {
     });
   }
 
-
-  // ======= FILTROS =======  
+  // ======= FILTROS =======
   function aplicaBusca(item, termo){
     if(!termo) return true;
     const hay = norm([
-      item.nome, item.email, item.nomeProduto, item.descricaoServico, item.quemIndicar,
-      item.unidade, item.urgencia, item.tipo
+      item.nome,
+      item.email,
+      item.nomeProduto,
+      item.descricaoServico,
+      item.quemIndicar,
+      item.unidade,
+      item.urgencia,
+      item.tipo
     ].filter(Boolean).join(' '));
     return hay.includes(norm(termo));
   }
 
   function inTab(item){
     const st = String(item.status||'pendente');
-    return activeTab==='pendentes' ? (st==='pendente') : (st!=='pendente');
-    }
+    return activeTab==='pendentes'
+      ? (st==='pendente')
+      : (st!=='pendente');
+  }
 
-  // ==== ESCAPE HTML (para usar em atributos/HTML seguros) ====  
   const esc = (s)=> String(s ?? '')
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#39;');
 
   function aplicarFiltrosERender(keepPage=false){
     if (!keepPage) page = 1;
 
     const q  = $('#fBusca').value.trim();
-    const st = $('#fStatus').value;      // aplicado só no histórico
+    const st = $('#fStatus').value;      // só conta pro histórico
     const un = $('#fUnidade').value;
     const tp = $('#fTipo').value;
     const ur = $('#fUrgencia').value;
 
-    dadosFiltrados = dadosBrutos.filter(it=>
-      inTab(it) &&
-      aplicaBusca(it, q) &&
-      // Status: na aba Pendentes ignoramos o filtro de status; na aba Histórico respeitamos se definido
-      (activeTab==='pendentes' || !st || (String(it.status||'pendente')===st)) &&
-      (!un || String(it.unidade)===String(un)) &&
-      (!tp || String(it.tipo)===String(tp)) &&
-      (!ur || String(it.urgencia)===String(ur))
-    ).sort((a,b)=> new Date(b.timestamp||0) - new Date(a.timestamp||0));
+    dadosFiltrados = dadosBrutos
+      .filter(it=>
+        inTab(it) &&
+        aplicaBusca(it, q) &&
+        // Status: na aba Pendentes ignoramos o filtro de status; na aba Histórico respeitamos se definido
+        (activeTab==='pendentes' || !st || (String(it.status||'pendente')===st)) &&
+        (!un || String(it.unidade)===String(un)) &&
+        (!tp || String(it.tipo)===String(tp)) &&
+        (!ur || String(it.urgencia)===String(ur))
+      )
+      .sort((a,b)=> new Date(b.timestamp||0) - new Date(a.timestamp||0));
 
     const { rows, total, totalPages } = getPageSlice(dadosFiltrados);
     renderTabela(rows);
     renderPaginacao(totalPages, total);
 
-    $('#contador').textContent = `${total} registro(s) ${activeTab==='pendentes' ? 'pendente(s)' : 'no histórico'}`;
+    $('#contador').textContent =
+      `${total} registro(s) ${activeTab==='pendentes' ? 'pendente(s)' : 'no histórico'}`;
+
     refreshCounters();
   }
 
@@ -705,210 +795,214 @@ if (btnSair) {
     $('#countHistorico').textContent = hist;
   }
 
-  // ======= TABELA =======  
+  // ======= TABELA =======
   function parseLinks(links){
     if(Array.isArray(links)) return links;
     if(typeof links==='string'){
-      try{ const j = JSON.parse(links); return Array.isArray(j)? j : []; }catch{ /* */ }
-      return links.split(/\s+/).filter(Boolean);
+      try{
+        const j = JSON.parse(links);
+        return Array.isArray(j)? j : [];
+      }catch{
+        return links.split(/\s+/).filter(Boolean);
+      }
     }
     return [];
   }
 
-function renderTabela(lista){
-  const tbody = $('#tbody');
-  if(!lista.length){
-    tbody.innerHTML = `<tr><td colspan="10" class="p-6 text-center text-slate-600">Nenhum registro encontrado.</td></tr>`;
-    return;
+  function renderTabela(lista){
+    const tbody = $('#tbody');
+    if(!lista.length){
+      tbody.innerHTML =
+        `<tr><td colspan="10" class="p-6 text-center text-slate-600">Nenhum registro encontrado.</td></tr>`;
+      return;
+    }
+
+    const popDetalhes = (it)=>{
+      if(it.tipo==='produto'){
+        return `
+          <div class="space-y-2">
+            <div class="text-xs uppercase tracking-wide text-slate-500">Produto</div>
+            <div class="font-semibold">${esc(it.nomeProduto||'-')}</div>
+            <div class="text-sm">Quantidade: <span class="font-medium">${esc(it.quantidadeProduto||'-')}</span></div>
+            ${it.observacao ? `<div class="text-sm"><span class="text-slate-500">Obs:</span> ${esc(it.observacao)}</div>`:''}
+          </div>`;
+      }else{
+        return `
+          <div class="space-y-2">
+            <div class="text-xs uppercase tracking-wide text-slate-500">Serviço</div>
+            <div class="font-semibold break-words">${esc(it.descricaoServico||'-')}</div>
+            ${it.quemIndicar ? `<div class="text-sm"><span class="text-slate-500">Indicação:</span> ${esc(it.quemIndicar)}</div>`:''}
+            ${it.observacao ? `<div class="text-sm"><span class="text-slate-500">Obs:</span> ${esc(it.observacao)}</div>`:''}
+          </div>`;
+      }
+    };
+
+    const popLinks = (arr)=>{
+      if(!arr.length) return `<div class="text-sm text-slate-600">Sem links.</div>`;
+      return `
+        <div class="space-y-2">
+          <div class="text-xs uppercase tracking-wide text-slate-500">Links</div>
+          <ul class="list-disc pl-5 space-y-1">
+            ${arr.map((l,i)=>`<li class="break-all"><a class="underline text-primaria" href="${l}" target="_blank" rel="noopener">Link ${i+1}</a></li>`).join('')}
+          </ul>
+        </div>`;
+    };
+
+    const popText = (title, html) => ({
+      title,
+      content: `<div class="text-sm">${html}</div>`
+    });
+
+    tbody.innerHTML = lista.map(item=>{
+      const links = parseLinks(item.links);
+      const prazoStr = (item.prazo==='sim' && item.dataPrazo) ? fmtDate(item.dataPrazo) : '-';
+
+      const showActions = (String(item.status||'pendente')==='pendente');
+
+      const acoes = showActions ? `
+        <div class="relative inline-block">
+          <button class="action-trigger" aria-haspopup="true" aria-expanded="false"
+                  data-menu="menu-${item.submissionId}">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                 viewBox="0 0 24 24" fill="currentColor">
+              <path d="M6 12a2 2 0 1 1-4 0a2 2 0 0 1 4 0m8 0a2 2 0 1 1-4 0a2 2 0 0 1 4 0m8 0a2 2 0 1 1-4 0a2 2 0 0 1 4 0"/>
+            </svg>
+          </button>
+          <div id="menu-${item.submissionId}" class="action-menu hidden">
+            <button class="action-item aprovar" data-act="aprovar" data-id="${item.submissionId}">
+              ✓ Aprovar
+            </button>
+            <button class="action-item reprovar" data-act="reprovar" data-id="${item.submissionId}">
+              ✕ Reprovar
+            </button>
+          </div>
+        </div>
+      ` : `<div class='text-xs text-slate-500'>—</div>`;
+
+      const enviadoInfo = popText('Enviado', esc(fmtDate(item.timestamp)));
+      const btnEnviado = `
+        <button type="button"
+          class="js-pop inline-flex items-center gap-1 hover:bg-orange-50/50 rounded px-1 -mx-1 transition whitespace-nowrap"
+          data-pop-title="${enviadoInfo.title}"
+          data-pop-content="${encodeURIComponent(enviadoInfo.content)}">
+          ${esc(fmtDate(item.timestamp))}
+        </button>`;
+
+      const solicitanteHtml = `
+        <div class="space-y-1">
+          <div class="text-xs uppercase tracking-wide text-slate-500">Solicitante</div>
+          <div class="font-semibold break-words">${esc(item.nome||'-')}</div>
+          <div class="text-sm break-all">${esc(item.email||'-')}</div>
+        </div>`;
+      const btnSolicitante = `
+        <button type="button"
+          class="js-pop block text-left hover:bg-orange-50/50 rounded px-1 -mx-1 transition w-full">
+          <div class='font-semibold'>${esc(item.nome||'-')}</div>
+          <div class='text-[11px] sm:text-xs text-slate-600 break-all'>${esc(item.email||'-')}</div>
+        </button>
+        <span class="hidden"
+          data-pop-title="Solicitante"
+          data-pop-content="${encodeURIComponent(solicitanteHtml)}"></span>`;
+
+      const unidadeInfo = popText('Unidade', `Unidade ${esc(item.unidade||'-')}`);
+      const btnUnidade = `
+        <button type="button"
+          class="js-pop inline-flex hover:bg-orange-50/50 rounded px-1 -mx-1 transition"
+          data-pop-title="${unidadeInfo.title}"
+          data-pop-content="${encodeURIComponent(unidadeInfo.content)}">
+          U${esc(item.unidade||'-')}
+        </button>`;
+
+      const tipoStr = humanTipo(item);
+      const tipoInfo = popText('Tipo', esc(tipoStr));
+      const btnTipo = `
+        <button type="button"
+          class="js-pop inline-flex hover:bg-orange-50/50 rounded px-1 -mx-1 transition"
+          data-pop-title="${tipoInfo.title}"
+          data-pop-content="${encodeURIComponent(tipoInfo.content)}">
+          ${esc(tipoStr)}
+        </button>`;
+
+      const btnDetalhes = `
+        <button type="button"
+          class="js-pop inline-flex text-left hover:bg-orange-50/50 rounded px-1 -mx-1 transition"
+          data-pop-title="Detalhes"
+          data-pop-content="${encodeURIComponent(popDetalhes(item))}">
+          <div class="font-semibold scroll-3">
+            ${esc(item.tipo==='produto' ? (item.nomeProduto||'-') : (item.descricaoServico||'-'))}
+          </div>
+        </button>`;
+
+      const prazoInfo = popText('Prazo', esc(prazoStr));
+      const btnPrazo = `
+        <button type="button"
+          class="js-pop inline-flex hover:bg-orange-50/50 rounded px-1 -mx-1 transition whitespace-nowrap"
+          data-pop-title="${prazoInfo.title}"
+          data-pop-content="${encodeURIComponent(prazoInfo.content)}">
+          ${esc(prazoStr)}
+        </button>`;
+
+      const urgStr = (item.urgencia||'-').toString().toUpperCase();
+      const urgInfo = popText('Urgência', esc(urgStr));
+      const btnUrgencia = `
+        <button type="button"
+          class="js-pop inline-flex hover:bg-orange-50/50 rounded px-1 -mx-1 transition uppercase"
+          data-pop-title="${urgInfo.title}"
+          data-pop-content="${encodeURIComponent(urgInfo.content)}">
+          ${esc(urgStr)}
+        </button>`;
+
+      const btnLinks = `
+        <button type="button"
+          class="js-pop underline decoration-dotted text-primaria"
+          data-pop-title="Links"
+          data-pop-content="${encodeURIComponent(popLinks(links))}">
+          ${links.length ? `${links.length} link(s)` : '-'}
+        </button>`;
+
+      return `<tr class='align-top'>
+        <td class='p-3 whitespace-nowrap text-slate-700'>${btnEnviado}</td>
+        <td class='p-3 col-solicitante'>${btnSolicitante}</td>
+        <td class='p-3 hidden md:table-cell'>${btnUnidade}</td>
+        <td class='p-3'>${btnTipo}</td>
+        <td class='p-3 col-detalhes'>${btnDetalhes}</td>
+        <td class='p-3 whitespace-nowrap hidden sm:table-cell'>${btnPrazo}</td>
+        <td class='p-3 uppercase hidden sm:table-cell'>${btnUrgencia}</td>
+        <td class='p-3 hidden lg:table-cell'>${btnLinks}</td>
+        <td class='p-3 col-status'>${badgeStatus(item.status||'pendente')}</td>
+        <td class='p-3 col-acoes'>${acoes}</td>
+      </tr>`;
+    }).join('');
+
+    // listeners de menu (aprovar/reprovar)
+    tbody.querySelectorAll('.action-trigger').forEach(btn=>{
+      btn.addEventListener('click', (e)=>{
+        e.stopPropagation();
+        document.querySelectorAll('.action-menu').forEach(m=>m.classList.add('hidden'));
+        const menuId = btn.getAttribute('data-menu');
+        const menuEl = document.getElementById(menuId);
+        menuEl?.classList.toggle('hidden');
+      });
+    });
+
+    document.addEventListener('click', ()=>{
+      document.querySelectorAll('.action-menu').forEach(m=>m.classList.add('hidden'));
+    });
+
+    tbody.querySelectorAll('button[data-act]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        document.querySelectorAll('.action-menu').forEach(m=>m.classList.add('hidden'));
+        const id  = btn.getAttribute('data-id');
+        const act = btn.getAttribute('data-act');
+        abrirModal(id, act);
+      });
+    });
+
+    // popovers
+    tbody.querySelectorAll('.js-pop').forEach(bindPopoverTrigger);
   }
 
-  const popDetalhes = (it)=>{
-    if(it.tipo==='produto'){
-      return `
-        <div class="space-y-2">
-          <div class="text-xs uppercase tracking-wide text-slate-500">Produto</div>
-          <div class="font-semibold">${esc(it.nomeProduto||'-')}</div>
-          <div class="text-sm">Quantidade: <span class="font-medium">${esc(it.quantidadeProduto||'-')}</span></div>
-          ${it.observacao ? `<div class="text-sm"><span class="text-slate-500">Obs:</span> ${esc(it.observacao)}</div>`:''}
-        </div>`;
-    }else{
-      return `
-        <div class="space-y-2">
-          <div class="text-xs uppercase tracking-wide text-slate-500">Serviço</div>
-          <div class="font-semibold break-words">${esc(it.descricaoServico||'-')}</div>
-          ${it.quemIndicar ? `<div class="text-sm"><span class="text-slate-500">Indicação:</span> ${esc(it.quemIndicar)}</div>`:''}
-          ${it.observacao ? `<div class="text-sm"><span class="text-slate-500">Obs:</span> ${esc(it.observacao)}</div>`:''}
-        </div>`;
-    }
-  };
-
-  const popLinks = (arr)=>{
-    if(!arr.length) return `<div class="text-sm text-slate-600">Sem links.</div>`;
-    return `
-      <div class="space-y-2">
-        <div class="text-xs uppercase tracking-wide text-slate-500">Links</div>
-        <ul class="list-disc pl-5 space-y-1">
-          ${arr.map((l,i)=>`<li class="break-all"><a class="underline text-primaria" href="${l}" target="_blank" rel="noopener">Link ${i+1}</a></li>`).join('')}
-        </ul>
-      </div>`;
-  };
-
-  // ===== NOVO: helpers simples para popover de texto curto =====
-  const popText = (title, html) => ({
-    title,
-    content: `<div class="text-sm">${html}</div>`
-  });
-
-  tbody.innerHTML = lista.map(item=>{
-    const links = parseLinks(item.links);
-    const prazoStr = (item.prazo==='sim' && item.dataPrazo) ? fmtDate(item.dataPrazo) : '-';
-
-    const showActions = (String(item.status||'pendente')==='pendente');
-
-    const acoes = showActions ? `
-      <div class="relative inline-block">
-        <button class="action-trigger" aria-haspopup="true" aria-expanded="false"
-                data-menu="menu-${item.submissionId}">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M6 12a2 2 0 1 1-4 0a2 2 0 0 1 4 0m8 0a2 2 0 1 1-4 0a2 2 0 0 1 4 0m8 0a2 2 0 1 1-4 0a2 2 0 0 1 4 0"/>
-          </svg>
-        </button>
-        <div id="menu-${item.submissionId}" class="action-menu hidden">
-          <button class="action-item aprovar" data-act="aprovar" data-id="${item.submissionId}">
-            ✓ Aprovar
-          </button>
-          <button class="action-item reprovar" data-act="reprovar" data-id="${item.submissionId}">
-            ✕ Reprovar
-          </button>
-        </div>
-      </div>
-    ` : `<div class='text-xs text-slate-500'>—</div>`;
-
-    // ====== Enviado (popover) ======
-    const enviadoInfo = popText('Enviado', esc(fmtDate(item.timestamp)));
-    const btnEnviado = `
-      <button type="button" class="js-pop inline-flex items-center gap-1 hover:bg-orange-50/50 rounded px-1 -mx-1 transition whitespace-nowrap"
-        data-pop-title="${enviadoInfo.title}"
-        data-pop-content="${encodeURIComponent(enviadoInfo.content)}">
-        ${esc(fmtDate(item.timestamp))}
-      </button>`;
-
-    // ====== Solicitante (popover) ======
-    const solicitanteHtml = `
-      <div class="space-y-1">
-        <div class="text-xs uppercase tracking-wide text-slate-500">Solicitante</div>
-        <div class="font-semibold break-words">${esc(item.nome||'-')}</div>
-        <div class="text-sm break-all">${esc(item.email||'-')}</div>
-      </div>`;
-    const btnSolicitante = `
-      <button type="button" class="js-pop block text-left hover:bg-orange-50/50 rounded px-1 -mx-1 transition w-full">
-        <div class='font-semibold'>${esc(item.nome||'-')}</div>
-        <div class='text-[11px] sm:text-xs text-slate-600 break-all'>${esc(item.email||'-')}</div>
-      </button>
-      <span class="hidden" data-pop-title="Solicitante" data-pop-content="${encodeURIComponent(solicitanteHtml)}"></span>
-    `;
-
-    // ====== Unidade (popover) ======
-    const unidadeInfo = popText('Unidade', `Unidade ${esc(item.unidade||'-')}`);
-    const btnUnidade = `
-      <button type="button" class="js-pop inline-flex hover:bg-orange-50/50 rounded px-1 -mx-1 transition"
-        data-pop-title="${unidadeInfo.title}"
-        data-pop-content="${encodeURIComponent(unidadeInfo.content)}">
-        U${esc(item.unidade||'-')}
-      </button>`;
-
-    // ====== Tipo (popover) ======
-    const tipoStr = humanTipo(item);
-    const tipoInfo = popText('Tipo', esc(tipoStr));
-    const btnTipo = `
-      <button type="button" class="js-pop inline-flex hover:bg-orange-50/50 rounded px-1 -mx-1 transition"
-        data-pop-title="${tipoInfo.title}"
-        data-pop-content="${encodeURIComponent(tipoInfo.content)}">
-        ${esc(tipoStr)}
-      </button>`;
-
-    // ====== Detalhes (já tinha popover; mantido) ======
-    const btnDetalhes = `
-      <button type="button" class="js-pop inline-flex text-left hover:bg-orange-50/50 rounded px-1 -mx-1 transition"
-        data-pop-title="Detalhes"
-        data-pop-content="${encodeURIComponent(popDetalhes(item))}">
-        <div class="font-semibold scroll-3">${esc(item.tipo==='produto' ? (item.nomeProduto||'-') : (item.descricaoServico||'-'))}</div>
-      </button>`;
-
-    // ====== Prazo (popover) ======
-    const prazoInfo = popText('Prazo', esc(prazoStr));
-    const btnPrazo = `
-      <button type="button" class="js-pop inline-flex hover:bg-orange-50/50 rounded px-1 -mx-1 transition whitespace-nowrap"
-        data-pop-title="${prazoInfo.title}"
-        data-pop-content="${encodeURIComponent(prazoInfo.content)}">
-        ${esc(prazoStr)}
-      </button>`;
-
-    // ====== Urgência (popover) ======
-    const urgStr = (item.urgencia||'-').toString().toUpperCase();
-    const urgInfo = popText('Urgência', esc(urgStr));
-    const btnUrgencia = `
-      <button type="button" class="js-pop inline-flex hover:bg-orange-50/50 rounded px-1 -mx-1 transition uppercase"
-        data-pop-title="${urgInfo.title}"
-        data-pop-content="${encodeURIComponent(urgInfo.content)}">
-        ${esc(urgStr)}
-      </button>`;
-
-    // ====== Links (já tinha popover; mantido) ======
-    const btnLinks = `
-      <button type="button" class="js-pop underline decoration-dotted text-primaria"
-        data-pop-title="Links"
-        data-pop-content="${encodeURIComponent(popLinks(links))}">
-        ${links.length ? `${links.length} link(s)` : '-'}
-      </button>`;
-
-    return `<tr class='align-top'>
-      <td class='p-3 whitespace-nowrap text-slate-700'>${btnEnviado}</td>
-      <td class='p-3 col-solicitante'>${btnSolicitante}</td>
-      <td class='p-3 hidden md:table-cell'>${btnUnidade}</td>
-      <td class='p-3'>${btnTipo}</td>
-      <td class='p-3 col-detalhes'>${btnDetalhes}</td>
-      <td class='p-3 whitespace-nowrap hidden sm:table-cell'>${btnPrazo}</td>
-      <td class='p-3 uppercase hidden sm:table-cell'>${btnUrgencia}</td>
-      <td class='p-3 hidden lg:table-cell'>${btnLinks}</td>
-      <td class='p-3 col-status'>${badgeStatus(item.status||'pendente')}</td>
-      <td class='p-3 col-acoes'>${acoes}</td>
-    </tr>`;
-  }).join('');
-
-  /* ========= LISTENERS ========= */
-
-  // abre/fecha menus
-  tbody.querySelectorAll('.action-trigger').forEach(btn=>{
-    btn.addEventListener('click', (e)=>{
-      e.stopPropagation();
-      document.querySelectorAll('.action-menu').forEach(m=>m.classList.add('hidden'));
-      const menuId = btn.getAttribute('data-menu');
-      const menuEl = document.getElementById(menuId);
-      menuEl?.classList.toggle('hidden');
-    });
-  });
-
-  // fecha menu ao clicar fora
-  document.addEventListener('click', ()=> {
-    document.querySelectorAll('.action-menu').forEach(m=>m.classList.add('hidden'));
-  });
-
-  // ação: abrir modal
-  tbody.querySelectorAll('button[data-act]').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      document.querySelectorAll('.action-menu').forEach(m=>m.classList.add('hidden'));
-      const id  = btn.getAttribute('data-id');
-      const act = btn.getAttribute('data-act');
-      abrirModal(id, act);
-    });
-  });
-
-  // popovers — ligar em todos os .js-pop inseridos
-  tbody.querySelectorAll('.js-pop').forEach(bindPopoverTrigger);
-}
-
-  // ======= MODAL =======  
+  // ======= MODAL APROVAR/REPROVAR =======
   let modalState = { id:null, act:null, noJustify:false };
 
   function updateNoJustifyUI(){
@@ -933,7 +1027,11 @@ function renderTabela(lista){
 
   function abrirModal(id, act){
     modalState = { id, act, noJustify:false };
-    $('#modalTitulo').textContent = act==='aprovar' ? 'Confirmar aprovação' : 'Confirmar reprovação';
+
+    $('#modalTitulo').textContent = act==='aprovar'
+      ? 'Confirmar aprovação'
+      : 'Confirmar reprovação';
+
     $('#modalHelp').textContent = 'Você pode adicionar uma observação.';
     $('#modalObs').value='';
     $('#modalExtras').value='';
@@ -955,7 +1053,9 @@ function renderTabela(lista){
   }
 
   $('#modalCancelar').addEventListener('click', fecharModal);
-  $('#modal').addEventListener('click', (e)=>{ if(e.target.id==='modal') fecharModal(); });
+  $('#modal').addEventListener('click', (e)=>{
+    if(e.target.id==='modal') fecharModal();
+  });
 
   const toggleNoJustify = document.getElementById('toggleNoJustify');
   if (toggleNoJustify) {
@@ -965,7 +1065,6 @@ function renderTabela(lista){
     });
   }
 
-  // contador + feedback ao digitar
   $('#modalObs').addEventListener('input', ()=>{
     const txt = $('#modalObs').value;
     const len = txt.trim().length;
@@ -974,7 +1073,8 @@ function renderTabela(lista){
   });
 
   $('#modalConfirmar').addEventListener('click', async ()=>{
-    const { id, act, noJustify } = modalState; if(!id||!act) return;
+    const { id, act, noJustify } = modalState;
+    if(!id||!act) return;
 
     const obs = noJustify ? '' : $('#modalObs').value.trim();
     const extras = ($('#modalExtras')?.value || '').trim();
@@ -986,7 +1086,13 @@ function renderTabela(lista){
     }
 
     try{
-      await atualizarStatus(id, act==='aprovar' ? 'aprovado' : 'reprovado', obs, extras);
+    await atualizarStatus(
+      id,
+      act==='aprovar' ? 'aprovado' : 'reprovado',
+      obs,
+      extras
+    );
+
       const alvo = dadosBrutos.find(x=>x.submissionId===id);
       if(alvo){
         alvo.status = act==='aprovar' ? 'aprovado' : 'reprovado';
@@ -995,7 +1101,6 @@ function renderTabela(lista){
         alvo.aprovadoEm = new Date().toISOString();
       }
 
-      // Ao aprovar/reprovar, o item sai automaticamente da aba Pendentes e passa ao Histórico
       refreshCounters();
       aplicarFiltrosERender();
       toast(act==='aprovar' ? 'Aprovado!' : 'Reprovado!', 'success');
@@ -1006,18 +1111,23 @@ function renderTabela(lista){
     }
   });
 
-  // ======= CONTROLES =======  
+  // ======= CONTROLES (filtros / tabs / atualizar) =======
   const aplicarFiltrosDebounced = debounce(aplicarFiltrosERender, 250);
 
-  // Busca: aplica ao digitar (debounce) e Enter aplica na hora
   $('#fBusca').addEventListener('input', aplicarFiltrosDebounced);
-  $('#fBusca').addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); aplicarFiltrosERender(); } });
+  $('#fBusca').addEventListener('keydown', (e)=>{
+    if(e.key==='Enter'){
+      e.preventDefault();
+      aplicarFiltrosERender();
+    }
+  });
 
-  // Selects: aplicam automaticamente ao mudar
-  ['#fStatus','#fUnidade','#fTipo','#fUrgencia'].forEach(sel=>{ $(sel).addEventListener('change', aplicarFiltrosERender); });
+  ['#fStatus','#fUnidade','#fTipo','#fUrgencia'].forEach(sel=>{
+    $(sel).addEventListener('change', aplicarFiltrosERender);
+  });
 
-  // Botões
   $('#btnFiltrar').addEventListener('click', aplicarFiltrosERender);
+
   $('#btnLimpar').addEventListener('click', ()=>{
     $('#fBusca').value='';
     $('#fStatus').value='';
@@ -1026,42 +1136,48 @@ function renderTabela(lista){
     $('#fUrgencia').value='';
     aplicarFiltrosERender();
   });
+
   $('#btnAtualizar').addEventListener('click', carregarLista);
 
-  // ======= Tabs =======  
   function setTab(tab){
     activeTab = tab;
     const p = $('#tabPendentes'), h = $('#tabHistorico');
+
     if(tab==='pendentes'){
       p.classList.add('tab-active'); p.classList.remove('tab-idle');
       h.classList.add('tab-idle');   h.classList.remove('tab-active');
-      // ao ver pendentes, ignoramos filtro de status (sempre pendente)
+
+      // na aba Pendentes a gente ignora status manual
       if($('#fStatus').value==='pendente') $('#fStatus').value='';
     }else{
       h.classList.add('tab-active'); h.classList.remove('tab-idle');
       p.classList.add('tab-idle');   p.classList.remove('tab-active');
     }
+
     aplicarFiltrosERender();
   }
+
   $('#tabPendentes').addEventListener('click', ()=> setTab('pendentes'));
   $('#tabHistorico').addEventListener('click', ()=> setTab('historico'));
 
-  /* =======================
-     Popover – utilitário
-     ======================= */
+  // ======= POPOVER =======
   let popEl, popTitleEl, popBodyEl, popPinnedBy = null, hoverTimer=null;
 
   function ensurePopover(){
     if(popEl) return popEl;
     popEl = document.createElement('div');
-    // classe __pop garante position:fixed + largura previsível (ver CSS)
     popEl.className = '__pop bg-white rounded-xl shadow-2xl border border-slate-200 p-3 sm:p-4 transition opacity-0 pointer-events-none';
     popEl.innerHTML = `
       <div class="flex items-start justify-between gap-3">
         <div id="__pop_title" class="text-sm font-semibold"></div>
-        <button type="button" id="__pop_close" class="rounded-md p-1 text-slate-500 hover:bg-slate-100" aria-label="Fechar">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293A1 1 0 1115.707 5.707L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+        <button type="button" id="__pop_close"
+          class="rounded-md p-1 text-slate-500 hover:bg-slate-100"
+          aria-label="Fechar">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4"
+               viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd"
+              d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293A1 1 0 1115.707 5.707L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+              clip-rule="evenodd"/>
           </svg>
         </button>
       </div>
@@ -1071,21 +1187,37 @@ function renderTabela(lista){
     popTitleEl = popEl.querySelector('#__pop_title');
     popBodyEl  = popEl.querySelector('#__pop_body');
     popEl.querySelector('#__pop_close').addEventListener('click', ()=> hidePopover());
-    document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') hidePopover(); });
-    window.addEventListener('scroll', ()=>{ if(!popPinnedBy) hidePopover(); }, true);
-    window.addEventListener('resize', ()=>{ if(!popPinnedBy) hidePopover(); });
+
+    document.addEventListener('keydown', (e)=>{
+      if(e.key==='Escape') hidePopover();
+    });
+
+    window.addEventListener('scroll', ()=>{
+      if(!popPinnedBy) hidePopover();
+    }, true);
+
+    window.addEventListener('resize', ()=>{
+      if(!popPinnedBy) hidePopover();
+    });
+
     return popEl;
   }
 
   function showPopoverFor(trigger){
     ensurePopover();
-    const title = trigger.getAttribute('data-pop-title') || trigger.nextElementSibling?.getAttribute?.('data-pop-title') || '';
-    const contentAttr = trigger.getAttribute('data-pop-content') || trigger.nextElementSibling?.getAttribute?.('data-pop-content') || '';
+    const title = trigger.getAttribute('data-pop-title')
+      || trigger.nextElementSibling?.getAttribute?.('data-pop-title')
+      || '';
+    const contentAttr = trigger.getAttribute('data-pop-content')
+      || trigger.nextElementSibling?.getAttribute?.('data-pop-content')
+      || '';
     const content = decodeURIComponent(contentAttr||'');
+
     popTitleEl.textContent = title;
     popBodyEl.innerHTML = content;
 
     positionPopover(trigger);
+
     popEl.style.opacity = '1';
     popEl.style.pointerEvents = 'auto';
   }
@@ -1096,7 +1228,6 @@ function renderTabela(lista){
     const vw   = window.innerWidth;
     const vh   = window.innerHeight;
 
-    // prepara para medir sem piscar
     popEl.style.opacity = '0';
     popEl.style.pointerEvents = 'none';
     popEl.style.top = '-9999px';
@@ -1106,24 +1237,19 @@ function renderTabela(lista){
       const pw = popEl.offsetWidth;
       const ph = popEl.offsetHeight;
 
-      // Preferência: ACIMA do trigger
       let top  = rect.top - ph - 8;
       let left = rect.left;
 
-      // Se não couber acima, coloca ABAIXO
       if (top < pad){
         top = rect.bottom + 8;
-        // e se também não couber abaixo, força dentro da viewport
         if (top + ph + pad > vh){
           top = Math.max(pad, vh - ph - pad);
         }
       }
 
-      // Ajuste horizontal dentro da viewport
       if (left + pw + pad > vw) left = Math.max(pad, vw - pw - pad);
       if (left < pad) left = pad;
 
-      // Como é fixed, não somamos scroll
       popEl.style.left = `${left}px`;
       popEl.style.top  = `${top}px`;
       popEl.style.opacity = '1';
@@ -1144,6 +1270,7 @@ function renderTabela(lista){
       hoverTimer && clearTimeout(hoverTimer);
       hoverTimer = setTimeout(()=> showPopoverFor(el), 150);
     });
+
     el.addEventListener('mouseleave', ()=>{
       hoverTimer && clearTimeout(hoverTimer);
       if(!popPinnedBy) hidePopover();
@@ -1151,7 +1278,7 @@ function renderTabela(lista){
 
     el.addEventListener('click', (e)=>{
       e.stopPropagation();
-      const isSame = popPinnedBy === el;
+      const isSame = (popPinnedBy === el);
       if(isSame){
         popPinnedBy = null;
         hidePopover();
@@ -1164,9 +1291,11 @@ function renderTabela(lista){
 
   document.addEventListener('click', (e)=>{
     if(!popEl) return;
+
     if(popPinnedBy) {
       const clickedInsidePop = popEl.contains(e.target);
       const clickedTrigger   = popPinnedBy.contains(e.target);
+
       if(!clickedInsidePop && !clickedTrigger){
         popPinnedBy = null;
         hidePopover();
@@ -1177,12 +1306,9 @@ function renderTabela(lista){
     }
   });
 
-  // Inicial: carregar via auth -> carregarLista(); setTab já está 'pendentes'
-
-  
-
-  
+  // fim do módulo
 </script>
+
 
 
 

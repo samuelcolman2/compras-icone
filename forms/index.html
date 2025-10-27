@@ -297,83 +297,156 @@
     </div>
   </main>
 
-  <!-- Firebase Auth + Checagem de Admin -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
+<!-- Firebase Auth + Checagem de Admin / Controle de login -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyAEZidq8mdAUKeJXvSQeE01gVOLWe_cp78",
-      authDomain: "compras-icone.firebaseapp.com",
-      projectId: "compras-icone",
-      storageBucket: "compras-icone.firebasestorage.app",
-      messagingSenderId: "831706842201",
-      appId: "1:831706842201:web:9b68ae4f98ad93c5a99d48",
-    };
+  const firebaseConfig = {
+    apiKey: "AIzaSyAEZidq8mdAUKeJXvSQeE01gVOLWe_cp78",
+    authDomain: "compras-icone.firebaseapp.com",
+    projectId: "compras-icone",
+    storageBucket: "compras-icone.firebasestorage.app",
+    messagingSenderId: "831706842201",
+    appId: "1:831706842201:web:9b68ae4f98ad93c5a99d48",
+  };
 
-    const ALLOWED_DOMAIN = 'icone.g12.br';
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
+  const app  = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
 
-    // === Lista fixa de admins ===
-    const ADMIN_EMAILS = new Set([
-      'samuel.colman@icone.g12.br',
-      'pedrolucas@icone.g12.br',
-      'filipemarques@icone.g12.br',
-    ].map(e => e.toLowerCase()));
+  let ADMIN_EMAILS = new Set(); // começa vazio
 
-    const isAllowedEmail = (email) => email?.toLowerCase().endsWith('@' + ALLOWED_DOMAIN);
+  async function carregarAdmins() {
+    try {
+      const resp = await fetch('../config/adminEmails.json', {
+        cache: 'no-cache'
+      });
 
-    const inputNome   = document.getElementById('nome');
-    const inputEmail  = document.getElementById('email');
-    const btnSair     = document.getElementById('btnSair');
-    const btnAdmin    = document.getElementById('btnAdmin');
-
-    const hrefLogin   = document.getElementById('hrefLogin');
-    const hrefAdmin   = document.getElementById('hrefAdmin');
-
-    // ===== BOTÕES =====
-    btnSair?.addEventListener('click', async (e) => {
-      e.preventDefault();
-      try {
-        await signOut(auth);
-      } catch (err) {
-        console.error('Erro ao sair:', err);
-        alert('Erro ao sair. Tente novamente.');
-      } finally {
-        // Redireciona por HREF
-        if (hrefLogin) hrefLogin.click();
-        else location.href = 'login.html';
-      }
-    });
-
-    btnAdmin?.addEventListener('click', (e) => {
-      e.preventDefault();
-      // Redireciona por HREF (abre na mesma aba)
-      if (hrefAdmin) hrefAdmin.click();
-      else location.href = '/admin/';
-    });
-
-    // ===== VERIFICAÇÃO DE LOGIN + ADMIN =====
-    onAuthStateChanged(auth, async (user) => {
-      if (!user || !isAllowedEmail(user.email)) {
-        try { await signOut(auth); } catch(e) {}
-        // Redireciona por HREF para /login/
-        if (hrefLogin) hrefLogin.click();
-        else location.href = 'login.html';
+      if (!resp.ok) {
+        console.error('Não consegui carregar adminEmails.json', resp.status);
         return;
       }
 
-      // Preenche campos automáticos
-      inputEmail.value = user.email;
-      inputEmail.readOnly = true;
-      if (!inputNome.value) inputNome.value = user.displayName || '';
+      const data = await resp.json();
 
-      // Checa se o usuário é admin
-      const isAdmin = ADMIN_EMAILS.has(user.email.toLowerCase());
+      ADMIN_EMAILS = new Set(
+        (data.admins || []).map(e => e.toLowerCase())
+      );
+    } catch (err) {
+      console.error('Erro buscando adminEmails.json:', err);
+    }
+  }
+
+  // carrega a lista de admins antes de seguir
+  await carregarAdmins();
+
+  // =====================================================
+  // 2. Elementos da UI
+  // =====================================================
+  const inputNome  = document.getElementById('nome');
+  const inputEmail = document.getElementById('email');
+  const btnSair    = document.getElementById('btnSair');
+  const btnAdmin   = document.getElementById('btnAdmin');
+
+  const hrefLogin  = document.getElementById('hrefLogin');
+  const hrefAdmin  = document.getElementById('hrefAdmin');
+
+  // Controle de login global
+  // true  = logado com QUALQUER e-mail
+  // false = não logado
+  window.isUserAuthed = false;
+  window.currentUserEmail = null;
+
+  // =====================================================
+  // 3. Botão "Sair"
+  // =====================================================
+  btnSair?.addEventListener('click', async (e) => {
+    e.preventDefault();
+
+    try {
+      // 1. Sai do Firebase (Google, etc.)
+      await signOut(auth);
+    } catch (err) {
+      console.error('Erro ao sair do Firebase:', err);
+      // mesmo que dê erro aqui, a gente continua limpando a sessão local
+    }
+
+    // 2. Limpa a sessão local usada pelo index.html
+    try {
+      localStorage.removeItem('sessionUser');
+    } catch (err) {
+      console.warn('Não consegui limpar sessionUser do localStorage:', err);
+    }
+
+    // 3. Atualiza flags globais dessa página
+    window.isUserAuthed = false;
+    window.currentUserEmail = null;
+
+    // 4. Redireciona pra tela de login
+    if (hrefLogin) {
+      hrefLogin.click();
+    } else {
+      // garante caminho certo relativo
+      location.href = '../index.html';
+    }
+  });
+
+  // =====================================================
+  // 4. Botão "Admin"
+  // =====================================================
+  btnAdmin?.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (hrefAdmin) {
+      hrefAdmin.click();
+    } else {
+      location.href = '/admin/';
+    }
+  });
+
+  // =====================================================
+  // 5. Verificação de login + admin
+  // =====================================================
+  onAuthStateChanged(auth, async (user) => {
+    // NÃO LOGADO
+    if (!user) {
+      window.isUserAuthed = false;
+      window.currentUserEmail = null;
+
+      // limpa campo email e deixa editável
+      if (inputEmail) {
+        inputEmail.value = '';
+        inputEmail.readOnly = false;
+      }
+
+      // esconde Admin
+      if (btnAdmin) btnAdmin.style.display = 'none';
+
+      // Importante: NÃO redireciona mais automaticamente
+      return;
+    }
+
+    // LOGADO (qualquer domínio agora é aceito)
+    window.isUserAuthed = true;
+    window.currentUserEmail = user.email || '';
+
+    // Preenche campos automáticos
+    if (inputEmail) {
+      inputEmail.value = user.email || '';
+      inputEmail.readOnly = true; // garante que o e-mail enviado é o da conta logada
+    }
+
+    if (inputNome && !inputNome.value) {
+      inputNome.value = user.displayName || '';
+    }
+
+    // Checa se o usuário é admin usando a lista carregada do JSON
+    const isAdmin = !!user.email && ADMIN_EMAILS.has(user.email.toLowerCase());
+    if (btnAdmin) {
       btnAdmin.style.display = isAdmin ? 'inline-flex' : 'none';
-    });
-  </script>
+    }
+  });
+</script>
+
 
   <!-- Lógica do formulário + envio para Google Sheets -->
   <script>
@@ -527,7 +600,7 @@
       const temIndicacao = document.querySelector('input[name="temIndicacao"]:checked')?.value;
       if(temIndicacao==='sim'){
         indicacaoQuem.classList.remove('hidden');
-        quemIndicar.required = false; // mude para true se quiser exigir
+        quemIndicar.required = false; // coloque true se quiser tornar obrigatório
       }else{
         indicacaoQuem.classList.add('hidden');
         quemIndicar.required = false;
@@ -551,7 +624,7 @@
     temLinkGroup.addEventListener('change', atualizarLink);
 
     // ======== INTEGRAÇÃO COM GOOGLE SHEETS (Apps Script) ========
-    const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzGd-7iP9i6LUDkLGWtkFYPJRzQ7AjOOHaiVl4SbQZPedB5ouKbsqAv4kZffEC8zzxO/exec';
+    const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbxwD-Bbg16WxYX8rIB0gsP-4uyV8fnTc78FG-1tLDfT4c1Nl62Fpn-KXP1BJcXycTOb/exec';
 
     function coletarLinks() {
       const inputs = listaLinks.querySelectorAll('input[type="url"]');
@@ -572,6 +645,12 @@
 
     form.addEventListener('submit', async function(e){
       e.preventDefault();
+
+      // BLOQUEIO SE NÃO LOGADO
+      if (!window.isUserAuthed) {
+        toast('Você precisa estar logado para enviar.', 'error');
+        return;
+      }
 
       if (isSubmitting) return; // trava dupla submissão
       isSubmitting = true;
