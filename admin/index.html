@@ -33,17 +33,15 @@
     html { scroll-behavior: smooth; }
     body { font-family: 'Poppins', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
 
-    /* ===== Variáveis da Navbar (Cantina) ===== */
     :root{
       --brand:#F1663C;
       --white:#FFFFFF;
       --cantina-primary:#FD7F08;
-      --cantina-secondary:#253237; /* fundo da navbar */
+      --cantina-secondary:#253237;
       --cantina-text:#FD7F08;
       --cantina-border:#e2e8f0;
     }
 
-    /* ===== Navbar Cantina (adaptada p/ Poppins) ===== */
     nav.cantina-nav{
       position:sticky; top:0; z-index:50;
       background:var(--cantina-secondary);
@@ -88,7 +86,6 @@
       border:1px solid rgba(226,232,240,0.18); max-width:52ch; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
     }
 
-    /* Mobile header */
     @media (max-width: 640px){
       nav.cantina-nav .cantina-container{ height:72px; position:relative; }
       nav.cantina-nav img{ height:48px; }
@@ -112,24 +109,20 @@
       nav.cantina-nav .brand .title{ font-size:clamp(16px, 5vw, 22px); }
     }
 
-    /* Badge */
     .badge { display:inline-flex; align-items:center; padding:2px 8px; border-radius:9999px; font-size:12px; font-weight:600; border-width:1px; }
 
-    /* Switch tipo iOS */
     #toggleNoJustify.active { background-color: #F1663C; }
     #toggleNoJustify.active span { transform: translateX(1.25rem); }
 
-    /* Tabs */
     .tab-btn { border-radius:0.5rem; padding:0.375rem 0.75rem; font-size:0.875rem; font-weight:600; border:1px solid; transition: all .2s ease; }
     .tab-active { background:#fff; color:#0f172a; border-color:#fff; box-shadow: 0 8px 16px -8px rgba(0,0,0,.25); }
     .tab-idle { background:rgba(255,255,255,.7); color:#475569; border-color:rgba(255,255,255,.6); }
     .tab-idle:hover { background:#fff; }
 
-    /* ===== Tabela ===== */
     .grid-table{
       border-collapse: separate;
       border-spacing: 0;
-      background-color: #f8fafc; /* slate-50 */
+      background-color: #f8fafc;
       width: 100%;
       table-layout: fixed;
     }
@@ -147,7 +140,7 @@
     }
     .grid-table tr > *:first-child{ border-left: 1px solid #e2e8f0; }
     .grid-table thead tr:first-child th{ border-top: 1px solid #e2e8f0; }
-    .grid-table tbody tr:hover td{ background-color: #f1f5f9; } /* slate-100 hover */
+    .grid-table tbody tr:hover td{ background-color: #f1f5f9; }
 
     .grid-table th.p-3,
     .grid-table td.p-3{ padding: .5rem .5rem; }
@@ -156,7 +149,6 @@
     .grid-table td.col-detalhes{ width: 280px; }
     .grid-table td.col-status{ width: 160px; }
 
-    /* Clamp / scroll Detalhes */
     .clamp-2, .clamp-3, .clamp-4{
       display: -webkit-box;
       -webkit-box-orient: vertical;
@@ -170,7 +162,7 @@
     .scroll-3{
       display:block;
       line-height: 1.35;
-      max-height: calc(3 * 1.35em); /* 3 linhas */
+      max-height: calc(3 * 1.35em);
       overflow-y: auto;
       word-break: break-word;
       scrollbar-width: thin;
@@ -180,7 +172,6 @@
     .scroll-3::-webkit-scrollbar-thumb{ background:#cbd5e1; border-radius:8px; }
     .scroll-3:hover::-webkit-scrollbar-thumb{ background:#94a3b8; }
 
-    /* === POP: container fixo === */
     .__pop {
       position: fixed;
       z-index: 60;
@@ -188,29 +179,39 @@
       width: min(92vw, 480px);
     }
 
-    /* Coluna de Ações / dropdown */
-    .grid-table td.col-acoes { position: relative; overflow: visible; width: 72px; }
+    .grid-table td.col-acoes {
+      position: relative;
+      overflow: visible;
+      width: 72px;
+    }
 
-    .action-trigger{
-      display:inline-flex; align-items:center; justify-content:center;
-      width:34px; height:30px; border:1px solid #e2e8f0; border-radius:10px;
-      background:#fff; transition:transform .15s ease, box-shadow .15s ease;
+    /* NOVO estilo dos botões de ação diretos (✓ e ✕)  ------------------ */
+    .action-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      width:32px;
+      height:30px;
+      border:1px solid #e2e8f0;
+      border-radius:10px;
+      background:#fff;
+      font-weight:600;
+      font-size:14px;
+      line-height:1;
+      box-shadow:0 1px 2px rgba(0,0,0,.05);
+      transition:transform .15s ease, box-shadow .15s ease;
     }
-    .action-trigger:hover{ transform:translateY(-1px); box-shadow:0 6px 14px rgba(2,8,23,.10); }
-
-    .action-menu{
-      position:absolute; right:0; top:calc(100% + 6px); z-index:30;
-      min-width:160px; background:#fff; border:1px solid #e2e8f0; border-radius:12px;
-      box-shadow:0 16px 40px rgba(2,8,23,.18); padding:6px;
+    .action-btn:hover{
+      transform:translateY(-1px);
+      box-shadow:0 6px 14px rgba(2,8,23,.10);
     }
-    .action-menu.hidden{ display:none; }
-    .action-item{
-      width:100%; text-align:left; border-radius:10px; font-weight:600;
-      padding:8px 10px; font-size:12px; display:flex; align-items:center; gap:8px;
+    .action-btn.aprovar{
+      color:#15803d; /* verde */
     }
-    .action-item:hover{ background:#f8fafc; }
-    .action-item.aprovar{ color:#15803d; }   /* green-700 */
-    .action-item.reprovar{ color:#b91c1c; }  /* red-700 */
+    .action-btn.reprovar{
+      color:#b91c1c; /* vermelho */
+    }
+    /* -------------------------------------------------------- */
   </style>
 </head>
 <body class="min-h-screen text-black antialiased" style="background: var(--cantina-secondary);">
@@ -235,7 +236,6 @@
 
       <!-- Ações -->
       <div id="menuActions" class="actions">
-        <!-- Botão sair -->
         <a id="btnSair" class="btn" href="../index.html" rel="noopener">Sair</a>
       </div>
     </div>
@@ -245,7 +245,7 @@
   <main class="w-full max-w-7xl mx-auto px-4 pb-20 pt-6">
     <div class="bg-[#3A474C] border border-white/60 rounded-xl sm:rounded-2xl shadow-2xl shadow-glow p-4 xs:p-5 sm:p-6 md:p-8">
 
-      <!-- Top bar: contador + ações + tabs -->
+      <!-- Top bar -->
       <div class="flex flex-col gap-3">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3">
           <div class="text-sm text-slate-800 order-2 sm:order-1">
@@ -256,7 +256,7 @@
           </div>
         </div>
 
-        <!-- Tabs: Pendentes x Histórico -->
+        <!-- Tabs -->
         <div class="flex flex-wrap items-center gap-2">
           <button id="tabPendentes" class="tab-btn tab-active" data-tab="pendentes">
             Pendentes
@@ -301,6 +301,7 @@
 
           <div class="mt-2 flex items-start justify-between gap-3">
             <p id="modalHelp" class="text-sm text-slate-600 flex-1">Você pode adicionar uma observação.</p>
+
             <!-- TOGGLE NÃO JUSTIFICAR -->
             <label class="flex items-center gap-2 cursor-pointer select-none">
               <span class="text-xs font-medium text-slate-700">Não justificar</span>
@@ -311,6 +312,7 @@
           </div>
 
           <textarea id="modalObs" class="mt-3 w-full min-h[110px] rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20" placeholder="Escreva sua observação…"></textarea>
+
           <div class="mt-3">
             <label class="block text-sm text-slate-700 font-medium mb-1">
               Enviar cópia para (opcional)
@@ -370,7 +372,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
 
-    // ======= CONFIG FIREBASE =======
+    // FIREBASE
     const firebaseConfig = {
       apiKey: "AIzaSyAEZidq8mdAUKeJXvSQeE01gVOLWe_cp78",
       authDomain: "compras-icone.firebaseapp.com",
@@ -380,41 +382,22 @@
       appId: "1:831706842201:web:9b68ae4f98ad93c5a99d48",
     };
 
-    // URL do Apps Script (planilha / aprovação)
     const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbyXgFaJa-Ig6Z_bS7KXiqRbcAWAZlsgB0CIXkuZGB2by9W6H65VS58zr3HqBmG672Yr/exec';
 
-    // Inicializa Firebase
     const app  = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    // ======= QUEM PODE ENTRAR NESSA PÁGINA (/admin/) =======
-    // Regra:
-    // - adminAprovacao
-    // - admSupremo
-    //
-    // adminEmails.json:
-    // {
-    //   "adminAprovacao": [...],
-    //   "adminCompras": [...],
-    //   "admSupremo": [...]
-    // }
-    //
-    // AQUI: ALLOWED_EMAILS = adminAprovacao U admSupremo
-    let ALLOWED_EMAILS = new Set(); // começa vazio
+    let ALLOWED_EMAILS = new Set();
 
     async function carregarAdmins() {
       try {
-        const resp = await fetch('../config/adminEmails.json', {
-          cache: 'no-cache'
-        });
-
+        const resp = await fetch('../config/adminEmails.json', { cache: 'no-cache' });
         if (!resp.ok) {
           console.error('Não consegui carregar adminEmails.json', resp.status);
           return;
         }
 
         const data = await resp.json();
-
         const listaAprovacao = Array.isArray(data.adminAprovacao) ? data.adminAprovacao : [];
         const listaSupremo   = Array.isArray(data.admSupremo)     ? data.admSupremo     : [];
 
@@ -426,10 +409,8 @@
       }
     }
 
-    // Carrega a lista de admins ANTES de checar auth
     await carregarAdmins();
 
-    // ======= FUNÇÃO DE LOGOUT COMPLETO =======
     async function doLogout() {
       try {
         await signOut(auth);
@@ -437,32 +418,26 @@
         console.warn('Erro no signOut Firebase:', err);
       }
 
-      // limpa qualquer dado local
       try { sessionStorage.clear(); } catch {}
       try { localStorage.removeItem('sessionUser'); } catch {}
       try { localStorage.removeItem('firebase:host:*'); } catch {}
       try { localStorage.removeItem('firebase:authUser'); } catch {}
       try { localStorage.removeItem('firebase:authUser:${firebaseConfig.apiKey}:[DEFAULT]'); } catch {}
 
-      // manda pro login
       window.location.replace('../index.html');
     }
 
-    // ======= BOTÃO "SAIR" NA NAVBAR =======
     const btnSair = document.getElementById('btnSair');
     if (btnSair) {
       btnSair.addEventListener('click', async (e) => {
         e.preventDefault();
-
         btnSair.setAttribute('aria-busy', 'true');
         btnSair.style.pointerEvents = 'none';
         btnSair.textContent = 'Saindo…';
-
         await doLogout();
       });
     }
 
-    // ======= UTIL =======
     const $  = (sel)=>document.querySelector(sel);
     const $$ = (sel)=>Array.from(document.querySelectorAll(sel));
 
@@ -514,26 +489,20 @@
       return '-';
     }
 
-    // ======= ESTADO =======
     let currentUser = null;
-    let dadosBrutos = [];      // vindo da planilha
-    let dadosFiltrados = [];   // versão atual (por aba)
-    let activeTab = 'pendentes'; // 'pendentes' | 'historico'
-
-    // bloqueio pra evitar spam no "Confirmar" do modal
+    let dadosBrutos = [];
+    let dadosFiltrados = [];
+    let activeTab = 'pendentes';
     let isSendingStatus = false;
 
-    // ======= AUTENTICAÇÃO / AUTORIZAÇÃO =======
     onAuthStateChanged(auth, async (user) => {
-      const adminEmailEl = $('#adminEmail'); // se existir algum span pra mostrar quem está logado
+      const adminEmailEl = $('#adminEmail');
 
-      // 1) Não logado -> login
       if (!user) {
         await doLogout();
         return;
       }
 
-      // 2) Checa se tem permissão
       const isAllowed = !!user.email && ALLOWED_EMAILS.has(user.email.toLowerCase());
       if (!isAllowed) {
         alert('Acesso restrito.');
@@ -541,14 +510,12 @@
         return;
       }
 
-      // 3) OK
       currentUser = user;
       if (adminEmailEl) adminEmailEl.textContent = user.email;
 
       carregarLista();
     });
 
-    // ======= CHAMADAS REDE =======
     async function chamarAPI(url, opts={}) {
       try {
         const resp = await fetch(url, opts);
@@ -571,7 +538,6 @@
       } catch (err) {
         console.error('[chamarAPI] falhou geral:', err);
 
-        // fallback no-cors
         try {
           await fetch(url, { ...opts, mode:'no-cors' });
           console.warn('[chamarAPI] fallback no-cors usado, resposta não legível');
@@ -587,7 +553,6 @@
       $('#tbody').innerHTML = `<tr><td colspan="10" class="p-6 text-center text-slate-600">Carregando…</td></tr>`;
 
       const url = WEBAPP_URL + '?action=list&email=' + encodeURIComponent(currentUser.email);
-
       const { ok, data, error, opaque } = await chamarAPI(url);
 
       if(opaque){
@@ -632,7 +597,6 @@
       if(!ok) throw new Error(error||'Falha ao atualizar');
     }
 
-    // ======= PAGINAÇÃO =======
     let page = 1;
     const pageSize = 3;
 
@@ -651,7 +615,7 @@
 
     function goToPage(n){
       page = n;
-      aplicarFiltrosERender(true); // mantém a página
+      aplicarFiltrosERender(true);
     }
 
     function renderPaginacao(totalPages, total){
@@ -699,12 +663,11 @@
       });
     }
 
-    // ======= LÓGICA DAS ABAS =======
     function inTab(item){
       const st = String(item.status||'pendente');
       return activeTab==='pendentes'
         ? (st==='pendente')
-        : (st!=='pendente'); // histórico = aprovado ou reprovado
+        : (st!=='pendente');
     }
 
     function aplicarFiltrosERender(keepPage=false){
@@ -730,13 +693,10 @@
 
       $('#countPendentes').textContent = pend;
       $('#countHistorico').textContent = hist;
-
-      // badge só aparece se tiver número > 0
       $('#countPendentes').style.display = pend ? 'inline-block' : 'none';
       $('#countHistorico').style.display = hist ? 'inline-block' : 'none';
     }
 
-    // ======= TABELA =======
     function parseLinks(links){
       if(Array.isArray(links)) return links;
       if(typeof links==='string'){
@@ -800,25 +760,18 @@
 
         const showActions = (String(item.status||'pendente')==='pendente');
 
+        // NOVO layout de ações (✓ verde / ✕ vermelho) --------------------- //
         const acoes = showActions ? `
-          <div class="relative inline-block">
-            <button class="action-trigger" aria-haspopup="true" aria-expanded="false"
-                    data-menu="menu-${item.submissionId}">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
-                   viewBox="0 0 24 24" fill="currentColor">
-                <path d="M6 12a2 2 0 1 1-4 0a2 2 0 0 1 4 0m8 0a2 2 0 1 1-4 0a2 2 0 0 1 4 0m8 0a2 2 0 1 1-4 0a2 2 0 0 1 4 0"/>
-              </svg>
+          <div class="flex items-center gap-1">
+            <button class="action-btn aprovar" data-act="aprovar" data-id="${item.submissionId}" title="Aprovar">
+              ✓
             </button>
-            <div id="menu-${item.submissionId}" class="action-menu hidden">
-              <button class="action-item aprovar" data-act="aprovar" data-id="${item.submissionId}">
-                ✓ Aprovar
-              </button>
-              <button class="action-item reprovar" data-act="reprovar" data-id="${item.submissionId}">
-                ✕ Reprovar
-              </button>
-            </div>
+            <button class="action-btn reprovar" data-act="reprovar" data-id="${item.submissionId}" title="Reprovar">
+              ✕
+            </button>
           </div>
         ` : `<div class='text-xs text-slate-500'>—</div>`;
+        // ------------------------------------------------------------------ //
 
         const enviadoInfo = popText('Enviado', esc(fmtDate(item.timestamp)));
         const btnEnviado = `
@@ -915,27 +868,12 @@
         </tr>`;
       }).join('');
 
-      // listeners de menu (aprovar/reprovar)
-      tbody.querySelectorAll('.action-trigger').forEach(btn=>{
-        btn.addEventListener('click', (e)=>{
-          e.stopPropagation();
-          document.querySelectorAll('.action-menu').forEach(m=>m.classList.add('hidden'));
-          const menuId = btn.getAttribute('data-menu');
-          const menuEl = document.getElementById(menuId);
-          menuEl?.classList.toggle('hidden');
-        });
-      });
-
-      document.addEventListener('click', ()=>{
-        document.querySelectorAll('.action-menu').forEach(m=>m.classList.add('hidden'));
-      });
-
+      // agora só precisamos ouvir os botões data-act direto
       tbody.querySelectorAll('button[data-act]').forEach(btn=>{
         btn.addEventListener('click', ()=>{
-          document.querySelectorAll('.action-menu').forEach(m=>m.classList.add('hidden'));
           const id  = btn.getAttribute('data-id');
           const act = btn.getAttribute('data-act');
-          abrirModal(id, act);
+          abrirModal(id, act); // mesma função que já existe
         });
       });
 
@@ -943,7 +881,6 @@
       tbody.querySelectorAll('.js-pop').forEach(bindPopoverTrigger);
     }
 
-    // ======= MODAL APROVAR/REPROVAR =======
     let modalState = { id:null, act:null, noJustify:false };
 
     function updateNoJustifyUI(){
@@ -1013,16 +950,7 @@
       if(len>0) $('#modalError').classList.add('hidden');
     });
 
-    // === CONFIRMAR (APROVAR / REPROVAR) COM UI OTIMISTA ===
-    //
-    // Fluxo atualizado:
-    // 1. Valida.
-    // 2. Atualiza UI localmente (muda status, tira da aba "pendentes", adiciona em "histórico", muda badges etc).
-    //    -> render() e toast imediatamente (parece que deu certo).
-    // 3. Fecha o modal.
-    // 4. Depois tenta realmente mandar pro backend.
-    //    Se backend falhar, mostra toast de erro (mas não reverte automaticamente).
-    //
+    // CONFIRMAR (UI otimista permanece igual)
     $('#modalConfirmar').addEventListener('click', async ()=>{
       if (isSendingStatus) return;
       isSendingStatus = true;
@@ -1036,7 +964,6 @@
       const obs = noJustify ? '' : $('#modalObs').value.trim();
       const extras = ($('#modalExtras')?.value || '').trim();
 
-      // valida reprovação sem justificativa
       if(act==='reprovar' && !noJustify && !obs){
         $('#modalError').classList.remove('hidden');
         $('#modalObs').focus();
@@ -1044,11 +971,9 @@
         return;
       }
 
-      // status alvo
       const newStatus = act==='aprovar' ? 'aprovado' : 'reprovado';
 
-      // === UI OTIMISTA ===
-      // Atualiza nosso array local imediatamente, antes de chamar o servidor.
+      // aplica UI local antes do backend
       const alvo = dadosBrutos.find(x=>x.submissionId===id);
       if(alvo){
         alvo.status = newStatus;
@@ -1057,16 +982,12 @@
         alvo.aprovadoEm = new Date().toISOString();
       }
 
-      // re-render com novo estado
       aplicarFiltrosERender(true);
 
-      // feedback instantâneo
       toast(act==='aprovar' ? 'Aprovado!' : 'Reprovado!', 'success');
 
-      // fecha modal agora
       fecharModal();
 
-      // === BACKEND DE VERDADE ===
       try{
         await atualizarStatus(
           id,
@@ -1074,9 +995,7 @@
           obs,
           extras
         );
-        // se o servidor respondeu ok, já está tudo certo
       }catch(err){
-        // se der erro depois do update otimista, só avisa
         toast('Erro ao salvar no servidor. Tente novamente.', 'error');
         console.error('Erro atualizar status:', err);
       }finally{
@@ -1084,7 +1003,6 @@
       }
     });
 
-    // ======= CONTROLES (tabs / atualizar) =======
     $('#btnAtualizar').addEventListener('click', carregarLista);
 
     function setTab(tab){
@@ -1259,7 +1177,7 @@
         if(!clickedInsidePop) hidePopover();
       }
     });
-    // ======= FIM DO SCRIPT PRINCIPAL =======
+    // ======= FIM =======
   </script>
 </body>
 </html>
