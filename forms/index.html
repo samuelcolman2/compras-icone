@@ -147,7 +147,7 @@
 
       <!-- Botão hambúrguer (aparece só no mobile via CSS) -->
       <button id="menuToggle" class="menu-toggle" aria-label="Abrir menu" aria-expanded="false" aria-controls="menuActions">
-        <!-- Ícone corrigido: usa STROKE ao invés de FILL -->
+        <!-- Ícone hambúrguer com stroke -->
         <svg xmlns="http://www.w3.org/2000/svg" class="size-6" viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
@@ -155,14 +155,26 @@
 
       <!-- Ações (dropdown no mobile; inline no desktop) -->
       <div id="menuActions" class="actions">
-        <button id="btnAdmin" style="display:none" class="btn">Admin</button>
+        <!-- MOSTRA SÓ pra adminCompras (ou admSupremo) -->
+        <button id="btnSetorCompras" style="display:none" class="btn">Setor Compras</button>
+
+        <!-- MOSTRA SÓ pra adminAprovacao (ou admSupremo) -->
+        <button id="btnAdminAprovacao" style="display:none" class="btn">Admin</button>
+
+        <!-- Sempre visível pra quem está logado -->
         <button id="btnSair" class="btn">Sair</button>
       </div>
     </div>
   </nav>
 
   <!-- Anchors ocultos para navegar por HREF -->
-  <a id="hrefAdmin" href="/admin/" style="display:none;"></a>
+  <!-- Painel de aprovação (/admin) -->
+  <a id="hrefAdminAprovacao" href="/admin/" style="display:none;"></a>
+
+  <!-- Painel compras (/financeiro) -->
+  <a id="hrefAdminCompras" href="/financeiro/" style="display:none;"></a>
+
+  <!-- Login -->
   <a id="hrefLogin" href="../index.html" style="display:none;"></a>
 
   <!-- Main -->
@@ -314,7 +326,26 @@
   const app  = initializeApp(firebaseConfig);
   const auth = getAuth(app);
 
-  let ADMIN_EMAILS = new Set(); // começa vazio
+  // =====================================================
+  // ESTADO GLOBAL COMPARTILHADO
+  // =====================================================
+  // (esses valores são lidos também pelo outro <script> abaixo)
+  window.isUserAuthed = false;
+  window.currentUserEmail = null;
+  window.currentUserName = null;
+
+  // =====================================================
+  // NÍVEIS DE ACESSO
+  // =====================================================
+  // adminCompras     -> só botão "Setor Compras"
+  // adminAprovacao   -> só botão "Admin"
+  // admSupremo       -> vê os dois
+  //
+  // Vamos carregar essas listas do JSON.
+  //
+  let ADMIN_COMPRAS_EMAILS    = new Set(); // compra/financeiro
+  let ADMIN_APROVACAO_EMAILS  = new Set(); // aprovação/admin
+  let ADMIN_SUPREMO_EMAILS    = new Set(); // tudo
 
   async function carregarAdmins() {
     try {
@@ -329,8 +360,16 @@
 
       const data = await resp.json();
 
-      ADMIN_EMAILS = new Set(
-        (data.admins || []).map(e => e.toLowerCase())
+      ADMIN_APROVACAO_EMAILS = new Set(
+        (data.adminAprovacao || []).map(e => e.toLowerCase())
+      );
+
+      ADMIN_COMPRAS_EMAILS = new Set(
+        (data.adminCompras || []).map(e => e.toLowerCase())
+      );
+
+      ADMIN_SUPREMO_EMAILS = new Set(
+        (data.admSupremo || []).map(e => e.toLowerCase())
       );
     } catch (err) {
       console.error('Erro buscando adminEmails.json:', err);
@@ -341,24 +380,49 @@
   await carregarAdmins();
 
   // =====================================================
-  // 2. Elementos da UI
+  // Elementos da UI (botões / anchors do header)
   // =====================================================
-  const inputNome  = document.getElementById('nome');
-  const inputEmail = document.getElementById('email');
-  const btnSair    = document.getElementById('btnSair');
-  const btnAdmin   = document.getElementById('btnAdmin');
+  const btnSair              = document.getElementById('btnSair');
 
-  const hrefLogin  = document.getElementById('hrefLogin');
-  const hrefAdmin  = document.getElementById('hrefAdmin');
+  const btnAdminAprovacao    = document.getElementById('btnAdminAprovacao'); // botão "Admin"
+  const btnSetorCompras      = document.getElementById('btnSetorCompras');   // botão "Setor Compras"
 
-  // Controle de login global
-  // true  = logado com QUALQUER e-mail
-  // false = não logado
-  window.isUserAuthed = false;
-  window.currentUserEmail = null;
+  const hrefLogin            = document.getElementById('hrefLogin');
+  const hrefAdminAprovacao   = document.getElementById('hrefAdminAprovacao');
+  const hrefAdminCompras     = document.getElementById('hrefAdminCompras');
 
   // =====================================================
-  // 3. Botão "Sair"
+  // Função global para preencher nome/e-mail no form
+  // - chamada quando loga
+  // - chamada depois que a gente limpa o formulário
+  // =====================================================
+  function preencherCamposUsuario() {
+    const nomeEl  = document.getElementById('nome');
+    const emailEl = document.getElementById('email');
+
+    if (!window.isUserAuthed) {
+      // usuário não logado -> campo e-mail deve ficar editável e vazio
+      if (emailEl) {
+        emailEl.readOnly = false;
+      }
+      return;
+    }
+
+    // usuário logado -> nome e email automáticos
+    if (emailEl) {
+      emailEl.value = window.currentUserEmail || '';
+      emailEl.readOnly = true; // garante que o envio use SEMPRE o email logado
+    }
+
+    if (nomeEl && !nomeEl.value) {
+      nomeEl.value = window.currentUserName || '';
+    }
+  }
+  // torna acessível no outro script
+  window.preencherCamposUsuario = preencherCamposUsuario;
+
+  // =====================================================
+  // Botão "Sair"
   // =====================================================
   btnSair?.addEventListener('click', async (e) => {
     e.preventDefault();
@@ -368,7 +432,7 @@
       await signOut(auth);
     } catch (err) {
       console.error('Erro ao sair do Firebase:', err);
-      // mesmo que dê erro aqui, a gente continua limpando a sessão local
+      // mesmo se der erro aqui, a gente continua limpando a sessão local
     }
 
     // 2. Limpa a sessão local usada pelo index.html
@@ -381,8 +445,16 @@
     // 3. Atualiza flags globais dessa página
     window.isUserAuthed = false;
     window.currentUserEmail = null;
+    window.currentUserName = null;
 
-    // 4. Redireciona pra tela de login
+    // 4. Esconde botões de admin
+    if (btnAdminAprovacao) btnAdminAprovacao.style.display = 'none';
+    if (btnSetorCompras)   btnSetorCompras.style.display   = 'none';
+
+    // 5. Reconfigura campos do formulário (tira readOnly do e-mail etc.)
+    preencherCamposUsuario();
+
+    // 6. Redireciona pra tela de login
     if (hrefLogin) {
       hrefLogin.click();
     } else {
@@ -392,410 +464,482 @@
   });
 
   // =====================================================
-  // 4. Botão "Admin"
+  // Botões "Admin" e "Setor Compras"
   // =====================================================
-  btnAdmin?.addEventListener('click', (e) => {
+  btnAdminAprovacao?.addEventListener('click', (e) => {
     e.preventDefault();
-    if (hrefAdmin) {
-      hrefAdmin.click();
+    if (hrefAdminAprovacao) {
+      hrefAdminAprovacao.click();
     } else {
       location.href = '/admin/';
     }
   });
 
+  btnSetorCompras?.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (hrefAdminCompras) {
+      hrefAdminCompras.click();
+    } else {
+      // rota dedicada ao painel financeiro/compras
+      location.href = '/financeiro/';
+    }
+  });
+
   // =====================================================
-  // 5. Verificação de login + admin
+  // Verificação de login + nível de admin
   // =====================================================
   onAuthStateChanged(auth, async (user) => {
     // NÃO LOGADO
     if (!user) {
       window.isUserAuthed = false;
       window.currentUserEmail = null;
+      window.currentUserName = null;
 
-      // limpa campo email e deixa editável
-      if (inputEmail) {
-        inputEmail.value = '';
-        inputEmail.readOnly = false;
-      }
+      // esconde botões de admin
+      if (btnAdminAprovacao) btnAdminAprovacao.style.display = 'none';
+      if (btnSetorCompras)   btnSetorCompras.style.display   = 'none';
 
-      // esconde Admin
-      if (btnAdmin) btnAdmin.style.display = 'none';
-
-      // Importante: NÃO redireciona mais automaticamente
+      // Prepara form (email editável e vazio)
+      preencherCamposUsuario();
       return;
     }
 
-    // LOGADO (qualquer domínio agora é aceito)
+    // LOGADO
     window.isUserAuthed = true;
     window.currentUserEmail = user.email || '';
+    window.currentUserName  = user.displayName || '';
 
-    // Preenche campos automáticos
-    if (inputEmail) {
-      inputEmail.value = user.email || '';
-      inputEmail.readOnly = true; // garante que o e-mail enviado é o da conta logada
+    // Preenche campos automáticos (nome/email no formulário)
+    preencherCamposUsuario();
+
+    // Checa nível do usuário usando as listas carregadas
+    const emailLower = (user.email || '').toLowerCase();
+
+    const isAprovacao = ADMIN_APROVACAO_EMAILS.has(emailLower);
+    const isCompras   = ADMIN_COMPRAS_EMAILS.has(emailLower);
+    const isSupremo   = ADMIN_SUPREMO_EMAILS.has(emailLower);
+
+    // VISIBILIDADE:
+    // - adminCompras        -> só "Setor Compras"
+    // - adminAprovacao      -> só "Admin"
+    // - admSupremo          -> os dois
+    //
+    // Lógica final: mostra se ele for supremo OU do nível correspondente.
+    if (btnAdminAprovacao) {
+      btnAdminAprovacao.style.display = (isSupremo || isAprovacao) ? 'inline-flex' : 'none';
     }
 
-    if (inputNome && !inputNome.value) {
-      inputNome.value = user.displayName || '';
-    }
-
-    // Checa se o usuário é admin usando a lista carregada do JSON
-    const isAdmin = !!user.email && ADMIN_EMAILS.has(user.email.toLowerCase());
-    if (btnAdmin) {
-      btnAdmin.style.display = isAdmin ? 'inline-flex' : 'none';
+    if (btnSetorCompras) {
+      btnSetorCompras.style.display = (isSupremo || isCompras) ? 'inline-flex' : 'none';
     }
   });
 </script>
 
 
-  <!-- Lógica do formulário + envio para Google Sheets -->
-  <script>
-    const form = document.getElementById('formulario');
+<!-- Lógica do formulário + envio para Google Sheets -->
+<script>
+  const form = document.getElementById('formulario');
 
-    // Prazo
-    const radiosPrazo = document.getElementsByName('prazo');
-    const prazoCampos = document.getElementById('prazoCampos');
-    const inputDataPrazo = document.getElementById('dataPrazo');
+  // Prazo
+  const radiosPrazo = document.getElementsByName('prazo');
+  const prazoCampos = document.getElementById('prazoCampos');
+  const inputDataPrazo = document.getElementById('dataPrazo');
 
-    // Tipo
-    const selectTipo = document.getElementById('tipo');
+  // Tipo
+  const selectTipo = document.getElementById('tipo');
 
-    // Serviço
-    const servicoCampos = document.getElementById('servicoCampos');
-    const descricaoServico = document.getElementById('descricaoServico');
-    const temIndicacaoGroup = document.getElementById('temIndicacaoGroup');
-    const indicacaoQuem = document.getElementById('indicacaoQuem');
-    const quemIndicar = document.getElementById('quemIndicar');
+  // Serviço
+  const servicoCampos = document.getElementById('servicoCampos');
+  const descricaoServico = document.getElementById('descricaoServico');
+  const temIndicacaoGroup = document.getElementById('temIndicacaoGroup');
+  const indicacaoQuem = document.getElementById('indicacaoQuem');
+  const quemIndicar = document.getElementById('quemIndicar');
 
-    // Produto
-    const produtoCampos = document.getElementById('produtoCampos');
-    const nomeProduto = document.getElementById('nomeProduto');
-    const quantidadeProduto = document.getElementById('quantidadeProduto');
+  // Produto
+  const produtoCampos = document.getElementById('produtoCampos');
+  const nomeProduto = document.getElementById('nomeProduto');
+  const quantidadeProduto = document.getElementById('quantidadeProduto');
 
-    // Links
-    const temLinkGroup = document.getElementById('temLinkGroup');
-    const linkCampos = document.getElementById('linkCampos');
-    const listaLinks = document.getElementById('listaLinks');
-    const btnAddLink = document.getElementById('adicionarLink');
+  // Links
+  const temLinkGroup = document.getElementById('temLinkGroup');
+  const linkCampos = document.getElementById('linkCampos');
+  const listaLinks = document.getElementById('listaLinks');
+  const btnAddLink = document.getElementById('adicionarLink');
 
-    let linkCount = 0;
-    const maxLinks = 3;
+  let linkCount = 0;
+  const maxLinks = 3;
 
-    // trava anti duplo-clique
-    let isSubmitting = false;
+  // trava anti duplo-clique simultâneo
+  // OBS: agora vamos liberar o form logo após o clique,
+  // mas esse flag impede que o MESMO envio dispare várias vezes rapidamente.
+  let isSubmitting = false;
 
-    // Toast helper
-    function toast(msg, type = 'info') {
-      const isSuccess = type === 'success';
-      const isError   = type === 'error';
-      Toastify({
-        text: msg,
-        duration: 3500,
-        close: true,
-        gravity: "top",
-        position: "right",
-        stopOnFocus: true,
-        style: {
-          background: isSuccess
-            ? "linear-gradient(90deg,#16a34a,#22c55e)"
-            : isError
-            ? "linear-gradient(90deg,#dc2626,#ef4444)"
-            : "linear-gradient(90deg,#334155,#64748b)",
-          color: "#ffffff",
-          fontWeight: "600",
-          boxShadow: "0 10px 25px -10px rgba(0,0,0,.35)",
-          borderRadius: "10px",
-          padding: "10px 16px",
-        },
-        offset: { x: 8, y: 10 },
-      }).showToast();
+  // Toast helper
+  function toast(msg, type = 'info') {
+    const isSuccess = type === 'success';
+    const isError   = type === 'error';
+    Toastify({
+      text: msg,
+      duration: 3500,
+      close: true,
+      gravity: "top",
+      position: "right",
+      stopOnFocus: true,
+      style: {
+        background: isSuccess
+          ? "linear-gradient(90deg,#16a34a,#22c55e)"
+          : isError
+          ? "linear-gradient(90deg,#dc2626,#ef4444)"
+          : "linear-gradient(90deg,#334155,#64748b)",
+        color: "#ffffff",
+        fontWeight: "600",
+        boxShadow: "0 10px 25px -10px rgba(0,0,0,.35)",
+        borderRadius: "10px",
+        padding: "10px 16px",
+      },
+      offset: { x: 8, y: 10 },
+    }).showToast();
+  }
+
+  function atualizarBotaoAddLink() {
+    if (!btnAddLink) return;
+    btnAddLink.style.display = linkCount >= maxLinks ? "none" : "inline-flex";
+  }
+
+  function criarCampoLink() {
+    linkCount++;
+    const div = document.createElement('div');
+    div.className = 'flex items-center gap-2';
+
+    if (linkCount === 1) {
+      div.innerHTML = `<input type="url" name="linkProduto${linkCount}" placeholder="Cole o link ${linkCount}" required class="flex-1 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm sm:text-base outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20 transition"/>`;
+    } else {
+      div.innerHTML = `
+        <input type="url" name="linkProduto${linkCount}" placeholder="Cole o link ${linkCount}" required class="flex-1 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm sm:text-base outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20 transition"/>
+        <button type="button" class="grid place-items-center rounded-full w-7 h-7 bg-white text-primaria border border-primaria/30 shadow hover:scale-105 active:scale-100 transition remove-link" aria-label="Remover link">&times;</button>
+      `;
+      div.querySelector('.remove-link').addEventListener('click', () => {
+        div.remove();
+        linkCount--;
+        atualizarBotaoAddLink();
+        atualizarPlaceholders();
+      });
     }
+    listaLinks.appendChild(div);
+    atualizarBotaoAddLink();
+  }
 
-    function atualizarBotaoAddLink() {
-      if (!btnAddLink) return;
-      btnAddLink.style.display = linkCount >= maxLinks ? "none" : "inline-flex";
+  function atualizarPlaceholders() {
+    const inputs = listaLinks.querySelectorAll('input[type="url"]');
+    inputs.forEach((input, index) => input.placeholder = `Cole o link ${index + 1}`);
+  }
+
+  btnAddLink?.addEventListener('click', () => {
+    if (linkCount < maxLinks) {
+      criarCampoLink();
+      atualizarPlaceholders();
     }
+  });
 
-    function criarCampoLink() {
-      linkCount++;
-      const div = document.createElement('div');
-      div.className = 'flex items-center gap-2';
+  function atualizarPrazo(){
+    const selecionado = [...radiosPrazo].find(r=>r.checked)?.value;
+    if(selecionado==='sim'){
+      prazoCampos.classList.remove('hidden');
+      inputDataPrazo.required = true;
+    }else{
+      prazoCampos.classList.add('hidden');
+      inputDataPrazo.required = false;
+      inputDataPrazo.value = '';
+    }
+  }
+  radiosPrazo.forEach(r=>r.addEventListener('change', atualizarPrazo));
+  atualizarPrazo();
 
-      if (linkCount === 1) {
-        div.innerHTML = `<input type="url" name="linkProduto${linkCount}" placeholder="Cole o link ${linkCount}" required class="flex-1 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm sm:text-base outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20 transition"/>`;
-      } else {
-        div.innerHTML = `
-          <input type="url" name="linkProduto${linkCount}" placeholder="Cole o link ${linkCount}" required class="flex-1 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm sm:text-base outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20 transition"/>
-          <button type="button" class="grid place-items-center rounded-full w-7 h-7 bg-white text-primaria border border-primaria/30 shadow hover:scale-105 active:scale-100 transition remove-link" aria-label="Remover link">&times;</button>
-        `;
-        div.querySelector('.remove-link').addEventListener('click', () => {
-          div.remove();
-          linkCount--;
-          atualizarBotaoAddLink();
-          atualizarPlaceholders();
-        });
-      }
-      listaLinks.appendChild(div);
+  function atualizarTipo(){
+    if(selectTipo.value==='servico'){
+      servicoCampos.classList.remove('hidden');
+      descricaoServico.required = true;
+
+      produtoCampos.classList.add('hidden');
+      nomeProduto.required = false; nomeProduto.value='';
+      quantidadeProduto.required = false; quantidadeProduto.value='';
+
+      document.querySelector('input[name="temLink"][value="nao"]').checked = true;
+      linkCampos.classList.add('hidden');
+      listaLinks.innerHTML=''; linkCount=0; atualizarBotaoAddLink();
+
+    }else if(selectTipo.value==='produto'){
+      produtoCampos.classList.remove('hidden');
+      nomeProduto.required = true;
+      quantidadeProduto.required = true;
+
+      servicoCampos.classList.add('hidden');
+      descricaoServico.required = false; descricaoServico.value='';
+
+      document.querySelector('input[name="temIndicacao"][value="nao"]').checked = true;
+      indicacaoQuem.classList.add('hidden');
+      quemIndicar.required = false; quemIndicar.value='';
+
+    }else{
+      servicoCampos.classList.add('hidden');
+      produtoCampos.classList.add('hidden');
+    }
+  }
+  selectTipo.addEventListener('change', atualizarTipo);
+  atualizarTipo();
+
+  function atualizarIndicacao(){
+    const temIndicacao = document.querySelector('input[name="temIndicacao"]:checked')?.value;
+    if(temIndicacao==='sim'){
+      indicacaoQuem.classList.remove('hidden');
+      // se quiser tornar obrigatório, mude aqui:
+      quemIndicar.required = false;
+    }else{
+      indicacaoQuem.classList.add('hidden');
+      quemIndicar.required = false;
+      quemIndicar.value = '';
+    }
+  }
+  temIndicacaoGroup.addEventListener('change', atualizarIndicacao);
+
+  function atualizarLink(){
+    const temLink = document.querySelector('input[name="temLink"]:checked')?.value;
+    if(temLink==='sim'){
+      linkCampos.classList.remove('hidden');
+      if(linkCount===0) criarCampoLink();
+    }else{
+      linkCampos.classList.add('hidden');
+      listaLinks.innerHTML='';
+      linkCount=0;
       atualizarBotaoAddLink();
     }
+  }
+  temLinkGroup.addEventListener('change', atualizarLink);
 
-    function atualizarPlaceholders() {
-      const inputs = listaLinks.querySelectorAll('input[type="url"]');
-      inputs.forEach((input, index) => input.placeholder = `Cole o link ${index + 1}`);
-    }
+  // ======== INTEGRAÇÃO COM GOOGLE SHEETS (Apps Script) ========
+  const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbyXgFaJa-Ig6Z_bS7KXiqRbcAWAZlsgB0CIXkuZGB2by9W6H65VS58zr3HqBmG672Yr/exec';
 
-    btnAddLink?.addEventListener('click', () => {
-      if (linkCount < maxLinks) {
-        criarCampoLink();
-        atualizarPlaceholders();
-      }
+  function coletarLinks() {
+    const inputs = listaLinks.querySelectorAll('input[type="url"]');
+    const arr = [];
+    inputs.forEach(i => {
+      const v = i.value.trim();
+      if (v) arr.push(v);
     });
+    return arr;
+  }
 
-    function atualizarPrazo(){
-      const selecionado = [...radiosPrazo].find(r=>r.checked)?.value;
-      if(selecionado==='sim'){
-        prazoCampos.classList.remove('hidden');
-        inputDataPrazo.required = true;
-      }else{
-        prazoCampos.classList.add('hidden');
-        inputDataPrazo.required = false;
-        inputDataPrazo.value = '';
-      }
-    }
-    radiosPrazo.forEach(r=>r.addEventListener('change', atualizarPrazo));
+  // Mantido caso queira reusar futuramente (não usamos mais para travar o botão após clique)
+  function desabilitarBotao(submitBtn, desabilitar) {
+    if (!submitBtn) return;
+    submitBtn.disabled = desabilitar;
+    submitBtn.style.opacity = desabilitar ? '0.7' : '1';
+    submitBtn.style.cursor  = desabilitar ? 'not-allowed' : 'pointer';
+  }
+
+  // Função que zera o formulário VISUALMENTE logo após o clique em "Enviar"
+  // -> comportamento otimista: já parece que deu certo
+  function resetarUIPosEnvioOtimista() {
+    // limpa campos do form
+    form.reset();
+
+    // limpa links extras
+    linkCount = 0;
+    listaLinks.innerHTML = '';
+    atualizarBotaoAddLink();
+
+    // volta pros defaults visuais
+    const prazoNao       = document.querySelector('input[name="prazo"][value="nao"]');
+    const indicacaoNao   = document.querySelector('input[name="temIndicacao"][value="nao"]');
+    const temLinkNao     = document.querySelector('input[name="temLink"][value="nao"]');
+
+    if (prazoNao) prazoNao.checked = true;
+    if (indicacaoNao) indicacaoNao.checked = true;
+    if (temLinkNao) temLinkNao.checked = true;
+
     atualizarPrazo();
-
-    function atualizarTipo(){
-      if(selectTipo.value==='servico'){
-        servicoCampos.classList.remove('hidden');
-        descricaoServico.required = true;
-
-        produtoCampos.classList.add('hidden');
-        nomeProduto.required = false; nomeProduto.value='';
-        quantidadeProduto.required = false; quantidadeProduto.value='';
-        document.querySelector('input[name="temLink"][value="nao"]').checked = true;
-        linkCampos.classList.add('hidden');
-        listaLinks.innerHTML=''; linkCount=0; atualizarBotaoAddLink();
-
-      }else if(selectTipo.value==='produto'){
-        produtoCampos.classList.remove('hidden');
-        nomeProduto.required = true;
-        quantidadeProduto.required = true;
-
-        servicoCampos.classList.add('hidden');
-        descricaoServico.required = false; descricaoServico.value='';
-        document.querySelector('input[name="temIndicacao"][value="nao"]').checked = true;
-        indicacaoQuem.classList.add('hidden');
-        quemIndicar.required = false; quemIndicar.value='';
-
-      }else{
-        servicoCampos.classList.add('hidden');
-        produtoCampos.classList.add('hidden');
-      }
-    }
-    selectTipo.addEventListener('change', atualizarTipo);
     atualizarTipo();
+    atualizarIndicacao();
+    atualizarLink();
 
-    function atualizarIndicacao(){
-      const temIndicacao = document.querySelector('input[name="temIndicacao"]:checked')?.value;
-      if(temIndicacao==='sim'){
-        indicacaoQuem.classList.remove('hidden');
-        quemIndicar.required = false; // coloque true se quiser tornar obrigatório
-      }else{
-        indicacaoQuem.classList.add('hidden');
-        quemIndicar.required = false;
-        quemIndicar.value = '';
-      }
+    // re-preencher nome/email do usuário logado
+    if (typeof window.preencherCamposUsuario === 'function') {
+      window.preencherCamposUsuario();
     }
-    temIndicacaoGroup.addEventListener('change', atualizarIndicacao);
+  }
 
-    function atualizarLink(){
-      const temLink = document.querySelector('input[name="temLink"]:checked')?.value;
-      if(temLink==='sim'){
-        linkCampos.classList.remove('hidden');
-        if(linkCount===0) criarCampoLink();
-      }else{
-        linkCampos.classList.add('hidden');
-        listaLinks.innerHTML='';
-        linkCount=0;
-        atualizarBotaoAddLink();
-      }
-    }
-    temLinkGroup.addEventListener('change', atualizarLink);
+  // Função que realmente envia pro Apps Script / Planilha
+  // Retorna true/false indicando se aparentemente deu certo
+  async function enviarParaPlanilha(payload) {
+    const body = new URLSearchParams(payload);
 
-    // ======== INTEGRAÇÃO COM GOOGLE SHEETS (Apps Script) ========
-    const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbyXgFaJa-Ig6Z_bS7KXiqRbcAWAZlsgB0CIXkuZGB2by9W6H65VS58zr3HqBmG672Yr/exec';
+    let ok = false;
+    let parseOk = false;
 
-    function coletarLinks() {
-      const inputs = listaLinks.querySelectorAll('input[type="url"]');
-      const arr = [];
-      inputs.forEach(i => {
-        const v = i.value.trim();
-        if (v) arr.push(v);
+    try {
+      const resp = await fetch(WEBAPP_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+        body
       });
-      return arr;
+
+      // Se a resposta for opaque (ex.: por CORS), consideramos sucesso
+      if (resp.type === 'opaque') {
+        ok = true;
+      } else {
+        let data = null;
+        try { data = await resp.json(); parseOk = true; } catch (_){}
+        ok = resp.ok && (parseOk ? (data?.ok !== false) : true);
+      }
+    } catch (networkErr) {
+      // Fallback em erro de rede real tentando no-cors
+      try {
+        await fetch(WEBAPP_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+          body
+        });
+        ok = true;
+      } catch (_) {
+        ok = false;
+      }
     }
 
-    function desabilitarBotao(submitBtn, desabilitar) {
-      if (!submitBtn) return;
-      submitBtn.disabled = desabilitar;
-      submitBtn.style.opacity = desabilitar ? '0.7' : '1';
-      submitBtn.style.cursor  = desabilitar ? 'not-allowed' : 'pointer';
+    return ok;
+  }
+
+  // SUBMIT DO FORM
+  // AGORA: UI OTIMISTA TOTAL
+  // 1. Valida e monta payload
+  // 2. Mostra toast sucesso + limpa form IMEDIATAMENTE
+  // 3. Libera pra próxima solicitação na hora
+  // 4. Só depois tenta de fato mandar pro servidor (fetch)
+  form.addEventListener('submit', async function(e){
+    e.preventDefault();
+
+    // BLOQUEIO SE NÃO LOGADO
+    if (!window.isUserAuthed) {
+      toast('Você precisa estar logado para enviar.', 'error');
+      return;
     }
 
-    form.addEventListener('submit', async function(e){
-      e.preventDefault();
+    if (isSubmitting) return; // evita múltiplos envios simultâneos do MESMO clique
+    isSubmitting = true;
 
-      // BLOQUEIO SE NÃO LOGADO
-      if (!window.isUserAuthed) {
-        toast('Você precisa estar logado para enviar.', 'error');
+    const nome = document.getElementById('nome').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const unidade = document.getElementById('unidade').value;
+    const urgencia = document.getElementById('urgencia').value;
+    const prazoSelecionado = [...radiosPrazo].find(r=>r.checked)?.value;
+    const dataPrazo = inputDataPrazo.value;
+    const tipo = selectTipo.value;
+
+    // Validações básicas antes de montar payload
+    if(!nome || !email || !unidade || !urgencia || !tipo){
+      toast('Preencha todos os campos obrigatórios.', 'error');
+      isSubmitting=false;
+      return;
+    }
+    if(prazoSelecionado==='sim' && !dataPrazo){
+      toast('Por favor, selecione a data e hora do prazo.', 'error');
+      isSubmitting=false;
+      return;
+    }
+    if(tipo==='servico' && !descricaoServico.value.trim()){
+      toast('Descreva o serviço.', 'error');
+      isSubmitting=false;
+      return;
+    }
+    if(tipo==='produto'){
+      if(!nomeProduto.value.trim()){
+        toast('Informe o nome do produto.', 'error');
+        isSubmitting=false;
         return;
       }
-
-      if (isSubmitting) return; // trava dupla submissão
-      isSubmitting = true;
-
-      const submitBtn = form.querySelector('button[type="submit"]');
-
-      const nome = document.getElementById('nome').value.trim();
-      const email = document.getElementById('email').value.trim();
-      const unidade = document.getElementById('unidade').value;
-      const urgencia = document.getElementById('urgencia').value;
-      const prazoSelecionado = [...radiosPrazo].find(r=>r.checked)?.value;
-      const dataPrazo = inputDataPrazo.value;
-      const tipo = selectTipo.value;
-
-      // Validações
-      if(!nome || !email || !unidade || !urgencia || !tipo){
-        toast('Preencha todos os campos obrigatórios.', 'error'); isSubmitting=false; return;
+      if(!quantidadeProduto.value || Number(quantidadeProduto.value) < 1){
+        toast('Informe a quantidade (mínimo 1).', 'error');
+        isSubmitting=false;
+        return;
       }
-      if(prazoSelecionado==='sim' && !dataPrazo){
-        toast('Por favor, selecione a data e hora do prazo.', 'error'); isSubmitting=false; return;
-      }
-      if(tipo==='servico' && !descricaoServico.value.trim()){
-        toast('Descreva o serviço.', 'error'); isSubmitting=false; return;
-      }
-      if(tipo==='produto'){
-        if(!nomeProduto.value.trim()){
-          toast('Informe o nome do produto.', 'error'); isSubmitting=false; return;
+    }
+
+    // Monta payload para enviar pro Apps Script
+    const payload = {
+      nome,
+      email,
+      unidade,
+      prazo: prazoSelecionado,
+      dataPrazo, // "YYYY-MM-DDTHH:mm"
+      urgencia,
+      tipo,
+      descricaoServico: (tipo==='servico') ? (descricaoServico.value.trim() || '') : '',
+      temIndicacao: (tipo==='servico') ? (document.querySelector('input[name="temIndicacao"]:checked')?.value || 'nao') : '',
+      quemIndicar: (tipo==='servico') ? (quemIndicar.value.trim() || '') : '',
+      nomeProduto: (tipo==='produto') ? (nomeProduto.value.trim() || '') : '',
+      quantidadeProduto: (tipo==='produto') ? (quantidadeProduto.value || '') : '',
+      links: (tipo==='produto' && document.querySelector('input[name="temLink"]:checked')?.value === 'sim')
+        ? JSON.stringify(coletarLinks())
+        : JSON.stringify([])
+    };
+
+    // ID único por envio (idempotência no servidor)
+    payload.submissionId = (
+      crypto.randomUUID
+        ? crypto.randomUUID()
+        : String(Date.now()) + Math.random().toString(16).slice(2)
+    );
+
+    // ✅ UX OTIMISTA: a partir daqui a tela já age como "enviado com sucesso"
+    toast('Pedido enviado com sucesso!', 'success');
+
+    // limpa o formulário e volta pro estado inicial logo após o clique
+    resetarUIPosEnvioOtimista();
+
+    // libera pra próxima solicitação IMEDIATAMENTE
+    isSubmitting = false;
+
+    // Agora tentamos realmente enviar pro backend/planilha
+    const ok = await enviarParaPlanilha(payload);
+
+    if (!ok) {
+      console.error('Falha ao enviar pedido (fetch retornou erro).');
+      // Se der erro depois do feedback otimista, avisamos:
+      toast('Erro ao enviar. Tente novamente.', 'error');
+    }
+  });
+
+  // Toggle do menu mobile
+  (function(){
+    const menuToggle = document.getElementById('menuToggle');
+    const menuActions = document.getElementById('menuActions');
+
+    if(menuToggle && menuActions){
+      menuToggle.addEventListener('click', () => {
+        const isOpen = menuActions.classList.toggle('open');
+        menuToggle.setAttribute('aria-expanded', String(isOpen));
+      });
+
+      // fecha ao clicar fora
+      document.addEventListener('click', (e) => {
+        if(!menuActions.classList.contains('open')) return;
+        const clickedInside = menuActions.contains(e.target) || menuToggle.contains(e.target);
+        if(!clickedInside){
+          menuActions.classList.remove('open');
+          menuToggle.setAttribute('aria-expanded', 'false');
         }
-        if(!quantidadeProduto.value || Number(quantidadeProduto.value) < 1){
-          toast('Informe a quantidade (mínimo 1).', 'error'); isSubmitting=false; return;
+      });
+
+      // garante que ao voltar para desktop o menu feche
+      window.addEventListener('resize', () => {
+        if(window.innerWidth > 640 && menuActions.classList.contains('open')){
+          menuActions.classList.remove('open');
+          menuToggle.setAttribute('aria-expanded', 'false');
         }
-      }
-
-      const payload = {
-        nome,
-        email,
-        unidade,
-        prazo: prazoSelecionado,
-        dataPrazo, // "YYYY-MM-DDTHH:mm"
-        urgencia,
-        tipo,
-        descricaoServico: (tipo==='servico') ? (descricaoServico.value.trim() || '') : '',
-        temIndicacao: (tipo==='servico') ? (document.querySelector('input[name="temIndicacao"]:checked')?.value || 'nao') : '',
-        quemIndicar: (tipo==='servico') ? (quemIndicar.value.trim() || '') : '',
-        nomeProduto: (tipo==='produto') ? (nomeProduto.value.trim() || '') : '',
-        quantidadeProduto: (tipo==='produto') ? (quantidadeProduto.value || '') : '',
-        links: (tipo==='produto' && document.querySelector('input[name="temLink"]:checked')?.value === 'sim')
-          ? JSON.stringify(coletarLinks())
-          : JSON.stringify([])
-      };
-
-      // ID único por envio (idempotência no servidor)
-      payload.submissionId = (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2));
-
-      const body = new URLSearchParams(payload);
-
-      try {
-        desabilitarBotao(submitBtn, true);
-
-        let ok = false;
-        let parseOk = false;
-
-        try {
-          const resp = await fetch(WEBAPP_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
-            body
-          });
-
-          // Se a resposta for opaqua (ex.: por CORS), considere sucesso
-          if (resp.type === 'opaque') {
-            ok = true;
-          } else {
-            let data = null;
-            try { data = await resp.json(); parseOk = true; } catch (_){}
-            ok = resp.ok && (parseOk ? (data?.ok !== false) : true);
-          }
-        } catch (networkErr) {
-          // Fallback só em erro de rede real
-          try {
-            await fetch(WEBAPP_URL, {
-              method: 'POST',
-              mode: 'no-cors',
-              headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
-              body
-            });
-            ok = true;
-          } catch (_) {
-            ok = false;
-          }
-        }
-
-        if (!ok) throw new Error('Falha ao enviar');
-
-        // Sucesso
-        toast('Pedido enviado com sucesso!', 'success');
-
-        // Reset UI
-        form.reset();
-        linkCount = 0; listaLinks.innerHTML = ''; atualizarBotaoAddLink();
-        document.querySelector('input[name="prazo"][value="nao"]').checked = true;
-        document.querySelector('input[name="temIndicacao"][value="nao"]').checked = true;
-        document.querySelector('input[name="temLink"][value="nao"]').checked = true;
-        atualizarPrazo(); atualizarTipo(); atualizarIndicacao(); atualizarLink();
-
-      } catch (err) {
-        console.error(err);
-        toast(`Erro ao enviar: ${err.message || err}`, 'error');
-      } finally {
-        desabilitarBotao(submitBtn, false);
-        isSubmitting = false;
-      }
-    });
-
-    // Toggle do menu mobile
-    (function(){
-      const menuToggle = document.getElementById('menuToggle');
-      const menuActions = document.getElementById('menuActions');
-
-      if(menuToggle && menuActions){
-        menuToggle.addEventListener('click', () => {
-          const isOpen = menuActions.classList.toggle('open');
-          menuToggle.setAttribute('aria-expanded', String(isOpen));
-        });
-
-        // fecha ao clicar fora
-        document.addEventListener('click', (e) => {
-          if(!menuActions.classList.contains('open')) return;
-          const clickedInside = menuActions.contains(e.target) || menuToggle.contains(e.target);
-          if(!clickedInside){
-            menuActions.classList.remove('open');
-            menuToggle.setAttribute('aria-expanded', 'false');
-          }
-        });
-
-        // garante que ao voltar para desktop o menu feche
-        window.addEventListener('resize', () => {
-          if(window.innerWidth > 640 && menuActions.classList.contains('open')){
-            menuActions.classList.remove('open');
-            menuToggle.setAttribute('aria-expanded', 'false');
-          }
-        });
-      }
-    })();
-  </script>
+      });
+    }
+  })();
+</script>
 
 </body>
 </html>

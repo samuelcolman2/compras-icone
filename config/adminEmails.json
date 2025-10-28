@@ -1,8 +1,13 @@
 {
-  "admins": [
+  "adminAprovacao": [
+    "pedrolucas@icone.g12.br"
+  ],
+  "adminCompras": [
+    "solucoes.financeiro@icone.g12.br",
+    "setorcompras@icone.g12.br"
+  ],
+  "admSupremo": [
     "samuel.colman@icone.g12.br",
-    "pedrolucas@icone.g12.br",
-    "filipemarques@icone.g12.br",
-    "solucoes.financeiro@icone.g12.br"
+    "filipemarques@icone.g12.br"
   ]
 }

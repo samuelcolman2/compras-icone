@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+  <title>Admin • Compras</title>
+
+  <!-- Fonte + Tailwind -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Toastify -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+  <link rel="shortcut icon" href="https://storage.googleapis.com/ecdt-logo-saida/1ebe52af502e25d3521cb9dad62bb72f6bc1c347353cdda5fa381ef8627a9eb8/COLEGIO-E-CURSO-ICONE.webp" type="image/x-icon">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { primaria: '#F1663C' },
+          boxShadow: { glow: '0 0 0 3px rgba(241,102,60,0.15), 0 10px 25px -5px rgba(0,0,0,0.25)' },
+          screens: { xs: '380px' }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Poppins', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+
+    :root{
+      --brand:#F1663C;
+      --white:#FFFFFF;
+      --cantina-primary:#FD7F08;
+      --cantina-secondary:#253237;
+      --cantina-text:#FD7F08;
+      --cantina-border:#e2e8f0;
+    }
+
+    nav.cantina-nav{
+      position:sticky; top:0; z-index:50;
+      background:var(--cantina-secondary);
+      border-bottom:3px solid var(--cantina-primary);
+      color:var(--cantina-text);
+      font-family: 'Poppins', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+    nav.cantina-nav .cantina-container{
+      max-width:min(98vw, 1400px); margin:0 auto; padding:0 12px;
+      height:96px; display:flex; align-items:center; justify-content:space-between;
+    }
+    nav.cantina-nav a{ display:flex; align-items:center; text-decoration:none; }
+    nav.cantina-nav img{ height:64px; width:auto; }
+    nav.cantina-nav .brand{ display:flex; align-items:center; gap:12px; color:var(--cantina-text); height:100%; }
+    nav.cantina-nav .brand .divider{ width:2px; height:70%; align-self:center; background:var(--cantina-primary); border-radius:2px; }
+    nav.cantina-nav .brand .title{
+      font-weight:800; letter-spacing:.5px;
+      font-size:clamp(18px, 3.8vw, 32px);
+      line-height:1.15; white-space:normal; word-break:keep-all;
+      color:var(--cantina-text);
+      text-transform:uppercase;
+    }
+    nav.cantina-nav .actions{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+    nav.cantina-nav .btn{
+      padding:10px 12px; border-radius:12px; border:1px solid var(--cantina-border);
+      background:#fff; color:#000; cursor:pointer; transition:transform .15s ease, box-shadow .15s ease;
+      font-weight:600;
+    }
+    nav.cantina-nav .btn:hover{ transform:translateY(-1px); box-shadow:0 2px 10px rgba(2,8,23,.06); }
+    nav.cantina-nav .menu-toggle{
+      display:none; border:1px solid var(--cantina-border);
+      background:#fff; color:#000; border-radius:10px;
+      padding:8px; cursor:pointer;
+    }
+    nav.cantina-nav .email{
+      color:#e2e8f0; font-size:12px; padding:6px 10px; border-radius:10px; background:rgba(255,255,255,0.06);
+      border:1px solid rgba(226,232,240,0.18); max-width:52ch; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+    }
+
+    @media (max-width: 640px){
+      nav.cantina-nav .cantina-container{ height:72px; position:relative; }
+      nav.cantina-nav img{ height:48px; }
+      nav.cantina-nav .brand{ flex:1; min-width:0; }
+      nav.cantina-nav .menu-toggle{
+        display:inline-flex; align-items:center; justify-content:center;
+        width:40px; height:40px; padding:6px; border-radius:10px;
+      }
+      nav.cantina-nav .actions{
+        position:absolute; right:12px; top:calc(100% + 8px); z-index:60;
+        display:none; flex-direction:column; gap:6px;
+        background:#ffffff; border:1px solid var(--cantina-border); border-radius:12px;
+        padding:10px; width:min(78vw, 280px); box-shadow:0 12px 30px rgba(2,8,23,.18);
+      }
+      nav.cantina-nav .actions.open{ display:flex; }
+      nav.cantina-nav .actions .btn{ width:100%; justify-content:center; }
+      nav.cantina-nav .actions .email{ color:#0f172a; background:#f8fafc; border-color:#e2e8f0; }
+    }
+    @media (max-width: 400px){
+      nav.cantina-nav .brand .title{ font-size:clamp(16px, 5vw, 22px); }
+    }
+
+    /* ===== Tabs ===== */
+    .tab-btn {
+      border-radius:0.5rem;
+      padding:0.375rem 0.75rem;
+      font-size:0.875rem;
+      font-weight:600;
+      border:1px solid;
+      transition: all .2s ease;
+      display:flex;
+      align-items:center;
+      gap:4px;
+      line-height:1.2;
+    }
+    .tab-active {
+      background:#fff;
+      color:#0f172a;
+      border-color:#fff;
+      box-shadow: 0 8px 16px -8px rgba(0,0,0,.25);
+    }
+    .tab-idle {
+      background:rgba(255,255,255,.7);
+      color:#475569;
+      border-color:rgba(255,255,255,.6);
+    }
+    .tab-idle:hover { background:#fff; }
+
+    /* ===== Tabela ===== */
+    .grid-table{
+      border-collapse: separate;
+      border-spacing: 0;
+      background-color: #f8fafc;
+      width: 100%;
+      table-layout: fixed;
+    }
+    .grid-table thead th{
+      background-color: rgba(255,255,255,.85);
+      backdrop-filter: saturate(1.2);
+    }
+    .grid-table th,
+    .grid-table td{
+      border-right: 1px solid #e2e8f0;
+      border-bottom: 1px solid #e2e8f0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      vertical-align: top;
+    }
+    .grid-table tr > *:first-child{ border-left: 1px solid #e2e8f0; }
+    .grid-table thead tr:first-child th{ border-top: 1px solid #e2e8f0; }
+    .grid-table tbody tr:hover td{ background-color: #f1f5f9; }
+
+    .grid-table th.p-3,
+    .grid-table td.p-3{ padding: .5rem .5rem; }
+
+    .grid-table td.col-detalhes{ width: 280px; }
+    .grid-table td.col-status{ width: 160px; }
+    .grid-table td.col-acoes{ width:110px; }
+
+    .scroll-3{
+      display:block;
+      line-height: 1.35;
+      max-height: calc(3 * 1.35em);
+      overflow-y: auto;
+      word-break: break-word;
+      scrollbar-width: thin;
+      scrollbar-color: #cbd5e1 transparent;
+    }
+    .scroll-3::-webkit-scrollbar{ width:6px; }
+    .scroll-3::-webkit-scrollbar-thumb{ background:#cbd5e1; border-radius:8px; }
+    .scroll-3:hover::-webkit-scrollbar-thumb{ background:#94a3b8; }
+
+    /* Badge status */
+    .badge {
+      display:inline-flex;
+      align-items:center;
+      padding:2px 8px;
+      border-radius:9999px;
+      font-size:12px;
+      font-weight:600;
+      border-width:1px;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen text-black antialiased" style="background: var(--cantina-secondary);">
+
+  <!-- ===== NAVBAR ===== -->
+  <nav class="cantina-nav" aria-label="Barra superior">
+    <div class="cantina-container">
+
+      <a class="brand" href="#">
+        <img src="https://iconecolegioecurso.com.br/wp-content/uploads/2022/08/xlogo_icone_site.png.pagespeed.ic_.QgXP3GszLC.webp"
+             alt="Logo Ícone Colégio e Curso"
+             onerror="this.onerror=null;this.src='https://placehold.co/150x50/eeeeee/333333?text=Logo';">
+        <span class="divider" aria-hidden="true"></span>
+        <span class="title">Compras</span>
+      </a>
+
+      <div class="actions">
+        <!-- opcional: botão sair -->
+        <button id="btnSair" class="btn text-xs sm:text-sm leading-none">Sair</button>
+      </div>
+
+    </div>
+  </nav>
+
+  <!-- CONTEÚDO -->
+  <main class="w-full max-w-7xl mx-auto px-4 pb-20 pt-6">
+    <div class="bg-[#3A474C] border border-white/60 rounded-xl sm:rounded-2xl shadow-2xl shadow-glow p-4 xs:p-5 sm:p-6 md:p-8 text-white">
+
+      <!-- Top bar -->
+      <div class="flex flex-col gap-3">
+        <!-- Linha contador + atualizar -->
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3">
+          <div class="text-sm text-slate-800">
+            <span style="color:#e2e8f0" id="contador"></span>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button
+              id="btnAtualizar"
+              class="rounded-lg border border-slate-200 bg-white text-slate-900 px-3 py-2 text-sm font-semibold shadow hover:-translate-y-0.5 hover:shadow-md transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primaria/30"
+            >
+              Atualizar
+            </button>
+          </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="flex flex-wrap items-center gap-2">
+          <button id="tabPendentes" class="tab-btn tab-active" data-tab="pendentes">
+            Pendentes Financeiro
+            <span style="display:none;" id="countPendentes" class="ml-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-orange-100 text-orange-700">0</span>
+          </button>
+
+          <button id="tabComprados" class="tab-btn tab-idle" data-tab="comprados">
+            Comprados
+            <span style="display:none;" id="countComprados" class="ml-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-green-100 text-green-700">0</span>
+          </button>
+        </div>
+
+        <!-- Texto de apoio da aba -->
+        <div class="text-xs text-slate-300 leading-snug" id="tabHelpText">
+          Itens aprovados aguardando compra.
+        </div>
+      </div>
+
+      <!-- ÁREA DA TABELA (renderizada via JS, muda conforme aba) -->
+      <div id="tableWrapper" class="mt-4 overflow-x-auto border border-slate-200/70 rounded-xl bg-slate-50 text-black">
+        <div id="tableArea" class="min-w-full text-xs sm:text-sm p-6 text-center text-slate-600">
+          Carregando…
+        </div>
+      </div>
+
+      <!-- PAGINAÇÃO -->
+      <div id="pager" class="mt-3 flex flex-wrap items-center justify-between gap-2 text-sm text-slate-200"></div>
+
+    </div>
+  </main>
+
+  <!-- MODAL "MARCAR COMPRADO" -->
+  <div id="modalCompra" class="fixed inset-0 hidden items-center justify-center bg-black/40 z-50 px-3">
+    <div class="w-full max-w-lg bg-white rounded-2xl p-4 sm:p-6 shadow-2xl">
+      <h3 class="text-base sm:text-lg font-bold">Marcar como Comprado</h3>
+      <p class="text-sm text-slate-600 mt-1">Informe os detalhes da compra.</p>
+
+      <div class="mt-4 space-y-4">
+
+        <!-- Valor -->
+        <div>
+          <label class="block text-sm text-slate-700 font-medium mb-1">Valor total</label>
+          <input
+            id="mcValor"
+            type="text"
+            inputmode="numeric"
+            autocomplete="off"
+            class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20"
+            placeholder="R$ 0,00">
+          <p class="text-[11px] text-slate-500 mt-1">Ex.: R$ 129,90</p>
+        </div>
+
+        <!-- Prazo / previsão de entrega -->
+        <div>
+          <label class="block text-sm text-slate-700 font-medium mb-1">Prazo / previsão de entrega</label>
+          <input
+            id="mcPrazo"
+            type="text"
+            inputmode="numeric"
+            maxlength="10"
+            autocomplete="off"
+            class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20"
+            placeholder="dd/mm/aaaa">
+          <p class="text-[11px] text-slate-500 mt-1">Formato: 31/12/2025</p>
+        </div>
+
+        <!-- Link da compra -->
+        <div>
+          <label class="block text-sm text-slate-700 font-medium mb-1">Link exato onde foi comprado</label>
+          <input
+            id="mcLink"
+            type="url"
+            class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20"
+            placeholder="https://lojaexemplo.com/produto123">
+          <p class="text-[11px] text-slate-500 mt-1">Obrigatório (pode ser diferente do link sugerido originalmente)</p>
+        </div>
+
+      </div>
+
+      <div class="mt-2 flex items-start justify-between">
+        <span id="mcError" class="text-xs text-red-600 hidden">Preencha valor, data válida e link da compra.</span>
+        <span id="mcCount" class="text-xs text-slate-500"></span>
+      </div>
+
+      <div class="mt-4 flex flex-col xs:flex-row justify-end gap-2">
+        <button id="mcCancelar" class="rounded-lg border px-3 py-2 text-sm">Cancelar</button>
+        <button id="mcConfirmar" class="rounded-lg bg-primaria text-white px-3 py-2 text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase + lógica -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
+
+    // ======= CONFIG FIREBASE =======
+    const firebaseConfig = {
+      apiKey: "AIzaSyAEZidq8mdAUKeJXvSQeE01gVOLWe_cp78",
+      authDomain: "compras-icone.firebaseapp.com",
+      projectId: "compras-icone",
+      storageBucket: "compras-icone.appspot.com",
+      messagingSenderId: "831706842201",
+      appId: "1:831706842201:web:9b68ae4f98ad93c5a99d48",
+    };
+
+    // Endpoint Apps Script publicado como Web App
+    const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbxIvX5aUQzfQS8R_zKlivaa_dPzz9rWSzPcG2-3br1nYO6iPe4YYyvk1j7e3eBkS5_v/exec';
+
+    // Inicializa Firebase
+    const app  = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // ======= QUEM PODE ACESSAR ESSA PÁGINA (/financeiro/) =======
+    // Pode acessar:
+    // - adminCompras
+    // - admSupremo
+    //
+    // (adminAprovacao NÃO entra aqui)
+    //
+    // adminEmails.json:
+    // {
+    //   "adminAprovacao": [...],
+    //   "adminCompras": [...],
+    //   "admSupremo": [...]
+    // }
+
+    let ALLOWED_EMAILS = new Set();
+
+    async function carregarAdmins() {
+      try {
+        const resp = await fetch('../config/adminEmails.json', { cache: 'no-cache' });
+        if (!resp.ok) {
+          console.error('Não consegui carregar adminEmails.json', resp.status);
+          return;
+        }
+
+        const data = await resp.json();
+
+        const listaCompras  = Array.isArray(data.adminCompras) ? data.adminCompras : [];
+        const listaSupremo  = Array.isArray(data.admSupremo)   ? data.admSupremo   : [];
+
+        ALLOWED_EMAILS = new Set(
+          [...listaCompras, ...listaSupremo].map(e => e.toLowerCase())
+        );
+
+      } catch (err) {
+        console.error('Erro buscando adminEmails.json:', err);
+      }
+    }
+
+    // ======= ESTADO LOCAL =======
+    let currentUser = null;
+
+    let dadosBrutos = [];           // tudo que vem do Apps Script (Pedidos + Comprados)
+    let pendentesFinanceiro = [];   // status === "aprovado"
+    let comprados = [];             // status === "comprado"
+
+    let activeTab = 'pendentes';    // 'pendentes' | 'comprados'
+
+    let page = 1;
+    const pageSize = 5;
+
+    // estado do modal "marcar comprado"
+    let modalCompraState = { id:null };
+
+    // trava anti duplo clique no confirmar (evita smash do botão)
+    let isSavingCompra = false;
+
+    // ======= UTILS =======
+    function $(sel){ return document.querySelector(sel); }
+
+    function toast(msg, type='info'){
+      const isSuccess = type==='success';
+      const isError   = type==='error';
+      Toastify({
+        text: msg,
+        duration: 3200,
+        close: true,
+        gravity: 'top',
+        position: 'right',
+        stopOnFocus: true,
+        style: {
+          background: isSuccess
+            ? 'linear-gradient(90deg,#16a34a,#22c55e)'
+            : isError
+            ? 'linear-gradient(90deg,#dc2626,#ef4444)'
+            : 'linear-gradient(90deg,#334155,#64748b)',
+          color:'#fff',
+          fontWeight:'600',
+          borderRadius:'10px',
+          padding:'10px 16px',
+          boxShadow:'0 10px 25px -10px rgba(0,0,0,.35)'
+        },
+        offset: {x:8, y:10}
+      }).showToast();
+    }
+
+    function esc(s){
+      return String(s ?? '')
+        .replace(/&/g,'&amp;')
+        .replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;')
+        .replace(/"/g,'&quot;')
+        .replace(/'/g,'&#39;');
+    }
+
+    function fmtDate(d){
+      if(!d) return '-';
+      const dt = new Date(d);
+      return isNaN(dt.getTime()) ? '-' : dt.toLocaleString('pt-BR');
+    }
+
+    function humanTipo(item){
+      if(item.tipo==='servico') return `Serviço`;
+      if(item.tipo==='produto') return `Produto`;
+      return '-';
+    }
+
+    function badgeStatus(s){
+      const base = 'inline-flex items-center px-2 py-0.5 rounded-full text-[11px] sm:text-xs font-semibold border';
+      const map = {
+        pendente:  'bg-yellow-50 text-yellow-800 border-yellow-200',
+        aprovado:  'bg-green-50 text-green-800 border-green-200',
+        reprovado: 'bg-red-50 text-red-800 border-red-200',
+        comprado:  'bg-blue-50 text-blue-800 border-blue-200'
+      };
+      return `<span class="${base} ${map[s]||'bg-slate-50 text-slate-700 border-slate-200'}">${(s||'pendente').toUpperCase()}</span>`;
+    }
+
+    function parseLinks(links){
+      if(Array.isArray(links)) return links;
+      if(typeof links==='string'){
+        try{
+          const j = JSON.parse(links);
+          return Array.isArray(j)? j : [];
+        }catch{
+          return links.split(/\s+/).filter(Boolean);
+        }
+      }
+      return [];
+    }
+
+    // ======= Máscaras / validações =======
+    function formatCurrencyFromDigits(digits){
+      if(!digits) {
+        return 'R$ 0,00';
+      }
+      digits = digits.replace(/^0+/, '') || '0';
+
+      if(digits.length === 1){
+        return 'R$ 0,0' + digits;
+      }
+      if(digits.length === 2){
+        return 'R$ 0,' + digits;
+      }
+
+      const intPart = digits.slice(0, -2);
+      const decPart = digits.slice(-2);
+
+      const intPartMilhar = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+      return `R$ ${intPartMilhar},${decPart}`;
+    }
+
+    function handleValorInput(e){
+      let digits = e.target.value.replace(/\D/g,'');
+      e.target.dataset.digits = digits;
+      e.target.value = formatCurrencyFromDigits(digits);
+    }
+
+    function maskDateBR(digits){
+      digits = digits.slice(0,8); // ddmmAAAA
+
+      if(digits.length <= 2){
+        return digits;
+      } else if(digits.length <= 4){
+        return digits.slice(0,2) + '/' + digits.slice(2);
+      } else {
+        return digits.slice(0,2) + '/' + digits.slice(2,4) + '/' + digits.slice(4);
+      }
+    }
+
+    function handlePrazoInput(e){
+      let digits = e.target.value.replace(/\D/g,'');
+      e.target.value = maskDateBR(digits);
+    }
+
+    function isValidDateBR(str){
+      const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(str);
+      if(!m) return false;
+      const dd = parseInt(m[1],10);
+      const mm = parseInt(m[2],10) - 1;
+      const yyyy = parseInt(m[3],10);
+      const dt = new Date(yyyy, mm, dd);
+      return dt.getFullYear()===yyyy && dt.getMonth()===mm && dt.getDate()===dd;
+    }
+
+    // ======= Paginação =======
+    function getPageSlice(list){
+      const total = list.length;
+      const totalPages = Math.max(1, Math.ceil(total / pageSize));
+      if (page > totalPages) page = totalPages;
+      if (page < 1) page = 1;
+      const start = (page - 1) * pageSize;
+      return {
+        rows: list.slice(start, start + pageSize),
+        total,
+        totalPages
+      };
+    }
+
+    function goToPage(n){
+      page = n;
+      render();
+    }
+
+    function renderPaginacao(totalPages, total){
+      const el = document.getElementById('pager');
+      if (!el) return;
+
+      if (total <= pageSize){
+        el.innerHTML = `<div class="text-slate-200">${total} registro(s)</div>`;
+        return;
+      }
+
+      const mkBtn = (lbl, p, disabled=false, aria='') =>
+        `<button ${aria} ${disabled ? 'disabled' : ''} data-page="${p}"
+          class="px-2.5 py-1.5 rounded border text-sm font-semibold
+                  ${disabled ? 'opacity-50 cursor-not-allowed' : 'bg-white hover:-translate-y-0.5 hover:shadow transition'}">
+          ${lbl}
+        </button>`;
+
+      const start = Math.max(1, page - 2);
+      const end   = Math.min(totalPages, start + 4);
+
+      const nums  = Array.from({length: end - start + 1}, (_,i)=> start+i).map(n=>{
+        const active = n===page;
+        return `<button data-page="${n}"
+                  class="px-2.5 py-1.5 rounded border text-sm font-semibold
+                        ${active ? 'bg-primaria text-white border-primaria' : 'bg-white hover:-translate-y-0.5 hover:shadow transition'}">
+                  ${n}
+                </button>`;
+      }).join('');
+
+      el.innerHTML = `
+        <div class="text-slate-200">Exibindo ${Math.min(page*pageSize, total)} de ${total}</div>
+        <div class="flex items-center gap-1">
+          ${mkBtn('‹ Anterior', page-1, page===1, 'aria-label="Página anterior"')}
+          ${nums}
+          ${mkBtn('Próxima ›', page+1, page===totalPages, 'aria-label="Próxima página"')}
+        </div>
+      `;
+
+      el.querySelectorAll('button[data-page]').forEach(b=>{
+        b.addEventListener('click', ()=>{
+          const p = parseInt(b.getAttribute('data-page'), 10);
+          if (!Number.isNaN(p)) goToPage(p);
+        });
+      });
+    }
+
+    // ======= Separar listas =======
+    function recalcLists(){
+      pendentesFinanceiro = dadosBrutos.filter(x =>
+        String(x.status||'').toLowerCase() === 'aprovado'
+      );
+      comprados = dadosBrutos.filter(x =>
+        String(x.status||'').toLowerCase() === 'comprado'
+      );
+    }
+
+    // helper p/ mover item localmente pra "comprado" (optimistic UI)
+    function marcarItemComoCompradoLocal(id, valor, prazo, linkCompra){
+      const alvo = dadosBrutos.find(x => x.submissionId === id);
+      if (alvo){
+        alvo.status        = 'comprado';
+        alvo.valorCompra   = valor;
+        alvo.prazoEntrega  = prazo;
+        alvo.linkCompra    = linkCompra;
+        alvo.comprador     = currentUser?.email || '';
+        alvo.compradoPor   = currentUser?.email || '';
+        alvo.compradoEm    = new Date().toISOString();
+      }
+      recalcLists();
+    }
+
+    // ======= Tabela =======
+    function rowPendentes(item){
+      const links = parseLinks(item.links);
+      const prazoStr =
+        (item.prazo==='sim' && item.dataPrazo)
+          ? fmtDate(item.dataPrazo)
+          : '-';
+
+      return `
+        <tr class='align-top'>
+          <td class='p-3 hidden md:table-cell'>
+            U${esc(item.unidade||'-')}
+          </td>
+
+          <td class='p-3'>
+            ${esc(humanTipo(item))}
+          </td>
+
+          <td class='p-3 col-detalhes'>
+            <div class="font-semibold scroll-3">
+              ${esc(
+                item.tipo==='produto'
+                  ? (item.nomeProduto||'-')
+                  : (item.descricaoServico||'-')
+              )}
+            </div>
+            ${
+              item.tipo==='produto'
+                ? `<div class="text-xs text-slate-600">Qtd: ${esc(item.quantidadeProduto||'-')}</div>`
+                : (item.quemIndicar
+                    ? `<div class="text-xs text-slate-600 break-words">Indicação: ${esc(item.quemIndicar)}</div>`
+                    : '')
+            }
+            ${
+              item.observacao
+                ? `<div class="text-xs text-slate-600 break-words">${esc(item.observacao)}</div>`
+                : ''
+            }
+          </td>
+
+          <td class='p-3 whitespace-nowrap hidden sm:table-cell'>
+            ${esc(prazoStr)}
+          </td>
+
+          <td class='p-3 uppercase hidden sm:table-cell'>
+            ${esc((item.urgencia||'-').toString().toUpperCase())}
+          </td>
+
+          <td class='p-3 hidden lg:table-cell'>
+            ${
+              links.length
+                ? `<ul class="list-disc pl-4 text-xs break-all">
+                    ${links.map((l,i)=>`<li><a class="underline text-primaria" href="${esc(l)}" target="_blank" rel="noopener">Link ${i+1}</a></li>`).join('')}
+                   </ul>`
+                : `<div class="text-sm text-slate-600">Sem links.</div>`
+            }
+          </td>
+
+          <td class='p-3 col-status'>
+            ${badgeStatus(item.status||'aprovado')}
+            <div class="text-[10px] text-slate-500 leading-tight mt-1">
+              Aprovado em:<br>
+              ${item.aprovadoEm ? esc(fmtDate(item.aprovadoEm)) : '-'}
+            </div>
+            <div class="text-[10px] text-slate-500 leading-tight">
+              Por:<br>
+              ${item.aprovadoPor ? esc(item.aprovadoPor) : '-'}
+            </div>
+          </td>
+
+          <td class='p-3 col-acoes'>
+            <button
+              class="btn-marcar-comprado w-full rounded-lg border border-slate-300 bg-white text-[11px] font-semibold px-2 py-1 hover:-translate-y-0.5 hover:shadow transition"
+              data-id="${esc(item.submissionId)}">
+              Marcar comprado
+            </button>
+          </td>
+        </tr>
+      `;
+    }
+
+    function rowComprados(item){
+      const linksOriginais = parseLinks(item.links);
+      const listaLinks = [];
+
+      if(item.linkCompra){
+        listaLinks.push({
+          label: 'Link comprado',
+          url: item.linkCompra
+        });
+      }
+      linksOriginais.forEach((l,i)=>{
+        listaLinks.push({
+          label: `Link original ${i+1}`,
+          url: l
+        });
+      });
+
+      const valorStr    = item.valorCompra ? item.valorCompra : '-';
+      const entregaStr  = item.prazoEntrega ? item.prazoEntrega : '-';
+
+      return `
+        <tr class='align-top'>
+          <td class='p-3 hidden md:table-cell'>
+            U${esc(item.unidade||'-')}
+          </td>
+
+          <td class='p-3'>
+            ${esc(humanTipo(item))}
+          </td>
+
+          <td class='p-3 col-detalhes'>
+            <div class="font-semibold scroll-3">
+              ${esc(
+                item.tipo==='produto'
+                  ? (item.nomeProduto||'-')
+                  : (item.descricaoServico||'-')
+              )}
+            </div>
+
+            ${
+              item.tipo==='produto'
+                ? `<div class="text-xs text-slate-600">Qtd: ${esc(item.quantidadeProduto||'-')}</div>`
+                : (item.quemIndicar
+                    ? `<div class="text-xs text-slate-600 break-words">Indicação: ${esc(item.quemIndicar)}</div>`
+                    : '')
+            }
+
+            ${
+              item.observacao
+                ? `<div class="text-xs text-slate-600 break-words">${esc(item.observacao)}</div>`
+                : ''
+            }
+          </td>
+
+          <td class='p-3 whitespace-nowrap'>
+            ${esc(valorStr)}
+          </td>
+
+          <td class='p-3 whitespace-nowrap'>
+            ${esc(entregaStr)}
+          </td>
+
+          <td class='p-3 hidden lg:table-cell'>
+            ${
+              listaLinks.length
+                ? `<ul class="list-disc pl-4 text-xs break-all">
+                    ${listaLinks.map(l=>`<li><a class="underline text-primaria" href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)}</a></li>`).join('')}
+                   </ul>`
+                : `<div class="text-sm text-slate-600">Sem links.</div>`
+            }
+          </td>
+
+          <td class='p-3 col-status'>
+            ${badgeStatus(item.status||'comprado')}
+            <div class="text-[10px] text-slate-500 leading-tight mt-1">
+              Comprado em:<br>
+              ${item.compradoEm ? esc(fmtDate(item.compradoEm)) : '-'}
+            </div>
+            <div class="text-[10px] text-slate-500 leading-tight">
+              Por:<br>
+              ${item.compradoPor ? esc(item.compradoPor) : '-'}
+            </div>
+          </td>
+        </tr>
+      `;
+    }
+
+    function buildTableHTMLPendentes(lista){
+      const rowsHTML = lista.length
+        ? lista.map(rowPendentes).join('')
+        : `<tr><td colspan="8" class="p-6 text-center text-slate-600">Nenhum item aprovado aguardando compra.</td></tr>`;
+
+      return `
+        <table class="min-w-full text-xs sm:text-sm grid-table">
+          <thead>
+            <tr class="text-left text-slate-700">
+              <th class="p-3 hidden md:table-cell">Unidade</th>
+              <th class="p-3">Tipo</th>
+              <th class="p-3">Detalhes</th>
+              <th class="p-3 hidden sm:table-cell">Prazo</th>
+              <th class="p-3 hidden sm:table-cell">Urgência</th>
+              <th class="p-3 hidden lg:table-cell">Links</th>
+              <th class="p-3">Status</th>
+              <th class="p-3">Ações</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyMain" class="bg-slate-50">
+            ${rowsHTML}
+          </tbody>
+        </table>
+      `;
+    }
+
+    function buildTableHTMLComprados(lista){
+      const rowsHTML = lista.length
+        ? lista.map(rowComprados).join('')
+        : `<tr><td colspan="7" class="p-6 text-center text-slate-600">Nenhum item marcado como comprado ainda.</td></tr>`;
+
+      return `
+        <table class="min-w-full text-xs sm:text-sm grid-table">
+          <thead>
+            <tr class="text-left text-slate-700">
+              <th class="p-3 hidden md:table-cell">Unidade</th>
+              <th class="p-3">Tipo</th>
+              <th class="p-3">Detalhes</th>
+              <th class="p-3 whitespace-nowrap">Valor</th>
+              <th class="p-3 whitespace-nowrap">Entrega</th>
+              <th class="p-3 hidden lg:table-cell">Links</th>
+              <th class="p-3">Status</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyMain" class="bg-slate-50">
+            ${rowsHTML}
+          </tbody>
+        </table>
+      `;
+    }
+
+    function buildTableHTML(lista, tab){
+      return tab==='pendentes'
+        ? buildTableHTMLPendentes(lista)
+        : buildTableHTMLComprados(lista);
+    }
+
+    // ======= MODAL COMPRA =======
+    function abrirModalCompra(id){
+      modalCompraState = { id };
+
+      $('#mcValor').value = '';
+      $('#mcValor').dataset.digits = '';
+      $('#mcPrazo').value = '';
+      $('#mcLink').value  = '';
+
+      $('#mcError').classList.add('hidden');
+      $('#mcConfirmar').disabled = false;
+
+      const modal = $('#modalCompra');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+
+      setTimeout(()=> $('#mcValor').focus(), 0);
+    }
+
+    function fecharModalCompra(){
+      const modal = $('#modalCompra');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+      modalCompraState = { id:null };
+    }
+
+    function attachRowHandlers(){
+      document.querySelectorAll('.btn-marcar-comprado').forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          const id = btn.getAttribute('data-id');
+          abrirModalCompra(id);
+        });
+      });
+    }
+
+    // ======= CHAMA BACKEND PRA MARCAR COMO COMPRADO =======
+    async function atualizarCompra(submissionId, valorCompra, prazoEntrega, linkCompra){
+      const body = new URLSearchParams({
+        action: 'markbought',
+        submissionId,
+        status: 'comprado',
+        valorCompra,
+        prazoEntrega,
+        linkCompra,
+        comprador: currentUser?.email || ''
+      });
+
+      const result = await chamarAPI(WEBAPP_URL, {
+        method:'POST',
+        headers:{'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8'},
+        body
+      });
+
+      if(!result.ok){
+        const backendErr = result?.data?.error || result?.error || 'Falha ao marcar como comprado';
+        throw new Error(backendErr);
+      }
+    }
+
+    // ======= TABS / RENDER =======
+    function updateTabsUI(){
+      const p = $('#tabPendentes');
+      const c = $('#tabComprados');
+
+      if(activeTab==='pendentes'){
+        p.classList.add('tab-active'); p.classList.remove('tab-idle');
+        c.classList.add('tab-idle');   c.classList.remove('tab-active');
+        $('#tabHelpText').innerHTML = 'Itens aprovados aguardando compra.';
+      }else{
+        c.classList.add('tab-active'); c.classList.remove('tab-idle');
+        p.classList.add('tab-idle');   p.classList.remove('tab-active');
+        $('#tabHelpText').innerHTML = 'Itens já comprados. Mostra valor, previsão de entrega e link final da compra.';
+      }
+
+      const cp = $('#countPendentes');
+      const cc = $('#countComprados');
+      if (cp){
+        cp.textContent = pendentesFinanceiro.length;
+        cp.style.display = pendentesFinanceiro.length ? 'inline-block' : 'none';
+      }
+      if (cc){
+        cc.textContent = comprados.length;
+        cc.style.display = comprados.length ? 'inline-block' : 'none';
+      }
+    }
+
+    function setTab(tab){
+      activeTab = tab;
+      page = 1;
+      render();
+    }
+
+    function render(){
+      const baseList = (activeTab==='pendentes')
+        ? pendentesFinanceiro
+        : comprados;
+
+      const ordenados = [...baseList].sort(
+        (a,b)=> new Date(b.timestamp||0) - new Date(a.timestamp||0)
+      );
+
+      const { rows, total, totalPages } = getPageSlice(ordenados);
+
+      const tableAreaEl = $('#tableArea');
+      if(tableAreaEl){
+        tableAreaEl.innerHTML = buildTableHTML(rows, activeTab);
+      }
+
+      renderPaginacao(totalPages, total);
+
+      if(activeTab === 'pendentes'){
+        $('#contador').textContent = `${total} item(ns) aguardando compra`;
+      } else {
+        $('#contador').textContent = `${total} item(ns) já comprados`;
+      }
+
+      updateTabsUI();
+      attachRowHandlers();
+    }
+
+    // ======= REDE =======
+    async function chamarAPI(url, opts={}){
+      try {
+        const resp = await fetch(url, opts);
+
+        if (resp.type === 'opaque') {
+          console.warn('[chamarAPI] resposta opaqua (provável CORS bloqueado)');
+          return { ok:true, opaque:true };
+        }
+
+        const data = await resp.json().catch(err => {
+          console.error('[chamarAPI] erro parse json:', err);
+          return null;
+        });
+
+        return {
+          ok: resp.ok && (data?.ok !== false),
+          data,
+          error: data?.error
+        };
+
+      } catch (err) {
+        console.error('[chamarAPI] falhou geral:', err);
+
+        try {
+          await fetch(url, { ...opts, mode:'no-cors' });
+          console.warn('[chamarAPI] fallback no-cors usado, resposta não legível');
+          return { ok:true, opaque:true };
+        } catch (err2) {
+          console.error('[chamarAPI] fallback também falhou:', err2);
+          return { ok:false, error: err2?.message || String(err2) };
+        }
+      }
+    }
+
+    async function carregarLista(){
+      const tableAreaEl = $('#tableArea');
+      if(tableAreaEl){
+        tableAreaEl.innerHTML = `<div class="p-6 text-center text-slate-600">Carregando…</div>`;
+      }
+
+      const url = WEBAPP_URL + '?action=list&email=' + encodeURIComponent(currentUser.email);
+
+      const { ok, data, error, opaque } = await chamarAPI(url);
+
+      if(opaque){
+        if(tableAreaEl){
+          tableAreaEl.innerHTML = `
+            <div class="p-6 text-center text-red-700">
+              O navegador bloqueou a resposta (CORS).<br>
+              Isso é limitação do Apps Script público.
+            </div>`;
+        }
+        return;
+      }
+
+      if(!ok){
+        const msg = data?.error === 'forbidden'
+          ? 'Sem permissão para acessar. Fale com o administrador.'
+          : `Falha ao carregar (${error||'erro'}).`;
+        if(tableAreaEl){
+          tableAreaEl.innerHTML = `<div class="p-6 text-center text-red-700">${msg}</div>`;
+        }
+        return;
+      }
+
+      dadosBrutos = Array.isArray(data?.items) ? data.items : [];
+      recalcLists();
+      render();
+      toast('Lista atualizada', 'success');
+    }
+
+    // ======= EVENTOS DO MODAL COMPRA =======
+    $('#mcCancelar').addEventListener('click', fecharModalCompra);
+    $('#modalCompra').addEventListener('click', (e)=>{
+      if(e.target.id==='modalCompra'){ fecharModalCompra(); }
+    });
+
+    document.addEventListener('keydown', (e)=>{
+      if(e.key === 'Escape'){
+        const modal = $('#modalCompra');
+        if(modal && !modal.classList.contains('hidden')){
+          fecharModalCompra();
+        }
+      }
+    });
+
+    const valorEl = $('#mcValor');
+    const prazoEl = $('#mcPrazo');
+
+    if(valorEl){
+      valorEl.addEventListener('input', handleValorInput);
+      valorEl.addEventListener('focus', (e)=>{
+        if(!e.target.value){
+          e.target.value = 'R$ 0,00';
+          e.target.dataset.digits = '';
+        }
+        setTimeout(()=>{
+          const len = e.target.value.length;
+          e.target.setSelectionRange(len,len);
+        },0);
+      });
+    }
+
+    if(prazoEl){
+      prazoEl.addEventListener('input', handlePrazoInput);
+    }
+
+    // ====== BOTÃO CONFIRMAR DO MODAL
+    // AGORA COM UI OTIMISTA:
+    // 1. Valida
+    // 2. Atualiza tudo localmente, some da lista de pendentes e vai pra comprados, fecha modal,
+    //    mostra toast de sucesso e re-render IMEDIATO (parece que funcionou na hora)
+    // 3. Depois tenta realmente salvar no backend. Se falhar, mostra toast de erro.
+    $('#mcConfirmar').addEventListener('click', async ()=>{
+      if(isSavingCompra) return;
+      isSavingCompra = true;
+
+      const id = modalCompraState.id;
+      if(!id) {
+        isSavingCompra = false;
+        return;
+      }
+
+      const valor = ($('#mcValor').value || '').trim();
+      const prazo = ($('#mcPrazo').value || '').trim();
+      const linkCompra = ($('#mcLink').value || '').trim();
+
+      // validação rápida antes de "otimista"
+      if(!valor || !prazo || !linkCompra || !isValidDateBR(prazo)){
+        $('#mcError').classList.remove('hidden');
+        $('#mcConfirmar').disabled = false;
+        isSavingCompra = false;
+        return;
+      }
+
+      // esconde erro
+      $('#mcError').classList.add('hidden');
+
+      // BLOCO UI OTIMISTA:
+      // marca localmente como comprado, atualiza tabelas e fecha modal AGORA
+      marcarItemComoCompradoLocal(id, valor, prazo, linkCompra);
+      render();
+      toast('Marcado como comprado', 'success');
+      fecharModalCompra();
+
+      // Depois tenta salvar no backend de verdade
+      try{
+        await atualizarCompra(id, valor, prazo, linkCompra);
+        // se der certo, nada a fazer (já atualizamos otimista)
+      }catch(err){
+        // se falhar depois da confirmação otimista, avisar
+        toast('Erro ao salvar compra no servidor. Tente novamente.', 'error');
+        console.error('Erro salvar compra:', err);
+      }finally{
+        isSavingCompra = false;
+        $('#mcConfirmar').disabled = false;
+      }
+    });
+
+    // ======= LOGOUT =======
+    async function doLogout() {
+      try {
+        await signOut(auth);
+      } catch (err) {
+        console.warn('Erro no signOut Firebase:', err);
+      }
+
+      try { sessionStorage.clear(); } catch {}
+      try { localStorage.removeItem('sessionUser'); } catch {}
+      try { localStorage.removeItem('firebase:host:*'); } catch {}
+      try { localStorage.removeItem('firebase:authUser'); } catch {}
+      try { localStorage.removeItem('firebase:authUser:${firebaseConfig.apiKey}:[DEFAULT]'); } catch {}
+
+      window.location.replace('../index.html');
+    }
+
+    const btnSair = document.getElementById('btnSair');
+    if (btnSair) {
+      btnSair.addEventListener('click', async (e) => {
+        e.preventDefault();
+        btnSair.setAttribute('aria-busy', 'true');
+        btnSair.style.pointerEvents = 'none';
+        btnSair.textContent = 'Saindo…';
+        await doLogout();
+      });
+    }
+
+    // ======= AUTH FLOW =======
+    await carregarAdmins();
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        await doLogout();
+        return;
+      }
+
+      // Agora considera adminCompras OU admSupremo
+      const isAllowed = !!user.email && ALLOWED_EMAILS.has(user.email.toLowerCase());
+
+      if (!isAllowed) {
+        alert('Acesso restrito.');
+        await doLogout();
+        return;
+      }
+
+      currentUser = user;
+      carregarLista();
+    });
+
+    // ======= BOTÕES / TROCAR ABA / ATUALIZAR =======
+    $('#btnAtualizar').addEventListener('click', carregarLista);
+    $('#tabPendentes').addEventListener('click', ()=> setTab('pendentes'));
+    $('#tabComprados').addEventListener('click', ()=> setTab('comprados'));
+
+  </script>
+</body>
+</html>

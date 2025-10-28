@@ -112,27 +112,26 @@
       nav.cantina-nav .brand .title{ font-size:clamp(16px, 5vw, 22px); }
     }
 
-    /* Badge (sem @apply) */
+    /* Badge */
     .badge { display:inline-flex; align-items:center; padding:2px 8px; border-radius:9999px; font-size:12px; font-weight:600; border-width:1px; }
 
     /* Switch tipo iOS */
     #toggleNoJustify.active { background-color: #F1663C; }
     #toggleNoJustify.active span { transform: translateX(1.25rem); }
 
-    /* Tabs (sem @apply) */
+    /* Tabs */
     .tab-btn { border-radius:0.5rem; padding:0.375rem 0.75rem; font-size:0.875rem; font-weight:600; border:1px solid; transition: all .2s ease; }
     .tab-active { background:#fff; color:#0f172a; border-color:#fff; box-shadow: 0 8px 16px -8px rgba(0,0,0,.25); }
     .tab-idle { background:rgba(255,255,255,.7); color:#475569; border-color:rgba(255,255,255,.6); }
     .tab-idle:hover { background:#fff; }
 
-    /* ===== Tabela com cinza fraco + linhas ===== */
+    /* ===== Tabela ===== */
     .grid-table{
       border-collapse: separate;
       border-spacing: 0;
       background-color: #f8fafc; /* slate-50 */
       width: 100%;
-      /* ===== ajustes novos p/ estreitar ===== */
-      table-layout: fixed;       /* deixa colunas mais estreitas e previsíveis */
+      table-layout: fixed;
     }
     .grid-table thead th{
       background-color: rgba(255,255,255,.85);
@@ -140,9 +139,9 @@
     }
     .grid-table th,
     .grid-table td{
-      border-right: 1px solid #e2e8f0;     /* slate-200 */
+      border-right: 1px solid #e2e8f0;
       border-bottom: 1px solid #e2e8f0;
-      overflow: hidden;                     /* evita estouro visual */
+      overflow: hidden;
       text-overflow: ellipsis;
       vertical-align: top;
     }
@@ -150,16 +149,14 @@
     .grid-table thead tr:first-child th{ border-top: 1px solid #e2e8f0; }
     .grid-table tbody tr:hover td{ background-color: #f1f5f9; } /* slate-100 hover */
 
-    /* reduzir padding da tabela (sobrepõe p-3) */
     .grid-table th.p-3,
     .grid-table td.p-3{ padding: .5rem .5rem; }
 
-    /* Larguras “fixas” (mais compactas) */
     .grid-table td.col-solicitante{ width: 200px; }
     .grid-table td.col-detalhes{ width: 280px; }
     .grid-table td.col-status{ width: 160px; }
 
-    /* ==== Multiline clamp padrão (2–4 linhas) ==== */
+    /* Clamp / scroll Detalhes */
     .clamp-2, .clamp-3, .clamp-4{
       display: -webkit-box;
       -webkit-box-orient: vertical;
@@ -170,32 +167,30 @@
     .clamp-3{ -webkit-line-clamp: 3; }
     .clamp-4{ -webkit-line-clamp: 4; }
 
-    /* ==== NOVO: rolagem após 3 linhas no “Detalhes” ==== */
     .scroll-3{
       display:block;
       line-height: 1.35;
       max-height: calc(3 * 1.35em); /* 3 linhas */
       overflow-y: auto;
       word-break: break-word;
-      scrollbar-width: thin; /* Firefox */
+      scrollbar-width: thin;
       scrollbar-color: #cbd5e1 transparent;
     }
     .scroll-3::-webkit-scrollbar{ width:6px; }
     .scroll-3::-webkit-scrollbar-thumb{ background:#cbd5e1; border-radius:8px; }
     .scroll-3:hover::-webkit-scrollbar-thumb{ background:#94a3b8; }
 
-    /* === POP: container fixo e previsível === */
+    /* === POP: container fixo === */
     .__pop {
-      position: fixed;             /* preso à viewport, não “escorrega” */
+      position: fixed;
       z-index: 60;
       max-width: min(92vw, 480px);
       width: min(92vw, 480px);
     }
 
-    /* Coluna de Ações: permite o dropdown “sair” da célula */
+    /* Coluna de Ações / dropdown */
     .grid-table td.col-acoes { position: relative; overflow: visible; width: 72px; }
 
-    /* Botão de 3 pontinhos */
     .action-trigger{
       display:inline-flex; align-items:center; justify-content:center;
       width:34px; height:30px; border:1px solid #e2e8f0; border-radius:10px;
@@ -203,7 +198,6 @@
     }
     .action-trigger:hover{ transform:translateY(-1px); box-shadow:0 6px 14px rgba(2,8,23,.10); }
 
-    /* Menu flutuante */
     .action-menu{
       position:absolute; right:0; top:calc(100% + 6px); z-index:30;
       min-width:160px; background:#fff; border:1px solid #e2e8f0; border-radius:12px;
@@ -221,7 +215,7 @@
 </head>
 <body class="min-h-screen text-black antialiased" style="background: var(--cantina-secondary);">
 
-  <!-- ===== NAVBAR CANTINA (mesma do login) ===== -->
+  <!-- ===== NAVBAR ===== -->
   <nav class="cantina-nav" aria-label="Barra superior">
     <div class="cantina-container">
       <a class="brand" href="#">
@@ -241,7 +235,7 @@
 
       <!-- Ações -->
       <div id="menuActions" class="actions">
-        <!-- Alterado: botão -> link para a pasta login -->
+        <!-- Botão sair -->
         <a id="btnSair" class="btn" href="../index.html" rel="noopener">Sair</a>
       </div>
     </div>
@@ -251,42 +245,8 @@
   <main class="w-full max-w-7xl mx-auto px-4 pb-20 pt-6">
     <div class="bg-[#3A474C] border border-white/60 rounded-xl sm:rounded-2xl shadow-2xl shadow-glow p-4 xs:p-5 sm:p-6 md:p-8">
 
-      <!-- Filtros -->
-      <div class="grid grid-cols-1 lg:grid-cols-6 gap-2 xs:gap-3">
-        <input id="fBusca" type="text" placeholder="Buscar por nome, e-mail, produto/serviço…" class="lg:col-span-2 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm sm:text-base outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20" />
-        <select id="fStatus" class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm sm:text-base outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20">
-          <option value="aprovado">Aprovado</option>
-          <option value="reprovado">Reprovado</option>
-        </select>
-        <select id="fUnidade" class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm sm:text-base outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20">
-          <option value="">Unidade (todas)</option>
-          <option value="1">Unidade 1</option>
-          <option value="2">Unidade 2</option>
-          <option value="3">Unidade 3</option>
-          <option value="4">Unidade 4</option>
-          <option value="5">Unidade 5</option>
-          <option value="6">Unidade 6</option>
-        </select>
-        <select id="fTipo" class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm sm:text-base outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20">
-          <option value="">Tipo (todos)</option>
-          <option value="servico">Serviço</option>
-          <option value="produto">Produto</option>
-        </select>
-        <select id="fUrgencia" class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm sm:text-base outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20">
-          <option value="">Urgência (todas)</option>
-          <option value="baixa">Baixa</option>
-          <option value="media">Média</option>
-          <option value="alta">Alta</option>
-          <option value="critica">Crítica</option>
-        </select>
-        <div class="flex flex-col xs:flex-row gap-2">
-          <button id="btnFiltrar" class="w-full xs:flex-1 rounded-lg bg-white px-3 py-2 text-sm font-semibold shadow hover:-translate-y-0.5 hover:shadow-md transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primaria/30">Aplicar</button>
-          <button id="btnLimpar" class="w-full xs:w-auto rounded-lg bg-white/80 px-3 py-2 text-sm font-semibold border border-white/60 hover:bg-white transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primaria/30">Limpar</button>
-        </div>
-      </div>
-
       <!-- Top bar: contador + ações + tabs -->
-      <div class="mt-4 flex flex-col gap-3">
+      <div class="flex flex-col gap-3">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3">
           <div class="text-sm text-slate-800 order-2 sm:order-1">
             <span style="color:#e2e8f0" id="contador"></span>
@@ -298,8 +258,15 @@
 
         <!-- Tabs: Pendentes x Histórico -->
         <div class="flex flex-wrap items-center gap-2">
-          <button id="tabPendentes" class="tab-btn tab-active" data-tab="pendentes">Pendentes <span style="display: none;" id="countPendentes" class="ml-1 text-xs font-semibold px-2 py-0.5 rounded-full bg-orange-100 text-orange-700">0</span></button>
-          <button id="tabHistorico" class="tab-btn tab-idle" data-tab="historico">Histórico <span style="display: none;" id="countHistorico" class="ml-1 text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">0</span></button>
+          <button id="tabPendentes" class="tab-btn tab-active" data-tab="pendentes">
+            Pendentes
+            <span style="display: none;" id="countPendentes" class="ml-1 text-xs font-semibold px-2 py-0.5 rounded-full bg-orange-100 text-orange-700">0</span>
+          </button>
+
+          <button id="tabHistorico" class="tab-btn tab-idle" data-tab="historico">
+            Histórico
+            <span style="display: none;" id="countHistorico" class="ml-1 text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">0</span>
+          </button>
         </div>
       </div>
 
@@ -413,15 +380,27 @@
       appId: "1:831706842201:web:9b68ae4f98ad93c5a99d48",
     };
 
-    // URL do Apps Script
+    // URL do Apps Script (planilha / aprovação)
     const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbyXgFaJa-Ig6Z_bS7KXiqRbcAWAZlsgB0CIXkuZGB2by9W6H65VS58zr3HqBmG672Yr/exec';
 
     // Inicializa Firebase
     const app  = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    // ======= LISTA DE ADMINS CARREGADA VIA ARQUIVO EXTERNO =======
-    let ADMIN_EMAILS = new Set(); // começa vazio
+    // ======= QUEM PODE ENTRAR NESSA PÁGINA (/admin/) =======
+    // Regra:
+    // - adminAprovacao
+    // - admSupremo
+    //
+    // adminEmails.json:
+    // {
+    //   "adminAprovacao": [...],
+    //   "adminCompras": [...],
+    //   "admSupremo": [...]
+    // }
+    //
+    // AQUI: ALLOWED_EMAILS = adminAprovacao U admSupremo
+    let ALLOWED_EMAILS = new Set(); // começa vazio
 
     async function carregarAdmins() {
       try {
@@ -436,8 +415,11 @@
 
         const data = await resp.json();
 
-        ADMIN_EMAILS = new Set(
-          (data.admins || []).map(e => e.toLowerCase())
+        const listaAprovacao = Array.isArray(data.adminAprovacao) ? data.adminAprovacao : [];
+        const listaSupremo   = Array.isArray(data.admSupremo)     ? data.admSupremo     : [];
+
+        ALLOWED_EMAILS = new Set(
+          [...listaAprovacao, ...listaSupremo].map(e => e.toLowerCase())
         );
       } catch (err) {
         console.error('Erro buscando adminEmails.json:', err);
@@ -455,14 +437,14 @@
         console.warn('Erro no signOut Firebase:', err);
       }
 
-      // limpa qualquer dado local de sessão que possa manter o usuário "preso"
+      // limpa qualquer dado local
       try { sessionStorage.clear(); } catch {}
-      try { localStorage.removeItem('sessionUser'); } catch {}           // mesmo nome usado no formulário
-      try { localStorage.removeItem('firebase:host:*'); } catch {}       // lixo do SDK em alguns browsers
-      try { localStorage.removeItem('firebase:authUser'); } catch {}     // variação comum
+      try { localStorage.removeItem('sessionUser'); } catch {}
+      try { localStorage.removeItem('firebase:host:*'); } catch {}
+      try { localStorage.removeItem('firebase:authUser'); } catch {}
       try { localStorage.removeItem('firebase:authUser:${firebaseConfig.apiKey}:[DEFAULT]'); } catch {}
 
-      // manda pro login fora da pasta /admin
+      // manda pro login
       window.location.replace('../index.html');
     }
 
@@ -472,7 +454,6 @@
       btnSair.addEventListener('click', async (e) => {
         e.preventDefault();
 
-        // feedback visual rápido
         btnSair.setAttribute('aria-busy', 'true');
         btnSair.style.pointerEvents = 'none';
         btnSair.textContent = 'Saindo…';
@@ -527,20 +508,6 @@
       return `<span class="${base} ${map[s]||'bg-slate-50 text-slate-700 border-slate-200'}">${(s||'pendente').toUpperCase()}</span>`;
     }
 
-    const debounce = (fn, wait=250)=>{
-      let t;
-      return (...args)=>{
-        clearTimeout(t);
-        t=setTimeout(()=>fn(...args), wait);
-      };
-    };
-
-    const norm = (s)=>
-      String(s||'')
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g,'')
-        .toLowerCase();
-
     function humanTipo(item){
       if(item.tipo==='servico') return `Serviço`;
       if(item.tipo==='produto') return `Produto`;
@@ -549,29 +516,32 @@
 
     // ======= ESTADO =======
     let currentUser = null;
-    let dadosBrutos = [];     // vindo da planilha
-    let dadosFiltrados = [];  // versão filtrada
+    let dadosBrutos = [];      // vindo da planilha
+    let dadosFiltrados = [];   // versão atual (por aba)
     let activeTab = 'pendentes'; // 'pendentes' | 'historico'
+
+    // bloqueio pra evitar spam no "Confirmar" do modal
+    let isSendingStatus = false;
 
     // ======= AUTENTICAÇÃO / AUTORIZAÇÃO =======
     onAuthStateChanged(auth, async (user) => {
-      const adminEmailEl = $('#adminEmail'); // elemento opcional (não existe no DOM atual, mas não quebra)
+      const adminEmailEl = $('#adminEmail'); // se existir algum span pra mostrar quem está logado
 
-      // 1) Não logado -> manda pro login e para tudo
+      // 1) Não logado -> login
       if (!user) {
         await doLogout();
         return;
       }
 
-      // 2) Checa se o usuário logado está na lista de admins carregada do JSON
-      const isAdmin = !!user.email && ADMIN_EMAILS.has(user.email.toLowerCase());
-      if (!isAdmin) {
-        alert('Acesso restrito a administradores.');
+      // 2) Checa se tem permissão
+      const isAllowed = !!user.email && ALLOWED_EMAILS.has(user.email.toLowerCase());
+      if (!isAllowed) {
+        alert('Acesso restrito.');
         await doLogout();
         return;
       }
 
-      // 3) Autorizado
+      // 3) OK
       currentUser = user;
       if (adminEmailEl) adminEmailEl.textContent = user.email;
 
@@ -580,11 +550,8 @@
 
     // ======= CHAMADAS REDE =======
     async function chamarAPI(url, opts={}) {
-      console.log('[chamarAPI] →', url, opts);
-
       try {
         const resp = await fetch(url, opts);
-        console.log('[chamarAPI] status:', resp.status, 'type:', resp.type);
 
         if (resp.type === 'opaque') {
           console.warn('[chamarAPI] resposta opaqua (provável CORS bloqueado)');
@@ -596,7 +563,6 @@
           return null;
         });
 
-        console.log('[chamarAPI] data:', data);
         return {
           ok: resp.ok && (data?.ok !== false),
           data
@@ -622,11 +588,7 @@
 
       const url = WEBAPP_URL + '?action=list&email=' + encodeURIComponent(currentUser.email);
 
-      console.log('[carregarLista] fetchando', url);
-
       const { ok, data, error, opaque } = await chamarAPI(url);
-
-      console.log('[carregarLista] retorno =>', {ok, data, error, opaque});
 
       if(opaque){
         $('#tbody').innerHTML = `
@@ -689,7 +651,7 @@
 
     function goToPage(n){
       page = n;
-      aplicarFiltrosERender(true); // mantém filtros/aba
+      aplicarFiltrosERender(true); // mantém a página
     }
 
     function renderPaginacao(totalPages, total){
@@ -737,55 +699,19 @@
       });
     }
 
-    // ======= FILTROS =======
-    function aplicaBusca(item, termo){
-      if(!termo) return true;
-      const hay = norm([
-        item.nome,
-        item.email,
-        item.nomeProduto,
-        item.descricaoServico,
-        item.quemIndicar,
-        item.unidade,
-        item.urgencia,
-        item.tipo
-      ].filter(Boolean).join(' '));
-      return hay.includes(norm(termo));
-    }
-
+    // ======= LÓGICA DAS ABAS =======
     function inTab(item){
       const st = String(item.status||'pendente');
       return activeTab==='pendentes'
         ? (st==='pendente')
-        : (st!=='pendente');
+        : (st!=='pendente'); // histórico = aprovado ou reprovado
     }
-
-    const esc = (s)=> String(s ?? '')
-      .replace(/&/g,'&amp;')
-      .replace(/</g,'&lt;')
-      .replace(/>/g,'&gt;')
-      .replace(/"/g,'&quot;')
-      .replace(/'/g,'&#39;');
 
     function aplicarFiltrosERender(keepPage=false){
       if (!keepPage) page = 1;
 
-      const q  = $('#fBusca').value.trim();
-      const st = $('#fStatus').value;      // só conta pro histórico
-      const un = $('#fUnidade').value;
-      const tp = $('#fTipo').value;
-      const ur = $('#fUrgencia').value;
-
       dadosFiltrados = dadosBrutos
-        .filter(it=>
-          inTab(it) &&
-          aplicaBusca(it, q) &&
-          // Status: na aba Pendentes ignoramos o filtro de status; na aba Histórico respeitamos se definido
-          (activeTab==='pendentes' || !st || (String(it.status||'pendente')===st)) &&
-          (!un || String(it.unidade)===String(un)) &&
-          (!tp || String(it.tipo)===String(tp)) &&
-          (!ur || String(it.urgencia)===String(ur))
-        )
+        .filter(it => inTab(it))
         .sort((a,b)=> new Date(b.timestamp||0) - new Date(a.timestamp||0));
 
       const { rows, total, totalPages } = getPageSlice(dadosFiltrados);
@@ -801,8 +727,13 @@
     function refreshCounters(){
       const pend = dadosBrutos.filter(x=>String(x.status||'pendente')==='pendente').length;
       const hist = dadosBrutos.filter(x=>String(x.status||'pendente')!=='pendente').length;
+
       $('#countPendentes').textContent = pend;
       $('#countHistorico').textContent = hist;
+
+      // badge só aparece se tiver número > 0
+      $('#countPendentes').style.display = pend ? 'inline-block' : 'none';
+      $('#countHistorico').style.display = hist ? 'inline-block' : 'none';
     }
 
     // ======= TABELA =======
@@ -1082,71 +1013,78 @@
       if(len>0) $('#modalError').classList.add('hidden');
     });
 
+    // === CONFIRMAR (APROVAR / REPROVAR) COM UI OTIMISTA ===
+    //
+    // Fluxo atualizado:
+    // 1. Valida.
+    // 2. Atualiza UI localmente (muda status, tira da aba "pendentes", adiciona em "histórico", muda badges etc).
+    //    -> render() e toast imediatamente (parece que deu certo).
+    // 3. Fecha o modal.
+    // 4. Depois tenta realmente mandar pro backend.
+    //    Se backend falhar, mostra toast de erro (mas não reverte automaticamente).
+    //
     $('#modalConfirmar').addEventListener('click', async ()=>{
+      if (isSendingStatus) return;
+      isSendingStatus = true;
+
       const { id, act, noJustify } = modalState;
-      if(!id||!act) return;
+      if(!id||!act) {
+        isSendingStatus = false;
+        return;
+      }
 
       const obs = noJustify ? '' : $('#modalObs').value.trim();
       const extras = ($('#modalExtras')?.value || '').trim();
 
+      // valida reprovação sem justificativa
       if(act==='reprovar' && !noJustify && !obs){
         $('#modalError').classList.remove('hidden');
         $('#modalObs').focus();
+        isSendingStatus = false;
         return;
       }
 
+      // status alvo
+      const newStatus = act==='aprovar' ? 'aprovado' : 'reprovado';
+
+      // === UI OTIMISTA ===
+      // Atualiza nosso array local imediatamente, antes de chamar o servidor.
+      const alvo = dadosBrutos.find(x=>x.submissionId===id);
+      if(alvo){
+        alvo.status = newStatus;
+        alvo.observacao = obs;
+        alvo.aprovadoPor = currentUser?.email || '';
+        alvo.aprovadoEm = new Date().toISOString();
+      }
+
+      // re-render com novo estado
+      aplicarFiltrosERender(true);
+
+      // feedback instantâneo
+      toast(act==='aprovar' ? 'Aprovado!' : 'Reprovado!', 'success');
+
+      // fecha modal agora
+      fecharModal();
+
+      // === BACKEND DE VERDADE ===
       try{
         await atualizarStatus(
           id,
-          act==='aprovar' ? 'aprovado' : 'reprovado',
+          newStatus,
           obs,
           extras
         );
-
-        const alvo = dadosBrutos.find(x=>x.submissionId===id);
-        if(alvo){
-          alvo.status = act==='aprovar' ? 'aprovado' : 'reprovado';
-          alvo.observacao = obs;
-          alvo.aprovadoPor = currentUser?.email || '';
-          alvo.aprovadoEm = new Date().toISOString();
-        }
-
-        refreshCounters();
-        aplicarFiltrosERender();
-        toast(act==='aprovar' ? 'Aprovado!' : 'Reprovado!', 'success');
+        // se o servidor respondeu ok, já está tudo certo
       }catch(err){
-        toast('Não foi possível atualizar: '+(err?.message||err), 'error');
+        // se der erro depois do update otimista, só avisa
+        toast('Erro ao salvar no servidor. Tente novamente.', 'error');
+        console.error('Erro atualizar status:', err);
       }finally{
-        fecharModal();
+        isSendingStatus = false;
       }
     });
 
-    // ======= CONTROLES (filtros / tabs / atualizar) =======
-    const aplicarFiltrosDebounced = debounce(aplicarFiltrosERender, 250);
-
-    $('#fBusca').addEventListener('input', aplicarFiltrosDebounced);
-    $('#fBusca').addEventListener('keydown', (e)=>{
-      if(e.key==='Enter'){
-        e.preventDefault();
-        aplicarFiltrosERender();
-      }
-    });
-
-    ['#fStatus','#fUnidade','#fTipo','#fUrgencia'].forEach(sel=>{
-      $(sel).addEventListener('change', aplicarFiltrosERender);
-    });
-
-    $('#btnFiltrar').addEventListener('click', aplicarFiltrosERender);
-
-    $('#btnLimpar').addEventListener('click', ()=>{
-      $('#fBusca').value='';
-      $('#fStatus').value='';
-      $('#fUnidade').value='';
-      $('#fTipo').value='';
-      $('#fUrgencia').value='';
-      aplicarFiltrosERender();
-    });
-
+    // ======= CONTROLES (tabs / atualizar) =======
     $('#btnAtualizar').addEventListener('click', carregarLista);
 
     function setTab(tab){
@@ -1156,9 +1094,6 @@
       if(tab==='pendentes'){
         p.classList.add('tab-active'); p.classList.remove('tab-idle');
         h.classList.add('tab-idle');   h.classList.remove('tab-active');
-
-        // na aba Pendentes a gente ignora status manual
-        if($('#fStatus').value==='pendente') $('#fStatus').value='';
       }else{
         h.classList.add('tab-active'); h.classList.remove('tab-idle');
         p.classList.add('tab-idle');   p.classList.remove('tab-active');
@@ -1172,6 +1107,15 @@
 
     // ======= POPOVER =======
     let popEl, popTitleEl, popBodyEl, popPinnedBy = null, hoverTimer=null;
+
+    function esc(s){
+      return String(s ?? '')
+        .replace(/&/g,'&amp;')
+        .replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;')
+        .replace(/"/g,'&quot;')
+        .replace(/'/g,'&#39;');
+    }
 
     function ensurePopover(){
       if(popEl) return popEl;
