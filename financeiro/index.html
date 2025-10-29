@@ -401,7 +401,7 @@
         </div>
       </div>
 
-      <!-- ÁREA DA TABELA (renderizada via JS, muda conforme aba) -->
+      <!-- ÁREA DA TABELA -->
       <div id="tableWrapper" class="mt-4 overflow-x-auto border border-slate-200/70 rounded-xl bg-slate-50 text-black">
         <div id="tableArea" class="min-w-full text-xs sm:text-sm p-6 text-center text-slate-600">
           Carregando…
@@ -480,25 +480,18 @@
     };
 
     // Endpoint Apps Script publicado como Web App
-    const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzDHoVkmbwipuZszwlOX5hZ2_DVQH39Sddz8U1sixBajsPpXCX1ERd9LOf98LPCKZBH/exec';
+    const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbwRzDIjaj8oEpBIieqJv8IyvcsV7ILCFzyXsj2tMRIMElHJj3p-I6iqMFBV9g8DVMgd/exec';
 
     // Inicializa Firebase
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    // ======= QUEM PODE ACESSAR ESSA PÁGINA (/financeiro/) =======
+    // ======= QUEM PODE ACESSAR ESSA PÁGINA (/financeiro/)
     // Pode acessar:
     // - adminCompras
     // - admSupremo
     //
     // (adminAprovacao NÃO entra aqui)
-    //
-    // adminEmails.json:
-    // {
-    //   "adminAprovacao": [...],
-    //   "adminCompras": [...],
-    //   "admSupremo": [...]
-    // }
 
     let ALLOWED_EMAILS = new Set();
 
@@ -539,7 +532,7 @@
     // estado do modal "marcar comprado"
     let modalCompraState = { id: null };
 
-    // trava anti duplo clique no confirmar (evita smash do botão)
+    // trava anti duplo clique no confirmar
     let isSavingCompra = false;
 
     // ======= UTILS =======
@@ -781,21 +774,21 @@
           <td class='p-3 col-detalhes'>
             <div class="font-semibold scroll-3">
               ${esc(
-        item.tipo === 'produto'
-          ? (item.nomeProduto || '-')
-          : (item.descricaoServico || '-')
-      )}
+                item.tipo === 'produto'
+                  ? (item.nomeProduto || '-')
+                  : (item.descricaoServico || '-')
+              )}
             </div>
             ${item.tipo === 'produto'
-          ? `<div class="text-xs text-slate-600">Qtd: ${esc(item.quantidadeProduto || '-')}</div>`
-          : (item.quemIndicar
-            ? `<div class="text-xs text-slate-600 break-words">Indicação: ${esc(item.quemIndicar)}</div>`
-            : '')
-        }
+              ? `<div class="text-xs text-slate-600">Qtd: ${esc(item.quantidadeProduto || '-')}</div>`
+              : (item.quemIndicar
+                ? `<div class="text-xs text-slate-600 break-words">Indicação: ${esc(item.quemIndicar)}</div>`
+                : '')
+            }
             ${item.observacao
-          ? `<div class="text-xs text-slate-600 break-words">${esc(item.observacao)}</div>`
-          : ''
-        }
+              ? `<div class="text-xs text-slate-600 break-words">${esc(item.observacao)}</div>`
+              : ''
+            }
           </td>
 
           <td class='p-3 whitespace-nowrap hidden sm:table-cell'>
@@ -808,11 +801,11 @@
 
           <td class='p-3 hidden lg:table-cell'>
             ${links.length
-          ? `<ul class="list-disc pl-4 text-xs break-all">
+              ? `<ul class="list-disc pl-4 text-xs break-all">
                     ${links.map((l, i) => `<li><a class="underline text-primaria" href="${esc(l)}" target="_blank" rel="noopener">Link ${i + 1}</a></li>`).join('')}
                    </ul>`
-          : `<div class="text-sm text-slate-600">Sem links.</div>`
-        }
+              : `<div class="text-sm text-slate-600">Sem links.</div>`
+            }
           </td>
 
           <td class='p-3 col-status'>
@@ -871,23 +864,23 @@
           <td class='p-3 col-detalhes'>
             <div class="font-semibold scroll-3">
               ${esc(
-        item.tipo === 'produto'
-          ? (item.nomeProduto || '-')
-          : (item.descricaoServico || '-')
-      )}
+                item.tipo === 'produto'
+                  ? (item.nomeProduto || '-')
+                  : (item.descricaoServico || '-')
+              )}
             </div>
 
             ${item.tipo === 'produto'
-          ? `<div class="text-xs text-slate-600">Qtd: ${esc(item.quantidadeProduto || '-')}</div>`
-          : (item.quemIndicar
-            ? `<div class="text-xs text-slate-600 break-words">Indicação: ${esc(item.quemIndicar)}</div>`
-            : '')
-        }
+              ? `<div class="text-xs text-slate-600">Qtd: ${esc(item.quantidadeProduto || '-')}</div>`
+              : (item.quemIndicar
+                ? `<div class="text-xs text-slate-600 break-words">Indicação: ${esc(item.quemIndicar)}</div>`
+                : '')
+            }
 
             ${item.observacao
-          ? `<div class="text-xs text-slate-600 break-words">${esc(item.observacao)}</div>`
-          : ''
-        }
+              ? `<div class="text-xs text-slate-600 break-words">${esc(item.observacao)}</div>`
+              : ''
+            }
           </td>
 
           <td class='p-3 whitespace-nowrap'>
@@ -900,11 +893,11 @@
 
           <td class='p-3 hidden lg:table-cell'>
             ${listaLinks.length
-          ? `<ul class="list-disc pl-4 text-xs break-all">
+              ? `<ul class="list-disc pl-4 text-xs break-all">
                     ${listaLinks.map(l => `<li><a class="underline text-primaria" href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)}</a></li>`).join('')}
                    </ul>`
-          : `<div class="text-sm text-slate-600">Sem links.</div>`
-        }
+              : `<div class="text-sm text-slate-600">Sem links.</div>`
+            }
           </td>
 
           <td class='p-3 col-status'>
@@ -1208,11 +1201,7 @@
     }
 
     // ====== BOTÃO CONFIRMAR DO MODAL
-    // AGORA COM UI OTIMISTA:
-    // 1. Valida
-    // 2. Atualiza tudo localmente, some da lista de pendentes e vai pra comprados, fecha modal,
-    //    mostra toast de sucesso e re-render IMEDIATO (parece que funcionou na hora)
-    // 3. Depois tenta realmente salvar no backend. Se falhar, mostra toast de erro.
+    // Fluxo otimista:
     $('#mcConfirmar').addEventListener('click', async () => {
       if (isSavingCompra) return;
       isSavingCompra = true;
@@ -1227,7 +1216,7 @@
       const prazo = ($('#mcPrazo').value || '').trim();
       const linkCompra = ($('#mcLink').value || '').trim();
 
-      // validação rápida antes de "otimista"
+      // valida frontend
       if (!valor || !prazo || !linkCompra || !isValidDateBR(prazo)) {
         $('#mcError').classList.remove('hidden');
         $('#mcConfirmar').disabled = false;
@@ -1238,19 +1227,17 @@
       // esconde erro
       $('#mcError').classList.add('hidden');
 
-      // BLOCO UI OTIMISTA:
-      // marca localmente como comprado, atualiza tabelas e fecha modal AGORA
+      // OTIMISTA: atualiza UI agora
       marcarItemComoCompradoLocal(id, valor, prazo, linkCompra);
       render();
       toast('Marcado como comprado', 'success');
       fecharModalCompra();
 
-      // Depois tenta salvar no backend de verdade
+      // Chama backend real
       try {
         await atualizarCompra(id, valor, prazo, linkCompra);
-        // se der certo, nada a fazer (já atualizamos otimista)
+        // deu bom
       } catch (err) {
-        // se falhar depois da confirmação otimista, avisar
         toast('Erro ao salvar compra no servidor. Tente novamente.', 'error');
         console.error('Erro salvar compra:', err);
       } finally {
