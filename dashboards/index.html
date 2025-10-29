@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Dashboards • Compras</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- Poppins (cards/form) -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <!-- Inter (navbar Cantina) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Roboto (base) -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+
+  <link rel="shortcut icon"
+        href="https://storage.googleapis.com/ecdt-logo-saida/1ebe52af502e25d3521cb9dad62bb72f6bc1c347353cdda5fa381ef8627a9eb8/COLEGIO-E-CURSO-ICONE.webp"
+        type="image/x-icon">
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { primaria: '#F1663C' },
+          boxShadow: {
+            glow: '0 0 0 3px rgba(241,102,60,0.15), 0 10px 25px -5px rgba(0,0,0,0.25)'
+          },
+          screens: { xs: '380px' }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* ===== Base ===== */
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Roboto', system-ui, -apple-system, Segoe UI, Poppins, Arial, sans-serif; color: #000; background: #253237; }
+    * { box-sizing: border-box; }
+
+    /* Toastify (se você quiser usar depois) */
+    .toastify, .toastify * { color: #fff !important; }
+
+    /* ===== Header Cantina ===== */
+    :root {
+      --cantina-primary: #FD7F08;
+      --cantina-secondary: #253237;
+      --cantina-text: #FD7F08;
+      --cantina-border: #e2e8f0;
+    }
+    nav.cantina-nav { position: sticky; top: 0; z-index: 50; background: var(--cantina-secondary); border-bottom: 3px solid var(--cantina-primary); color: var(--cantina-text); font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"; }
+    nav.cantina-nav .cantina-container { max-width: min(98vw, 1400px); margin: 0 auto; padding: 0 12px; height: 96px; display: flex; align-items: center; justify-content: space-between; }
+    nav.cantina-nav a { display: flex; align-items: center; text-decoration: none; }
+    nav.cantina-nav img { height: 64px; width: auto; }
+    nav.cantina-nav .brand { display: flex; align-items: center; gap: 12px; color: var(--cantina-text); height: 100%; }
+    nav.cantina-nav .brand .divider { width: 2px; height: 70%; align-self: center; background: var(--cantina-primary); border-radius: 2px; }
+    nav.cantina-nav .brand .title { font-weight: 800; letter-spacing: .5px; font-size: clamp(18px, 3.8vw, 32px); line-height: 1.15; white-space: normal; word-break: keep-all; color: var(--cantina-text); }
+    nav.cantina-nav .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    nav.cantina-nav .btn { padding: 10px 12px; border-radius: 12px; border: 1px solid var(--cantina-border); background: #fff; color: #000; cursor: pointer; transition: transform .15s ease, box-shadow .15s ease; font-weight: 600; }
+    nav.cantina-nav .btn:hover { transform: translateY(-1px); box-shadow: 0 2px 10px rgba(2, 8, 23, .06); }
+    nav.cantina-nav .menu-toggle { display: none; border: 1px solid var(--cantina-border); background: #fff; color: #000; border-radius: 10px; padding: 8px; cursor: pointer; }
+    nav.cantina-nav .menu-toggle:focus-visible, nav.cantina-nav .btn:focus-visible { outline: 2px solid var(--cantina-primary); outline-offset: 2px; }
+
+    /* ===== Mobile (<=640px) ===== */
+    @media (max-width: 640px) {
+      nav.cantina-nav .cantina-container { height: 72px; position: relative; }
+      nav.cantina-nav img { height: 48px; }
+      nav.cantina-nav .brand { flex: 1; min-width: 0; }
+      nav.cantina-nav .menu-toggle { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; padding: 6px; border-radius: 10px; }
+      nav.cantina-nav .menu-toggle svg { width: 18px; height: 18px; }
+      nav.cantina-nav .actions { position: absolute; right: 12px; top: calc(100% + 8px); z-index: 60; display: none; flex-direction: column; gap: 6px; background: #ffffff; border: 1px solid var(--cantina-border); border-radius: 12px; padding: 10px; width: min(78vw, 280px); box-shadow: 0 12px 30px rgba(2, 8, 23, .18); }
+      nav.cantina-nav .actions.open { display: flex; }
+      nav.cantina-nav .actions .btn { width: 100%; justify-content: center; }
+    }
+    @media (max-width: 400px) { nav.cantina-nav .brand .title { font-size: clamp(16px, 5vw, 22px); } }
+
+    /* Texto claro nos cards escuros */
+    .card-dark * { color: #f1f5f9; }
+
+    /* SELECT FIX */
+    .card-dark select option { color: #000 !important; background-color: #fff !important; }
+    .card-dark select { color: #f1f5f9; }
+
+    /* KPI hover */
+    .kpi-card { cursor: pointer; transition: transform .15s ease, box-shadow .15s ease; }
+    .kpi-card:hover {
+      transform: scale(1.03);
+      box-shadow: 0 0 0 3px rgba(253, 127, 8, 0.2), 0 20px 40px -10px rgba(0,0,0,0.6);
+    }
+  </style>
+
+  <!-- Chart.js para o gráfico de gasto por unidade -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+<body class="min-h-screen text-white antialiased" style="background: var(--cantina-secondary);">
+
+  <!-- NAVBAR -->
+  <nav class="cantina-nav" aria-label="Topo">
+    <div class="cantina-container">
+      <a class="brand" href="#">
+        <img
+          src="https://iconecolegioecurso.com.br/wp-content/uploads/2022/08/xlogo_icone_site.png.pagespeed.ic_.QgXP3GszLC.webp"
+          alt="Logo Ícone Colégio e Curso"
+          onerror="this.onerror=null;this.src='https://placehold.co/150x50/eeeeee/333333?text=Logo';">
+        <span class="divider" aria-hidden="true"></span>
+        <span class="title text-[#FD7F08]">DASHBOARDS DE COMPRAS</span>
+      </a>
+
+      <!-- Botão hambúrguer (mobile) -->
+      <button id="menuToggle" class="menu-toggle" aria-label="Abrir menu" aria-expanded="false"
+              aria-controls="menuActions">
+        <svg xmlns="http://www.w3.org/2000/svg" class="size-6" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M3 6h18M3 12h18M3 18h18"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </button>
+
+      <!-- Ações -->
+      <div id="menuActions" class="actions">
+        <button id="btnVoltarForm" class="btn">Formulário</button>
+        <button id="btnSair" class="btn">Sair</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- CONTEÚDO -->
+  <main class="w-full px-4 sm:px-6 pb-20 pt-6 sm:pt-8">
+    <div class="max-w-6xl mx-auto space-y-8">
+
+      <!-- ==================== FILTROS + CARDS KPI ==================== -->
+      <section class="space-y-4 sm:space-y-6">
+
+        <!-- Filtros -->
+        <div
+          class="card-dark rounded-xl bg-[#3A474C] border border-white/60 shadow-2xl shadow-glow p-4 sm:p-6 flex flex-col gap-4">
+          <div class="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-end">
+
+            <!-- Filtro Tipo (Produto / Serviço / Tudo) -->
+            <div class="flex-1 min-w-[150px]">
+              <label for="filtroTipo" class="block text-slate-200 text-xs font-medium mb-1">
+                Tipo do pedido
+              </label>
+              <select id="filtroTipo"
+                      class="w-full rounded-lg bg-white/10 border border-white/40 text-slate-100 text-sm px-3 py-2 pr-8 appearance-none focus:outline-none focus:ring-2 focus:ring-[#FD7F08] focus:border-transparent">
+                <option value="produto" selected>Produtos</option>
+                <option value="servico">Serviços</option>
+                <option value="">Tudo</option>
+              </select>
+            </div>
+
+            <!-- Filtro Unidade -->
+            <div class="flex-1 min-w-[150px]">
+              <label for="filtroUnidade" class="block text-slate-200 text-xs font-medium mb-1">
+                Unidade
+              </label>
+              <select id="filtroUnidade"
+                      class="w-full rounded-lg bg-white/10 border border-white/40 text-slate-100 text-sm px-3 py-2 pr-8 appearance-none focus:outline-none focus:ring-2 focus:ring-[#FD7F08] focus:border-transparent">
+                <option value="">Todas as unidades</option>
+              </select>
+            </div>
+
+            <!-- Filtro Mês -->
+            <div class="flex-1 min-w-[150px]">
+              <label for="filtroMes" class="block text-slate-200 text-xs font-medium mb-1">
+                Mês (data do pedido)
+              </label>
+              <select id="filtroMes"
+                      class="w-full rounded-lg bg-white/10 border border-white/40 text-slate-100 text-sm px-3 py-2 pr-8 appearance-none focus:outline-none focus:ring-2 focus:ring-[#FD7F08] focus:border-transparent">
+                <option value="">Todos os meses</option>
+              </select>
+            </div>
+
+            <!-- Botão recarregar -->
+            <div class="sm:self-end">
+              <button
+                id="btnRecarregar"
+                class="rounded-lg bg-white text-black text-sm font-semibold px-3 py-2 shadow hover:-translate-y-0.5 hover:shadow-md active:translate-y-0 transition">
+                Recarregar dados
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- KPIs principais -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4 sm:gap-6">
+
+          <!-- Card: Custo total / Valor gasto total -->
+          <div
+            id="cardValorGasto"
+            class="kpi-card card-dark rounded-xl bg-[#3A474C] border border-white/60 shadow-2xl shadow-glow p-4 sm:p-6 flex flex-col">
+            <span id="labelValorGasto" class="text-slate-200 text-sm font-medium">Custo total (R$)</span>
+            <span class="text-white text-3xl font-semibold leading-tight mt-1" id="kpiValorGasto">--</span>
+            <span id="descValorGasto" class="text-slate-400 text-xs mt-2">Somatório de produtos comprados</span>
+          </div>
+
+          <!-- Card: Solicitações / Pedidos -->
+          <div
+            id="cardQtdPedidos"
+            class="kpi-card card-dark rounded-xl bg-[#3A474C] border border-white/60 shadow-2xl shadow-glow p-4 sm:p-6 flex flex-col">
+            <span id="labelQtdPedidos" class="text-slate-200 text-sm font-medium">Solicitações de produto</span>
+            <span class="text-white text-3xl font-semibold leading-tight mt-1" id="kpiQtdPedidos">--</span>
+            <span id="descQtdPedidos" class="text-slate-400 text-xs mt-2">Total de solicitações registradas</span>
+          </div>
+
+          <!-- Card: Aprovadas (Total - Reprovadas) -->
+          <div
+            id="cardQtdAprovados"
+            class="kpi-card card-dark rounded-xl bg-[#3A474C] border border-white/60 shadow-2xl shadow-glow p-4 sm:p-6 flex flex-col">
+            <span id="labelQtdAprovados" class="text-slate-200 text-sm font-medium">Solicitações aprovadas</span>
+            <span class="text-white text-3xl font-semibold leading-tight mt-1" id="kpiQtdAprovados">--</span>
+            <span id="descQtdAprovados" class="text-slate-400 text-xs mt-2">Calculado: total − reprovadas</span>
+          </div>
+
+          <!-- Card: Reprovadas -->
+          <div
+            id="cardQtdRejeicoes"
+            class="kpi-card card-dark rounded-xl bg-[#3A474C] border border-white/60 shadow-2xl shadow-glow p-4 sm:p-6 flex flex-col">
+            <span id="labelQtdRejeicoes" class="text-slate-200 text-sm font-medium">Solicitações reprovadas</span>
+            <span class="text-white text-3xl font-semibold leading-tight mt-1" id="kpiQtdRejeicoes">--</span>
+            <span id="descQtdRejeicoes" class="text-slate-400 text-xs mt-2">Produtos/serviços não aprovados</span>
+          </div>
+
+          <!-- Card: Comprados (NOVO) -->
+          <div
+            id="cardQtdComprados"
+            class="kpi-card card-dark rounded-xl bg-[#3A474C] border border-white/60 shadow-2xl shadow-glow p-4 sm:p-6 flex flex-col">
+            <span id="labelQtdComprados" class="text-slate-200 text-sm font-medium">Itens comprados</span>
+            <span class="text-white text-3xl font-semibold leading-tight mt-1" id="kpiQtdComprados">--</span>
+            <span id="descQtdComprados" class="text-slate-400 text-xs mt-2">Status “comprado” (produto/serviço)</span>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ==================== GRÁFICO GASTO POR UNIDADE ==================== -->
+      <section
+        class="card-dark rounded-xl bg-[#3A474C] border border-white/60 shadow-2xl shadow-glow p-4 sm:p-6 md:p-8">
+        <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+          <h2 class="text-white font-semibold text-lg sm:text-xl flex items-center gap-2">
+            <span class="text-[#FD7F08]">Gasto por unidade</span>
+            <span class="text-slate-400 text-xs font-normal">(valor comprado)</span>
+          </h2>
+        </div>
+
+        <div class="mt-6 w-full overflow-x-auto">
+          <div class="min-w-[300px]">
+            <canvas id="graficoGastoPorUnidade" class="w-full h-[260px]"></canvas>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- ======================= MODAL DETALHE KPI ======================= -->
+  <div id="modalOverlay"
+       class="fixed inset-0 bg-black/70 z-[100] hidden items-center justify-center p-4">
+    <div class="bg-[#3A474C] border border-white/60 rounded-xl shadow-2xl max-w-2xl w-full max-h-[80vh] flex flex-col text-slate-100">
+      <!-- Header -->
+      <div class="flex items-start justify-between p-4 border-b border-white/20">
+        <div>
+          <h3 id="modalTitulo" class="text-white text-lg font-semibold"></h3>
+          <p id="modalDescricao" class="text-slate-400 text-xs mt-1 leading-snug"></p>
+        </div>
+        <button id="modalFechar"
+                class="text-slate-400 hover:text-white text-xl leading-none font-bold px-2"
+                aria-label="Fechar modal">×</button>
+      </div>
+
+      <!-- Conteúdo -->
+      <div class="overflow-y-auto p-4 text-sm">
+        <table class="w-full text-left text-slate-100 text-xs sm:text-sm">
+          <thead id="modalThead"
+                 class="text-slate-400 uppercase border-b border-white/20 text-[11px] sm:text-[12px]">
+          </thead>
+          <tbody id="modalTbody"
+                 class="align-top divide-y divide-white/10">
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Toggle de menu responsivo (hambúrguer) ===== -->
+  <script>
+    (function () {
+      const menuToggle = document.getElementById('menuToggle');
+      const menuActions = document.getElementById('menuActions');
+
+      if (menuToggle && menuActions) {
+        menuToggle.addEventListener('click', () => {
+          const isOpen = menuActions.classList.toggle('open');
+          menuToggle.setAttribute('aria-expanded', String(isOpen));
+        });
+
+        document.addEventListener('click', (e) => {
+          if (!menuActions.classList.contains('open')) return;
+          const clickedInside = menuActions.contains(e.target) || menuToggle.contains(e.target);
+          if (!clickedInside) {
+            menuActions.classList.remove('open');
+            menuToggle.setAttribute('aria-expanded', 'false');
+          }
+        });
+
+        window.addEventListener('resize', () => {
+          if (window.innerWidth > 640 && menuActions.classList.contains('open')) {
+            menuActions.classList.remove('open');
+            menuToggle.setAttribute('aria-expanded', 'false');
+          }
+        });
+      }
+    })();
+  </script>
+
+  <!-- ===== Firebase Auth / KPIs / Filtros / Integração Apps Script / Gráfico ===== -->
+  <script type="module">
+    /*********************************************************
+     * IMPORTS FIREBASE
+     *********************************************************/
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
+
+    /*********************************************************
+     * CONFIG FIREBASE
+     *********************************************************/
+    const firebaseConfig = {
+      apiKey: "AIzaSyAEZidq8mdAUKeJXvSQeE01gVOLWe_cp78",
+      authDomain: "compras-icone.firebaseapp.com",
+      projectId: "compras-icone",
+      storageBucket: "compras-icone.firebasestorage.app",
+      messagingSenderId: "831706842201",
+      appId: "1:831706842201:web:9b68ae4f98ad93c5a99d48",
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    /*********************************************************
+     * CONFIG BACKEND (Apps Script WebApp)
+     * Lido de ../config/appConfig.json
+     *********************************************************/
+    let API_BASE = '';
+
+    async function carregarConfigBackend() {
+      try {
+        const resp = await fetch('../config/appConfig.json', { cache: 'no-cache' });
+        if (!resp.ok) { console.error('Não consegui carregar appConfig.json', resp.status); return; }
+        const data = await resp.json();
+        API_BASE = data.WEBAPP_URL || data.API_BASE || '';
+        if (!API_BASE) console.error('API_BASE / WEBAPP_URL não veio no JSON.');
+      } catch (err) {
+        console.error('Erro buscando appConfig.json:', err);
+      }
+    }
+    carregarConfigBackend();
+
+    /*********************************************************
+     * ELEMENTOS DO DOM
+     *********************************************************/
+    const btnSair        = document.getElementById('btnSair');
+    const btnVoltarForm  = document.getElementById('btnVoltarForm');
+
+    const selectUnidade  = document.getElementById('filtroUnidade');
+    const selectMes      = document.getElementById('filtroMes');
+    const selectTipo     = document.getElementById('filtroTipo');
+    const btnRecarregar  = document.getElementById('btnRecarregar');
+
+    const kpiValorGasto     = document.getElementById('kpiValorGasto');
+    const kpiQtdPedidos     = document.getElementById('kpiQtdPedidos');
+    const kpiQtdAprovados   = document.getElementById('kpiQtdAprovados');
+    const kpiQtdRejeicoes   = document.getElementById('kpiQtdRejeicoes');
+    const kpiQtdComprados   = document.getElementById('kpiQtdComprados'); // NOVO
+
+    const cardValorGasto    = document.getElementById('cardValorGasto');
+    const cardQtdPedidos    = document.getElementById('cardQtdPedidos');
+    const cardQtdAprovados  = document.getElementById('cardQtdAprovados');
+    const cardQtdRejeicoes  = document.getElementById('cardQtdRejeicoes');
+    const cardQtdComprados  = document.getElementById('cardQtdComprados'); // NOVO
+
+    // labels/subs para texto dinâmico nos cards
+    const labelValorGasto    = document.getElementById('labelValorGasto');
+    const descValorGasto     = document.getElementById('descValorGasto');
+    const labelQtdPedidos    = document.getElementById('labelQtdPedidos');
+    const descQtdPedidos     = document.getElementById('descQtdPedidos');
+    const labelQtdAprovados  = document.getElementById('labelQtdAprovados');
+    const descQtdAprovados   = document.getElementById('descQtdAprovados');
+    const labelQtdRejeicoes  = document.getElementById('labelQtdRejeicoes');
+    const descQtdRejeicoes   = document.getElementById('descQtdRejeicoes');
+    const labelQtdComprados  = document.getElementById('labelQtdComprados'); // NOVO
+    const descQtdComprados   = document.getElementById('descQtdComprados');  // NOVO
+
+    // Modal
+    const modalOverlay   = document.getElementById('modalOverlay');
+    const modalTitulo    = document.getElementById('modalTitulo');
+    const modalDescricao = document.getElementById('modalDescricao');
+    const modalThead     = document.getElementById('modalThead');
+    const modalTbody     = document.getElementById('modalTbody');
+    const modalFechar    = document.getElementById('modalFechar');
+
+    // Canvas do gráfico
+    const canvasGastoPorUnidade = document.getElementById('graficoGastoPorUnidade');
+    const ctxGastoPorUnidade = canvasGastoPorUnidade
+      ? canvasGastoPorUnidade.getContext('2d')
+      : null;
+
+    /*********************************************************
+     * ESTADO LOCAL
+     *********************************************************/
+    let allItems = []; // tudo vindo da planilha (Pedidos + Comprados)
+
+    // Estrutura usada pra montar o modal depois
+    const detalhesKPIs = {
+      gasto: [],       // itens 'comprado' (valor gasto)
+      pedidos: [],     // todos os pedidos
+      aprovados: [],   // agora: todos EXCETO 'reprovado'
+      rejeicoes: [],   // status === 'reprovado'
+      comprados: []    // status === 'comprado' (NOVO)
+    };
+
+    // Instância do gráfico Chart.js
+    let gastoPorUnidadeChart = null;
+
+    /*********************************************************
+     * HELPERS DE DATA / FORMATAÇÃO
+     *********************************************************/
+    function getMonthKey(dateObj) {
+      const y = dateObj.getFullYear();
+      const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+      return `${y}-${m}`;
+    }
+    function getMonthLabel(monthKey) {
+      const [yyyy, mmStr] = monthKey.split('-');
+      const mm = parseInt(mmStr, 10);
+      const nomesMes = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+      const nome = nomesMes[mm - 1] || mmStr;
+      return `${nome}/${yyyy}`;
+    }
+    function parseValorBrToNumber(v) {
+      if (typeof v === 'number') return v;
+      if (!v) return 0;
+      let s = String(v).trim();
+      if (!s) return 0;
+      s = s.replace(/R\$\s?/gi, '').trim();
+      if (s.includes(',') && s.includes('.')) s = s.replace(/\./g, '').replace(',', '.');
+      else if (s.includes(',') && !s.includes('.')) s = s.replace(',', '.');
+      const n = parseFloat(s);
+      return isNaN(n) ? 0 : n;
+    }
+    function formatBRL(num) {
+      return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2 }).format(num || 0);
+    }
+    function getNomeItem(it) {
+      return it.nomeProduto || it.descricaoServico || it.produto || it.item || it.descricao || it.descricaoItem || it.itemServico || '(sem descrição)';
+    }
+    function getSolicitante(it) {
+      return it.solicitante || it.nomeSolicitante || it.nome || '(sem solicitante)';
+    }
+    function getAprovador(it) {
+      return it.aprovador || it.aprovadoPor || it.aprovou || '(aprovador não informado)';
+    }
+    function getReprovador(it) {
+      return it.reprovador || it.rejeitadoPor || it.rejeitou || '(reprovador não informado)';
+    }
+    function escapeHtml(str) {
+      if (str === undefined || str === null) return '';
+      return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+    }
+    function getTipoSelecionado() {
+      return (selectTipo.value || '').trim().toLowerCase();
+    }
+
+    /*********************************************************
+     * FILTROS (popular selects dinamicamente)
+     *********************************************************/
+    function popularFiltros() {
+      // Unidades
+      const unidadesSet = new Set();
+      allItems.forEach(item => { const u = String(item.unidade || '').trim(); if (u) unidadesSet.add(u); });
+      selectUnidade.innerHTML = '';
+      const optAllU = document.createElement('option'); optAllU.value = ''; optAllU.textContent = 'Todas as unidades';
+      selectUnidade.appendChild(optAllU);
+      Array.from(unidadesSet).sort((a,b)=>a.localeCompare(b,'pt-BR',{numeric:true})).forEach(u=>{
+        const opt = document.createElement('option'); opt.value=u; opt.textContent=u; selectUnidade.appendChild(opt);
+      });
+
+      // Meses
+      const mesesSet = new Set();
+      allItems.forEach(item => {
+        if (!item.timestamp) return;
+        const d = new Date(item.timestamp);
+        if (!isNaN(d)) mesesSet.add(getMonthKey(d));
+      });
+      selectMes.innerHTML = '';
+      const optAllM = document.createElement('option'); optAllM.value=''; optAllM.textContent='Todos os meses';
+      selectMes.appendChild(optAllM);
+      Array.from(mesesSet).sort((a,b)=>b.localeCompare(a)).forEach(mKey=>{
+        const opt=document.createElement('option'); opt.value=mKey; opt.textContent=getMonthLabel(mKey); selectMes.appendChild(opt);
+      });
+    }
+
+    /*********************************************************
+     * FILTRAR ITENS COM BASE NOS SELECTS ATUAIS
+     *********************************************************/
+    function getItensFiltrados() {
+      const unidadeSel = (selectUnidade.value || '').trim();
+      const mesSel     = (selectMes.value || '').trim();
+      const tipoSel    = getTipoSelecionado();
+
+      return allItems.filter(item => {
+        const tipoItem = String(item.tipo || '').toLowerCase().trim();
+        if (tipoSel && tipoItem !== tipoSel) return false;
+
+        if (unidadeSel && String(item.unidade || '').trim() !== unidadeSel) return false;
+
+        if (mesSel) {
+          if (!item.timestamp) return false;
+          const d = new Date(item.timestamp);
+          if (isNaN(d)) return false;
+          if (getMonthKey(d) !== mesSel) return false;
+        }
+        return true;
+      });
+    }
+
+    /*********************************************************
+     * CALCULAR E RENDERIZAR KPIs
+     *********************************************************/
+    function atualizarKPIs() {
+      const itens = getItensFiltrados();
+      const tipoSel = getTipoSelecionado();
+
+      // zera detalhes
+      detalhesKPIs.gasto = [];
+      detalhesKPIs.pedidos = [];
+      detalhesKPIs.aprovados = [];
+      detalhesKPIs.rejeicoes = [];
+      detalhesKPIs.comprados = [];
+
+      const totalPedidos = itens.length;
+      let rejeicoes = 0;
+      let valorTotal = 0;
+      let compradosCount = 0;
+
+      itens.forEach(item => {
+        const st = String(item.status || '').toLowerCase().trim();
+        const tipoItemNormalizado = String(item.tipo || '').toLowerCase().trim();
+
+        const linhaBase = {
+          produto: getNomeItem(item),
+          unidade: item.unidade || '',
+          solicitante: getSolicitante(item),
+          valorCompra: parseValorBrToNumber(item.valorCompra),
+          aprovador: getAprovador(item),
+          reprovador: getReprovador(item),
+          tipo: tipoItemNormalizado || '',
+          status: st
+        };
+
+        detalhesKPIs.pedidos.push(linhaBase);
+
+        if (st === 'reprovado') {
+          rejeicoes++;
+          detalhesKPIs.rejeicoes.push(linhaBase);
+        } else {
+          // tudo que NÃO é reprovado entra como "aprovado" pela nova regra
+          detalhesKPIs.aprovados.push(linhaBase);
+        }
+
+        if (st === 'comprado') {
+          compradosCount++;
+          valorTotal += linhaBase.valorCompra;
+          detalhesKPIs.gasto.push(linhaBase);
+          detalhesKPIs.comprados.push(linhaBase);
+        }
+      });
+
+      const aprovados = Math.max(0, totalPedidos - rejeicoes); // nova regra
+
+      // Atualiza DOM
+      kpiValorGasto.textContent   = formatBRL(valorTotal);
+      kpiQtdPedidos.textContent   = totalPedidos;
+      kpiQtdAprovados.textContent = aprovados;
+      kpiQtdRejeicoes.textContent = rejeicoes;
+      kpiQtdComprados.textContent = compradosCount;
+
+      ajustarLayoutKPIs(tipoSel);
+    }
+
+    /*********************************************************
+     * AJUSTAR TEXTOS / VISIBILIDADE DOS CARDS KPI
+     *********************************************************/
+    function ajustarLayoutKPIs(tipoSel) {
+      if (tipoSel === 'produto') {
+        labelValorGasto.textContent  = 'Custo total (R$)';
+        descValorGasto.textContent   = 'Somatório de produtos comprados';
+
+        labelQtdPedidos.textContent  = 'Solicitações de produto';
+        descQtdPedidos.textContent   = 'Total de solicitações registradas';
+
+        labelQtdAprovados.textContent = 'Solicitações aprovadas';
+        descQtdAprovados.textContent  = 'Calculado: total − reprovadas';
+
+        labelQtdRejeicoes.textContent = 'Solicitações reprovadas';
+        descQtdRejeicoes.textContent  = 'Produtos não aprovados';
+
+        labelQtdComprados.textContent = 'Produtos comprados';
+        descQtdComprados.textContent  = 'Pedidos finalizados (status “comprado”)';
+      }
+      else if (tipoSel === 'servico') {
+        labelValorGasto.textContent  = 'Custo total (R$)';
+        descValorGasto.textContent   = 'Somatório de serviços contratados';
+
+        labelQtdPedidos.textContent  = 'Solicitações de serviço';
+        descQtdPedidos.textContent   = 'Total de solicitações registradas';
+
+        labelQtdAprovados.textContent = 'Solicitações aprovadas';
+        descQtdAprovados.textContent  = 'Calculado: total − reprovadas';
+
+        labelQtdRejeicoes.textContent = 'Solicitações reprovadas';
+        descQtdRejeicoes.textContent  = 'Serviços não aprovados';
+
+        labelQtdComprados.textContent = 'Serviços contratados';
+        descQtdComprados.textContent  = 'Solicitações finalizadas (status “comprado”)';
+      }
+      else {
+        labelValorGasto.textContent  = 'Valor gasto total (R$)';
+        descValorGasto.textContent   = 'Soma de produtos e serviços';
+
+        labelQtdPedidos.textContent  = 'Solicitações totais';
+        descQtdPedidos.textContent   = 'Produtos + serviços solicitados';
+
+        labelQtdAprovados.textContent = 'Total aprovado';
+        descQtdAprovados.textContent  = 'Calculado: total − reprovadas';
+
+        labelQtdRejeicoes.textContent = 'Total reprovado';
+        descQtdRejeicoes.textContent  = 'Produtos + serviços reprovados';
+
+        labelQtdComprados.textContent = 'Comprados';
+        descQtdComprados.textContent  = 'Itens comprados / serviços contratados';
+      }
+
+      // Todos os cards visíveis
+      cardValorGasto.classList.remove('hidden');
+      cardQtdPedidos.classList.remove('hidden');
+      cardQtdAprovados.classList.remove('hidden');
+      cardQtdRejeicoes.classList.remove('hidden');
+      cardQtdComprados.classList.remove('hidden');
+    }
+
+    /*********************************************************
+     * GRÁFICO DE GASTO POR UNIDADE
+     *********************************************************/
+    function calcularResumoGastoPorUnidade() {
+      const mesSel  = (selectMes.value || '').trim();
+      const tipoSel = getTipoSelecionado();
+
+      const mapa = new Map(); // unidade -> total gasto (R$)
+
+      allItems.forEach(item => {
+        const st = String(item.status || '').toLowerCase().trim();
+        if (st !== 'comprado') return;
+
+        const tipoItem = String(item.tipo || '').toLowerCase().trim();
+        if (tipoSel && tipoItem !== tipoSel) return;
+
+        if (mesSel) {
+          if (!item.timestamp) return;
+          const d = new Date(item.timestamp);
+          if (isNaN(d)) return;
+          if (getMonthKey(d) !== mesSel) return;
+        }
+
+        const unidade = (item.unidade || '(sem unidade)').trim() || '(sem unidade)';
+        const val = parseValorBrToNumber(item.valorCompra);
+
+        mapa.set(unidade, (mapa.get(unidade) || 0) + val);
+      });
+
+      const arr = Array.from(mapa.entries()).sort((a, b) => b[1] - a[1]);
+      const labels = arr.map(([u]) => u);
+      const valores = arr.map(([_, v]) => Number(v.toFixed(2)));
+      return { labels, valores };
+    }
+
+    function atualizarGraficoGastoPorUnidade() {
+      if (!ctxGastoPorUnidade) return;
+
+      const { labels, valores } = calcularResumoGastoPorUnidade();
+
+      const dataConfig = {
+        labels,
+        datasets: [{
+          label: 'Total gasto (R$)',
+          data: valores,
+          backgroundColor: '#FD7F08',
+          borderColor: '#ffffff',
+          borderWidth: 1,
+          borderRadius: 8,
+          barThickness: 'flex',
+          maxBarThickness: 48
+        }]
+      };
+
+      const optionsConfig = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false, labels: { color: '#f1f5f9' } },
+          tooltip: {
+            callbacks: { label: (ctx) => ' ' + formatBRL(ctx.parsed.y || 0) }
+          }
+        },
+        scales: {
+          x: {
+            ticks: { color: '#f1f5f9', maxRotation: 45, minRotation: 0, autoSkip: false },
+            grid: { display: false, borderColor: 'rgba(255,255,255,0.25)' }
+          },
+          y: {
+            ticks: { color: '#f1f5f9', callback: (v) => formatBRL(v) },
+            grid: { color: 'rgba(255,255,255,0.15)', borderColor: 'rgba(255,255,255,0.25)' }
+          }
+        }
+      };
+
+      if (!gastoPorUnidadeChart) {
+        gastoPorUnidadeChart = new Chart(ctxGastoPorUnidade, { type: 'bar', data: dataConfig, options: optionsConfig });
+      } else {
+        gastoPorUnidadeChart.data.labels = dataConfig.labels;
+        gastoPorUnidadeChart.data.datasets[0].data = dataConfig.datasets[0].data;
+        gastoPorUnidadeChart.update();
+      }
+    }
+
+    /*********************************************************
+     * MODAL (abrir/fechar e montar tabela)
+     *********************************************************/
+    function fecharModal() { modalOverlay.classList.add('hidden'); }
+
+    function abrirModal(kpiTipo) {
+      const tipoSel = getTipoSelecionado();
+      const isTudo  = (tipoSel === '');
+
+      let rowsHtml = '';
+      let theadHtml = '';
+      let descricao = '';
+
+      if (kpiTipo === 'gasto') {
+        modalTitulo.textContent = isTudo ? 'Valor gasto total (R$)' : 'Custo total (R$)';
+        descricao = isTudo
+          ? 'Soma de produtos e serviços marcados como "comprado". A tabela indica o tipo de cada linha.'
+          : (tipoSel === 'servico'
+              ? 'Somatório de serviços contratados (status "comprado").'
+              : 'Somatório de produtos comprados (status "comprado").');
+        theadHtml = isTudo ? `
+          <tr>
+            <th class="py-2 pr-3 font-medium">Item / Serviço</th>
+            <th class="py-2 pr-3 font-medium whitespace-nowrap">Tipo</th>
+            <th class="py-2 pr-3 font-medium text-right whitespace-nowrap">Valor (R$)</th>
+          </tr>` : `
+          <tr>
+            <th class="py-2 pr-3 font-medium">Item / Serviço</th>
+            <th class="py-2 pr-3 font-medium text-right whitespace-nowrap">Valor (R$)</th>
+          </tr>`;
+        rowsHtml = detalhesKPIs.gasto.map(it => `
+          <tr class="text-slate-100">
+            <td class="py-2 pr-3">${escapeHtml(it.produto)}</td>
+            ${isTudo ? `<td class="py-2 pr-3 whitespace-nowrap">${escapeHtml(it.tipo)}</td>` : ``}
+            <td class="py-2 pr-3 text-right">${formatBRL(it.valorCompra || 0)}</td>
+          </tr>`).join('');
+      }
+
+      if (kpiTipo === 'pedidos') {
+        modalTitulo.textContent = isTudo ? 'Solicitações totais' : (tipoSel === 'servico' ? 'Solicitações de serviço feitas' : 'Solicitações de produto feitas');
+        descricao = isTudo ? 'Todas as solicitações registradas (produtos e serviços). A tabela indica o tipo.' :
+                    (tipoSel === 'servico' ? 'Total de solicitações de serviço registradas.' : 'Total de solicitações de produto registradas.');
+        theadHtml = isTudo ? `
+          <tr>
+            <th class="py-2 pr-3 font-medium">Item / Serviço</th>
+            <th class="py-2 pr-3 font-medium whitespace-nowrap">Tipo</th>
+            <th class="py-2 pr-3 font-medium">Solicitante</th>
+            <th class="py-2 pr-3 font-medium">Unidade</th>
+          </tr>` : `
+          <tr>
+            <th class="py-2 pr-3 font-medium">Item / Serviço</th>
+            <th class="py-2 pr-3 font-medium">Solicitante</th>
+            <th class="py-2 pr-3 font-medium">Unidade</th>
+          </tr>`;
+        rowsHtml = detalhesKPIs.pedidos.map(it => `
+          <tr class="text-slate-100">
+            <td class="py-2 pr-3">${escapeHtml(it.produto)}</td>
+            ${isTudo ? `<td class="py-2 pr-3 whitespace-nowrap">${escapeHtml(it.tipo)}</td>` : ``}
+            <td class="py-2 pr-3 whitespace-nowrap">${escapeHtml(it.solicitante)}</td>
+            <td class="py-2 pr-3 whitespace-nowrap">${escapeHtml(it.unidade)}</td>
+          </tr>`).join('');
+      }
+
+      if (kpiTipo === 'aprovados') {
+        // agora "aprovados" = total − reprovadas (inclui pendente/comprado/aprovado)
+        modalTitulo.textContent = isTudo ? 'Total aprovado (total − reprovadas)' : 'Solicitações aprovadas (total − reprovadas)';
+        descricao = 'Lista de solicitações não reprovadas. Inclui pendentes, aprovadas e compradas.';
+        theadHtml = isTudo ? `
+          <tr>
+            <th class="py-2 pr-3 font-medium">Item / Serviço</th>
+            <th class="py-2 pr-3 font-medium whitespace-nowrap">Tipo</th>
+            <th class="py-2 pr-3 font-medium">Solicitante</th>
+            <th class="py-2 pr-3 font-medium">Unidade</th>
+            <th class="py-2 pr-3 font-medium whitespace-nowrap">Status</th>
+            <th class="py-2 pr-3 font-medium">Aprovador</th>
+          </tr>` : `
+          <tr>
+            <th class="py-2 pr-3 font-medium">Item / Serviço</th>
+            <th class="py-2 pr-3 font-medium">Solicitante</th>
+            <th class="py-2 pr-3 font-medium">Unidade</th>
+            <th class="py-2 pr-3 font-medium whitespace-nowrap">Status</th>
+            <th class="py-2 pr-3 font-medium">Aprovador</th>
+          </tr>`;
+        rowsHtml = detalhesKPIs.aprovados.map(it => `
+          <tr class="text-slate-100">
+            <td class="py-2 pr-3">${escapeHtml(it.produto)}</td>
+            ${isTudo ? `<td class="py-2 pr-3 whitespace-nowrap">${escapeHtml(it.tipo)}</td>` : ``}
+            <td class="py-2 pr-3 whitespace-nowrap">${escapeHtml(it.solicitante)}</td>
+            <td class="py-2 pr-3 whitespace-nowrap">${escapeHtml(it.unidade)}</td>
+            <td class="py-2 pr-3 whitespace-nowrap">${escapeHtml(it.status)}</td>
+            <td class="py-2 pr-3 whitespace-nowrap">${escapeHtml(it.aprovador)}</td>
+          </tr>`).join('');
+      }
+
+      if (kpiTipo === 'rejeicoes') {
+        modalTitulo.textContent = isTudo ? 'Total reprovado' : 'Solicitações reprovadas';
+        descricao = isTudo ? 'Produtos e serviços reprovados. A tabela mostra o tipo de cada linha.' :
+                    (getTipoSelecionado()==='servico' ? 'Serviços não aprovados.' : 'Produtos não aprovados.');
+        theadHtml = isTudo ? `
+          <tr>
+            <th class="py-2 pr-3 font-medium">Item / Serviço</th>
+            <th class="py-2 pr-3 font-medium whitespace-nowrap">Tipo</th>
+            <th class="py-2 pr-3 font-medium">Solicitante</th>
+            <th class="py-2 pr-3 font-medium">Unidade</th>
+            <th class="py-2 pr-3 font-medium">Rejeitado por</th>
+          </tr>` : `
+          <tr>
+            <th class="py-2 pr-3 font-medium">Item / Serviço</th>
+            <th class="py-2 pr-3 font-medium">Solicitante</th>
+            <th class="py-2 pr-3 font-medium">Unidade</th>
+            <th class="py-2 pr-3 font-medium">Rejeitado por</th>
+          </tr>`;
+        rowsHtml = detalhesKPIs.rejeicoes.map(it => `
+          <tr class="text-slate-100">
+            <td class="py-2 pr-3">${escapeHtml(it.produto)}</td>
+            ${isTudo ? `<td class="py-2 pr-3 whitespace-nowrap">${escapeHtml(it.tipo)}</td>` : ``}
+            <td class="py-2 pr-3 whitespace-nowrap">${escapeHtml(it.solicitante)}</td>
+            <td class="py-2 pr-3 whitespace-nowrap">${escapeHtml(it.unidade)}</td>
+            <td class="py-2 pr-3 whitespace-nowrap">${escapeHtml(it.reprovador)}</td>
+          </tr>`).join('');
+      }
+
+      if (kpiTipo === 'comprados') {
+        modalTitulo.textContent = isTudo ? 'Comprados' : (getTipoSelecionado()==='servico' ? 'Serviços contratados' : 'Produtos comprados');
+        descricao = 'Solicitações finalizadas com status “comprado”.';
+        theadHtml = isTudo ? `
+          <tr>
+            <th class="py-2 pr-3 font-medium">Item / Serviço</th>
+            <th class="py-2 pr-3 font-medium whitespace-nowrap">Tipo</th>
+            <th class="py-2 pr-3 font-medium">Unidade</th>
+            <th class="py-2 pr-3 font-medium text-right whitespace-nowrap">Valor (R$)</th>
+          </tr>` : `
+          <tr>
+            <th class="py-2 pr-3 font-medium">Item / Serviço</th>
+            <th class="py-2 pr-3 font-medium">Unidade</th>
+            <th class="py-2 pr-3 font-medium text-right whitespace-nowrap">Valor (R$)</th>
+          </tr>`;
+        rowsHtml = detalhesKPIs.comprados.map(it => `
+          <tr class="text-slate-100">
+            <td class="py-2 pr-3">${escapeHtml(it.produto)}</td>
+            ${isTudo ? `<td class="py-2 pr-3 whitespace-nowrap">${escapeHtml(it.tipo)}</td>` : ``}
+            <td class="py-2 pr-3 whitespace-nowrap">${escapeHtml(it.unidade)}</td>
+            <td class="py-2 pr-3 text-right">${formatBRL(it.valorCompra || 0)}</td>
+          </tr>`).join('');
+      }
+
+      if (!rowsHtml) {
+        rowsHtml = `
+          <tr>
+            <td class="py-4 text-center text-slate-400" colspan="99">
+              Sem dados para este filtro.
+            </td>
+          </tr>`;
+      }
+
+      modalDescricao.textContent = descricao;
+      modalThead.innerHTML = theadHtml;
+      modalTbody.innerHTML = rowsHtml;
+
+      modalOverlay.classList.remove('hidden');
+    }
+
+    /*********************************************************
+     * BUSCAR DADOS DO BACKEND (Apps Script)
+     *********************************************************/
+    async function carregarDadosDoBackend(emailDoUsuario) {
+      if (!emailDoUsuario) return [];
+      if (!API_BASE) { console.warn('API_BASE ainda não inicializada. Não vou buscar agora.'); return []; }
+      try {
+        const url = `${API_BASE}?action=list&email=${encodeURIComponent(emailDoUsuario)}`;
+        const resp = await fetch(url);
+        const data = await resp.json();
+        if (!data || !data.ok || !Array.isArray(data.items)) {
+          console.error('Resposta inesperada do backend:', data);
+          return [];
+        }
+        return data.items;
+      } catch (err) {
+        console.error('Erro ao buscar dados do backend:', err);
+        return [];
+      }
+    }
+
+    /*********************************************************
+     * EVENTOS DE UI
+     *********************************************************/
+    function atualizarTela() {
+      atualizarKPIs();
+      atualizarGraficoGastoPorUnidade();
+    }
+
+    btnVoltarForm?.addEventListener('click', (e) => {
+      e.preventDefault();
+      location.href = "../formulario/";
+    });
+
+    btnSair?.addEventListener('click', async (e) => {
+      e.preventDefault();
+      try { await signOut(auth); } catch (err) { console.error('Erro ao sair do Firebase:', err); }
+      try { localStorage.removeItem('sessionUser'); } catch (err) { console.warn('Não consegui limpar sessionUser do localStorage:', err); }
+      location.href = "../index.html";
+    });
+
+    selectUnidade?.addEventListener('change', atualizarTela);
+    selectMes?.addEventListener('change', atualizarTela);
+    selectTipo?.addEventListener('change', atualizarTela);
+
+    btnRecarregar?.addEventListener('click', async () => {
+      if (!auth.currentUser) return;
+      const emailAtual = auth.currentUser.email || '';
+      await carregarConfigBackend();
+      allItems = await carregarDadosDoBackend(emailAtual);
+      popularFiltros();
+      atualizarTela();
+    });
+
+    // KPIs -> abrir modal
+    cardValorGasto?.addEventListener('click', () => abrirModal('gasto'));
+    cardQtdPedidos?.addEventListener('click', () => abrirModal('pedidos'));
+    cardQtdAprovados?.addEventListener('click', () => abrirModal('aprovados'));
+    cardQtdRejeicoes?.addEventListener('click', () => abrirModal('rejeicoes'));
+    cardQtdComprados?.addEventListener('click', () => abrirModal('comprados')); // NOVO
+
+    // Modal fechar
+    modalFechar?.addEventListener('click', fecharModal);
+    modalOverlay?.addEventListener('click', (e) => { if (e.target === modalOverlay) fecharModal(); });
+
+    /*********************************************************
+     * AUTENTICAÇÃO / BOOT
+     *********************************************************/
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) { location.href = "../index.html"; return; }
+      const emailAtual = user.email || '';
+      await carregarConfigBackend();
+      allItems = await carregarDadosDoBackend(emailAtual);
+      popularFiltros();
+      atualizarTela();
+    });
+  </script>
+
+</body>
+</html>

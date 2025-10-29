@@ -128,49 +128,131 @@
       word-break: keep-all;
     }
 
-    nav.cantina-nav .actions {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
+    /* ===== MENU HAMBÚRGUER WRAPPER ===== */
+    nav.cantina-nav .menu-wrapper {
+      position: relative;
+      display: inline-block;
     }
 
-    nav.cantina-nav .btn {
-      padding: 10px 12px;
+    /* checkbox invisível que controla o estado visual do ícone (menu vs X)
+       e também abre/fecha o dropdown via CSS */
+    nav.cantina-nav .menu-checkbox {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* Botão hamburguer estilizado (dark mode friendly) */
+    nav.cantina-nav .menu-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      cursor: pointer;
+      user-select: none;
+      background-color: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      transition: background-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    nav.cantina-nav .menu-button:hover {
+      background-color: rgba(255, 255, 255, 0.12);
+      box-shadow: 0 2px 10px rgba(2, 8, 23, .5);
+    }
+
+    nav.cantina-nav .menu-button:active {
+      transform: scale(0.96);
+    }
+
+    nav.cantina-nav .menu-button:focus-visible {
+      outline: 2px solid var(--cantina-primary);
+      outline-offset: 2px;
+    }
+
+    /* Ícones dentro do botão */
+    nav.cantina-nav .icon {
+      width: 24px;
+      height: 24px;
+      stroke: #fff;
+    }
+
+    /* por padrão (menu fechado): mostra hamburguer, esconde X */
+    nav.cantina-nav .icon-menu {
+      display: block;
+    }
+
+    nav.cantina-nav .icon-close {
+      display: none;
+    }
+
+    /* quando checkbox marcado (= aberto), troca os ícones */
+    nav.cantina-nav .menu-checkbox:checked+label .icon-menu {
+      display: none;
+    }
+
+    nav.cantina-nav .menu-checkbox:checked+label .icon-close {
+      display: block;
+    }
+
+    /* ===== DROPDOWN DO MENU ===== */
+    nav.cantina-nav .actions {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      z-index: 60;
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+      background: #ffffff;
+      border: 1px solid var(--cantina-border);
       border-radius: 12px;
+      padding: 12px;
+      width: min(78vw, 240px);
+      box-shadow:
+        0 24px 60px rgba(2, 8, 23, .45),
+        0 2px 6px rgba(2, 8, 23, .2);
+    }
+
+    /* quando checkbox marcado, mostra o dropdown */
+    nav.cantina-nav .menu-checkbox:checked~.actions {
+      display: flex;
+    }
+
+    /* Botões dentro do dropdown */
+    nav.cantina-nav .btn {
+      width: 100%;
+      justify-content: center;
+      border-radius: 10px;
+      padding: 12px;
       border: 1px solid var(--cantina-border);
       background: #fff;
       color: #000;
       cursor: pointer;
-      transition: transform .15s ease, box-shadow .15s ease;
+      transition: background-color .15s ease, box-shadow .15s ease, transform .15s ease;
       font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-align: center;
     }
 
     nav.cantina-nav .btn:hover {
+      background-color: #f8fafc;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, .06);
       transform: translateY(-1px);
-      box-shadow: 0 2px 10px rgba(2, 8, 23, .06);
     }
 
-    nav.cantina-nav .menu-toggle {
-      display: none;
-      border: 1px solid var(--cantina-border);
-      background: #fff;
-      color: #000;
-      border-radius: 10px;
-      padding: 8px;
-      cursor: pointer;
-    }
-
-    nav.cantina-nav .menu-toggle:focus-visible,
     nav.cantina-nav .btn:focus-visible {
       outline: 2px solid var(--cantina-primary);
       outline-offset: 2px;
     }
 
-    /* ===== Mobile (<=640px): header estável, hambúrguer menor e dropdown ancorado ===== */
+    /* ===== Mobile (<=640px): ajustes ===== */
     @media (max-width: 640px) {
       nav.cantina-nav .cantina-container {
         height: 72px;
-        position: relative;
       }
 
       nav.cantina-nav img {
@@ -182,49 +264,17 @@
         min-width: 0;
       }
 
-      nav.cantina-nav .menu-toggle {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
+      nav.cantina-nav .menu-button {
         width: 40px;
         height: 40px;
-        padding: 6px;
         border-radius: 10px;
       }
 
-      nav.cantina-nav .menu-toggle svg {
-        width: 18px;
-        height: 18px;
+      nav.cantina-nav .icon {
+        width: 20px;
+        height: 20px;
       }
 
-      nav.cantina-nav .actions {
-        position: absolute;
-        right: 12px;
-        top: calc(100% + 8px);
-        z-index: 60;
-        display: none;
-        flex-direction: column;
-        gap: 6px;
-        background: #ffffff;
-        border: 1px solid var(--cantina-border);
-        border-radius: 12px;
-        padding: 10px;
-        width: min(78vw, 280px);
-        box-shadow: 0 12px 30px rgba(2, 8, 23, .18);
-      }
-
-      nav.cantina-nav .actions.open {
-        display: flex;
-      }
-
-      nav.cantina-nav .actions .btn {
-        width: 100%;
-        justify-content: center;
-      }
-    }
-
-    /* ===== Mini ajuste de tipografia do título para telas muito pequenas ===== */
-    @media (max-width: 400px) {
       nav.cantina-nav .brand .title {
         font-size: clamp(16px, 5vw, 22px);
       }
@@ -252,27 +302,59 @@
         <span class="title text-[#FD7F08]">FORMULÁRIO DE COMPRAS</span>
       </a>
 
-      <!-- Botão hambúrguer (aparece só no mobile via CSS) -->
-      <button id="menuToggle" class="menu-toggle" aria-label="Abrir menu" aria-expanded="false"
-        aria-controls="menuActions">
-        <!-- Ícone hambúrguer com stroke -->
-        <svg xmlns="http://www.w3.org/2000/svg" class="size-6" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-            stroke-linejoin="round" />
-        </svg>
-      </button>
+      <!-- MENU HAMBÚRGUER + DROPDOWN (tudo agrupado para o dropdown ficar grudado embaixo) -->
+      <div class="menu-wrapper" id="menuWrapper">
+        <!-- checkbox controla estado visual e abertura -->
+        <input type="checkbox" id="menuCheckbox" class="menu-checkbox" aria-label="Abrir / fechar menu">
 
-      <!-- Ações (dropdown no mobile; inline no desktop) -->
-      <div id="menuActions" class="actions">
-        <!-- MOSTRA SÓ pra adminCompras (ou admSupremo) -->
-        <button id="btnSetorCompras" style="display:none" class="btn">Setor Compras</button>
+        <!-- label atua como botão -->
+        <label id="menuToggle" for="menuCheckbox" class="menu-button" aria-expanded="false"
+          aria-controls="menuActions">
 
-        <!-- MOSTRA SÓ pra adminAprovacao (ou admSupremo) -->
-        <button id="btnAdminAprovacao" style="display:none" class="btn">Admin</button>
+          <!-- ÍCONE HAMBÚRGUER -->
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="menu"
+            class="icon icon-menu">
+            <line x1="4" y1="6" x2="20" y2="6"></line>
+            <line x1="4" y1="12" x2="20" y2="12"></line>
+            <line x1="4" y1="18" x2="20" y2="18"></line>
+          </svg>
 
-        <!-- Sempre visível pra quem está logado -->
-        <button id="btnSair" class="btn">Sair</button>
+          <!-- ÍCONE X / FECHAR -->
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="x"
+            class="icon icon-close">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+
+        </label>
+
+        <!-- Dropdown de ações (grudado exatamente abaixo do hambúrguer) -->
+        <div id="menuActions" class="actions">
+          <!-- MOSTRA SÓ pra adminCompras (ou admSupremo) -->
+          <button id="btnSetorCompras" style="display:none" class="btn">Setor Compras</button>
+
+          <!-- MOSTRA SÓ pra adminAprovacao (ou admSupremo) -->
+          <button id="btnAdminAprovacao" style="display:none" class="btn">Admin</button>
+
+          <!-- Dashboards (visível pra quem está logado) -->
+          <button id="btnDashboards" style="display:none" class="btn">Dashboards</button>
+
+          <!-- Sair ícone -->
+          <button id="btnSair" class="btn" aria-label="Sair" title="Sair">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              data-lucide="log-out" class="lucide lucide-log-out w-6 h-6">
+              <path d="m16 17 5-5-5-5"></path>
+              <path d="M21 12H9"></path>
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            </svg>
+            <span class="sr-only">Sair</span>
+          </button>
+        </div>
       </div>
+      <!-- /menu-wrapper -->
     </div>
   </nav>
 
@@ -285,6 +367,10 @@
 
   <!-- Login -->
   <a id="hrefLogin" href="../index.html" style="display:none;"></a>
+
+  <!-- Painel Dashboards (/dashboards) -->
+  <a id="hrefDashboards" href="/dashboards/" style="display:none;"></a>
+
 
   <!-- Main -->
   <main class="w-full px-4 sm:px-6 pb-16 mt-6 sm:mt-8">
@@ -506,6 +592,8 @@
     const hrefLogin = document.getElementById('hrefLogin');
     const hrefAdminAprovacao = document.getElementById('hrefAdminAprovacao');
     const hrefAdminCompras = document.getElementById('hrefAdminCompras');
+    const btnDashboards = document.getElementById('btnDashboards');
+    const hrefDashboards = document.getElementById('hrefDashboards');
 
     // =====================================================
     // Função global para preencher nome/e-mail no form
@@ -566,6 +654,8 @@
       // 4. Esconde botões de admin
       if (btnAdminAprovacao) btnAdminAprovacao.style.display = 'none';
       if (btnSetorCompras) btnSetorCompras.style.display = 'none';
+      if (btnDashboards) btnDashboards.style.display = 'none';
+
 
       // 5. Reconfigura campos do formulário (tira readOnly do e-mail etc.)
       preencherCamposUsuario();
@@ -580,7 +670,7 @@
     });
 
     // =====================================================
-    // Botões "Admin" e "Setor Compras"
+    // Botão "Admin"
     // =====================================================
     btnAdminAprovacao?.addEventListener('click', (e) => {
       e.preventDefault();
@@ -591,6 +681,23 @@
       }
     });
 
+    // =====================================================
+    // Botão "Dashboards"
+    // =====================================================
+    btnDashboards?.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (hrefDashboards) {
+        // usa o anchor oculto pra navegar
+        hrefDashboards.click();
+      } else {
+        // fallback direto
+        location.href = '/dashboards/';
+      }
+    });
+
+    // =====================================================
+    // Botão "Setor Compras"
+    // =====================================================
     btnSetorCompras?.addEventListener('click', (e) => {
       e.preventDefault();
       if (hrefAdminCompras) {
@@ -611,9 +718,10 @@
         window.currentUserEmail = null;
         window.currentUserName = null;
 
-        // esconde botões de admin
+        // esconde botões de admin e dashboards
         if (btnAdminAprovacao) btnAdminAprovacao.style.display = 'none';
-        if (btnSetorCompras) btnSetorCompras.style.display = 'none';
+        if (btnSetorCompras)   btnSetorCompras.style.display   = 'none';
+        if (btnDashboards)     btnDashboards.style.display     = 'none';
 
         // Prepara form (email editável e vazio)
         preencherCamposUsuario();
@@ -632,15 +740,14 @@
       const emailLower = (user.email || '').toLowerCase();
 
       const isAprovacao = ADMIN_APROVACAO_EMAILS.has(emailLower);
-      const isCompras = ADMIN_COMPRAS_EMAILS.has(emailLower);
-      const isSupremo = ADMIN_SUPREMO_EMAILS.has(emailLower);
+      const isCompras   = ADMIN_COMPRAS_EMAILS.has(emailLower);
+      const isSupremo   = ADMIN_SUPREMO_EMAILS.has(emailLower);
 
       // VISIBILIDADE:
-      // - adminCompras        -> só "Setor Compras"
-      // - adminAprovacao      -> só "Admin"
-      // - admSupremo          -> os dois
-      //
-      // Lógica final: mostra se ele for supremo OU do nível correspondente.
+      // - adminCompras        -> "Setor Compras"
+      // - adminAprovacao      -> "Admin"
+      // - admSupremo          -> "Setor Compras" + "Admin" + "Dashboards"
+
       if (btnAdminAprovacao) {
         btnAdminAprovacao.style.display = (isSupremo || isAprovacao) ? 'inline-flex' : 'none';
       }
@@ -648,11 +755,17 @@
       if (btnSetorCompras) {
         btnSetorCompras.style.display = (isSupremo || isCompras) ? 'inline-flex' : 'none';
       }
+
+      // Dashboards -> SOMENTE admSupremo
+      if (btnDashboards) {
+        btnDashboards.style.display = isSupremo ? 'inline-flex' : 'none';
+      }
     });
+
   </script>
 
 
-  <!-- Lógica do formulário + envio para Google Sheets -->
+  <!-- Lógica do formulário + envio para Google Sheets + menu dropdown -->
   <script>
     const form = document.getElementById('formulario');
 
@@ -681,6 +794,11 @@
     const linkCampos = document.getElementById('linkCampos');
     const listaLinks = document.getElementById('listaLinks');
     const btnAddLink = document.getElementById('adicionarLink');
+
+    // Menu
+    const menuWrapper = document.getElementById('menuWrapper');
+    const menuCheckbox = document.getElementById('menuCheckbox');
+    const menuToggleLabel = document.getElementById('menuToggle');
 
     let linkCount = 0;
     const maxLinks = 3;
@@ -833,7 +951,32 @@
     temLinkGroup.addEventListener('change', atualizarLink);
 
     // ======== INTEGRAÇÃO COM GOOGLE SHEETS (Apps Script) ========
-    const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbwRzDIjaj8oEpBIieqJv8IyvcsV7ILCFzyXsj2tMRIMElHJj3p-I6iqMFBV9g8DVMgd/exec';
+    // valor começa vazio e vai ser preenchido via fetch do JSON de config
+    let WEBAPP_URL = '';
+
+    async function carregarConfigBackend() {
+      try {
+        const resp = await fetch('../config/appConfig.json', {
+          cache: 'no-cache'
+        });
+
+        if (!resp.ok) {
+          console.error('Não consegui carregar appConfig.json', resp.status);
+          return;
+        }
+
+        const data = await resp.json();
+        WEBAPP_URL = data.WEBAPP_URL || '';
+        if (!WEBAPP_URL) {
+          console.error('WEBAPP_URL não veio no JSON.');
+        }
+      } catch (err) {
+        console.error('Erro buscando appConfig.json:', err);
+      }
+    }
+
+    // dispara logo que o script carrega
+    carregarConfigBackend();
 
     function coletarLinks() {
       const inputs = listaLinks.querySelectorAll('input[type="url"]');
@@ -843,14 +986,6 @@
         if (v) arr.push(v);
       });
       return arr;
-    }
-
-    // Mantido caso queira reusar futuramente (não usamos mais para travar o botão após clique)
-    function desabilitarBotao(submitBtn, desabilitar) {
-      if (!submitBtn) return;
-      submitBtn.disabled = desabilitar;
-      submitBtn.style.opacity = desabilitar ? '0.7' : '1';
-      submitBtn.style.cursor = desabilitar ? 'not-allowed' : 'pointer';
     }
 
     // Função que zera o formulário VISUALMENTE logo após o clique em "Enviar"
@@ -892,6 +1027,12 @@
       let ok = false;
       let parseOk = false;
 
+      // segurança extra: se por algum motivo a config não carregou ainda
+      if (!WEBAPP_URL) {
+        console.error('WEBAPP_URL ainda não carregada, não posso enviar.');
+        return false;
+      }
+
       try {
         const resp = await fetch(WEBAPP_URL, {
           method: 'POST',
@@ -899,7 +1040,6 @@
           body
         });
 
-        // Se a resposta for opaque (ex.: por CORS), consideramos sucesso
         if (resp.type === 'opaque') {
           ok = true;
         } else {
@@ -908,7 +1048,6 @@
           ok = resp.ok && (parseOk ? (data?.ok !== false) : true);
         }
       } catch (networkErr) {
-        // Fallback em erro de rede real tentando no-cors
         try {
           await fetch(WEBAPP_URL, {
             method: 'POST',
@@ -926,17 +1065,19 @@
     }
 
     // SUBMIT DO FORM
-    // AGORA: UI OTIMISTA TOTAL
-    // 1. Valida e monta payload
-    // 2. Mostra toast sucesso + limpa form IMEDIATAMENTE
-    // 3. Libera pra próxima solicitação na hora
-    // 4. Só depois tenta de fato mandar pro servidor (fetch)
+    // UI OTIMISTA
     form.addEventListener('submit', async function (e) {
       e.preventDefault();
 
       // BLOQUEIO SE NÃO LOGADO
       if (!window.isUserAuthed) {
         toast('Você precisa estar logado para enviar.', 'error');
+        return;
+      }
+
+      // BLOQUEIO SE A URL DO BACKEND AINDA NÃO CHEGOU
+      if (!WEBAPP_URL) {
+        toast('Conectando ao setor de compras... tente novamente em 1 segundo.', 'error');
         return;
       }
 
@@ -1006,7 +1147,7 @@
           : String(Date.now()) + Math.random().toString(16).slice(2)
       );
 
-      // ✅ UX OTIMISTA: a partir daqui a tela já age como "enviado com sucesso"
+      // ✅ UX OTIMISTA:
       toast('Pedido enviado com sucesso!', 'success');
 
       // limpa o formulário e volta pro estado inicial logo após o clique
@@ -1025,36 +1166,38 @@
       }
     });
 
-    // Toggle do menu mobile
-    (function () {
-      const menuToggle = document.getElementById('menuToggle');
-      const menuActions = document.getElementById('menuActions');
-
-      if (menuToggle && menuActions) {
-        menuToggle.addEventListener('click', () => {
-          const isOpen = menuActions.classList.toggle('open');
-          menuToggle.setAttribute('aria-expanded', String(isOpen));
-        });
-
-        // fecha ao clicar fora
-        document.addEventListener('click', (e) => {
-          if (!menuActions.classList.contains('open')) return;
-          const clickedInside = menuActions.contains(e.target) || menuToggle.contains(e.target);
-          if (!clickedInside) {
-            menuActions.classList.remove('open');
-            menuToggle.setAttribute('aria-expanded', 'false');
-          }
-        });
-
-        // garante que ao voltar para desktop o menu feche
-        window.addEventListener('resize', () => {
-          if (window.innerWidth > 640 && menuActions.classList.contains('open')) {
-            menuActions.classList.remove('open');
-            menuToggle.setAttribute('aria-expanded', 'false');
-          }
-        });
+    // ===== Toggle do menu hambúrguer =====
+    // Agora o open/close visual é controlado pelo checkbox CSS.
+    // Abaixo só fechamos quando clica fora ou redimensiona,
+    // e mantemos aria-expanded atualizado.
+    function closeMenu() {
+      if (menuCheckbox.checked) {
+        menuCheckbox.checked = false;
+        if (menuToggleLabel) {
+          menuToggleLabel.setAttribute('aria-expanded', 'false');
+        }
       }
-    })();
+    }
+
+    // Atualiza aria-expanded quando clicamos no botão
+    menuToggleLabel?.addEventListener('click', () => {
+      // esperar o checkbox atualizar
+      setTimeout(() => {
+        menuToggleLabel.setAttribute('aria-expanded', String(menuCheckbox.checked));
+      }, 0);
+    });
+
+    // Fecha ao clicar fora
+    document.addEventListener('click', (e) => {
+      if (!menuWrapper.contains(e.target)) {
+        closeMenu();
+      }
+    });
+
+    // Fecha ao mudar tamanho da janela (evita ficar preso aberto)
+    window.addEventListener('resize', () => {
+      closeMenu();
+    });
   </script>
 
 </body>

@@ -44,6 +44,7 @@
     :root {
       --brand: #F1663C;
       --white: #FFFFFF;
+
       --cantina-primary: #FD7F08;
       --cantina-secondary: #253237;
       --cantina-text: #FD7F08;
@@ -150,6 +151,7 @@
     nav.cantina-nav .email {
       color: #e2e8f0;
       font-size: 12px;
+      line-height: 1.2;
       padding: 6px 10px;
       border-radius: 10px;
       background: rgba(255, 255, 255, 0.06);
@@ -219,6 +221,9 @@
         color: #0f172a;
         background: #f8fafc;
         border-color: #e2e8f0;
+        max-width: 100%;
+        white-space: normal;
+        word-break: break-word;
       }
     }
 
@@ -380,7 +385,7 @@
       width: 72px;
     }
 
-    /* NOVO estilo dos botões de ação diretos (✓ e ✕)  ------------------ */
+    /* Botões de ação diretos (✓ e ✕) */
     .action-btn {
       display: inline-flex;
       align-items: center;
@@ -411,8 +416,6 @@
       color: #b91c1c;
       /* vermelho */
     }
-
-    /* -------------------------------------------------------- */
   </style>
 </head>
 
@@ -441,6 +444,9 @@
 
       <!-- Ações -->
       <div id="menuActions" class="actions">
+        <!-- email do admin logado -->
+
+        <!-- Sair -->
         <a id="btnSair" class="btn" href="../index.html" rel="noopener">Sair</a>
       </div>
     </div>
@@ -551,57 +557,67 @@
     </div>
   </main>
 
+  <!-- MENU MOBILE ABRE/FECHA -->
   <script>
-      (function () {
-        const menuToggle = document.getElementById('menuToggle');
-        const menuActions = document.getElementById('menuActions');
+    (function () {
+      const menuToggle = document.getElementById('menuToggle');
+      const menuActions = document.getElementById('menuActions');
 
-        if (menuToggle && menuActions) {
-          menuToggle.addEventListener('click', () => {
-            const isOpen = menuActions.classList.toggle('open');
-            menuToggle.setAttribute('aria-expanded', String(isOpen));
-          });
+      if (menuToggle && menuActions) {
+        menuToggle.addEventListener('click', () => {
+          const isOpen = menuActions.classList.toggle('open');
+          menuToggle.setAttribute('aria-expanded', String(isOpen));
+        });
 
-          document.addEventListener('click', (e) => {
-            if (!menuActions.classList.contains('open')) return;
-            const clickedInside = menuActions.contains(e.target) || menuToggle.contains(e.target);
-            if (!clickedInside) {
-              menuActions.classList.remove('open');
-              menuToggle.setAttribute('aria-expanded', 'false');
-            }
-          });
+        document.addEventListener('click', (e) => {
+          if (!menuActions.classList.contains('open')) return;
+          const clickedInside = menuActions.contains(e.target) || menuToggle.contains(e.target);
+          if (!clickedInside) {
+            menuActions.classList.remove('open');
+            menuToggle.setAttribute('aria-expanded', 'false');
+          }
+        });
 
-          window.addEventListener('resize', () => {
-            if (window.innerWidth > 640 && menuActions.classList.contains('open')) {
-              menuActions.classList.remove('open');
-              menuToggle.setAttribute('aria-expanded', 'false');
-            }
-          });
-        }
-      })();
+        window.addEventListener('resize', () => {
+          if (window.innerWidth > 640 && menuActions.classList.contains('open')) {
+            menuActions.classList.remove('open');
+            menuToggle.setAttribute('aria-expanded', 'false');
+          }
+        });
+      }
+    })();
   </script>
 
+  <!-- LÓGICA PRINCIPAL ADMIN -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
 
-    // FIREBASE
+    // =========================
+    // FIREBASE CONFIG
+    // (mesmo projeto do formulário)
+    // =========================
     const firebaseConfig = {
       apiKey: "AIzaSyAEZidq8mdAUKeJXvSQeE01gVOLWe_cp78",
       authDomain: "compras-icone.firebaseapp.com",
       projectId: "compras-icone",
-      storageBucket: "compras-icone.appspot.com",
+      storageBucket: "compras-icone.firebasestorage.app",
       messagingSenderId: "831706842201",
       appId: "1:831706842201:web:9b68ae4f98ad93c5a99d48",
     };
 
-    const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbwRzDIjaj8oEpBIieqJv8IyvcsV7ILCFzyXsj2tMRIMElHJj3p-I6iqMFBV9g8DVMgd/exec';
+    // =====================================================
+    // ESTADO GLOBAL CONFIG / PERMISSÕES
+    // =====================================================
+    // WEBAPP_URL vem de appConfig.json (igual na página do formulário)
+    let WEBAPP_URL = '';
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-
+    // adminAprovacao + admSupremo -> pode acessar essa tela
     let ALLOWED_EMAILS = new Set();
 
+    // =====================================================
+    // Carregar adminEmails.json
+    // =====================================================
     async function carregarAdmins() {
       try {
         const resp = await fetch('../config/adminEmails.json', { cache: 'no-cache' });
@@ -611,6 +627,7 @@
         }
 
         const data = await resp.json();
+
         const listaAprovacao = Array.isArray(data.adminAprovacao) ? data.adminAprovacao : [];
         const listaSupremo = Array.isArray(data.admSupremo) ? data.admSupremo : [];
 
@@ -622,35 +639,43 @@
       }
     }
 
-    await carregarAdmins();
-
-    async function doLogout() {
+    // =====================================================
+    // Carregar appConfig.json (WEBAPP_URL dinâmico)
+    // =====================================================
+    async function carregarConfigBackend() {
       try {
-        await signOut(auth);
+        const resp = await fetch('../config/appConfig.json', {
+          cache: 'no-cache'
+        });
+
+        if (!resp.ok) {
+          console.error('Não consegui carregar appConfig.json', resp.status);
+          return;
+        }
+
+        const data = await resp.json();
+        WEBAPP_URL = data.WEBAPP_URL || '';
+        if (!WEBAPP_URL) {
+          console.error('WEBAPP_URL não veio no JSON.');
+        }
       } catch (err) {
-        console.warn('Erro no signOut Firebase:', err);
+        console.error('Erro buscando appConfig.json:', err);
       }
-
-      try { sessionStorage.clear(); } catch { }
-      try { localStorage.removeItem('sessionUser'); } catch { }
-      try { localStorage.removeItem('firebase:host:*'); } catch { }
-      try { localStorage.removeItem('firebase:authUser'); } catch { }
-      try { localStorage.removeItem('firebase:authUser:${firebaseConfig.apiKey}:[DEFAULT]'); } catch { }
-
-      window.location.replace('../index.html');
     }
 
-    const btnSair = document.getElementById('btnSair');
-    if (btnSair) {
-      btnSair.addEventListener('click', async (e) => {
-        e.preventDefault();
-        btnSair.setAttribute('aria-busy', 'true');
-        btnSair.style.pointerEvents = 'none';
-        btnSair.textContent = 'Saindo…';
-        await doLogout();
-      });
-    }
+    // carrega permissões + endpoint antes de iniciar auth
+    await carregarAdmins();
+    await carregarConfigBackend();
 
+    // =====================================================
+    // Inicializa Firebase
+    // =====================================================
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // =====================================================
+    // Helpers de DOM e toast
+    // =====================================================
     const $ = (sel) => document.querySelector(sel);
     const $$ = (sel) => Array.from(document.querySelectorAll(sel));
 
@@ -702,33 +727,51 @@
       return '-';
     }
 
+    // =====================================================
+    // Logout
+    // =====================================================
+    async function doLogout() {
+      try {
+        await signOut(auth);
+      } catch (err) {
+        console.warn('Erro no signOut Firebase:', err);
+      }
+
+      try { sessionStorage.clear(); } catch { }
+      try { localStorage.removeItem('sessionUser'); } catch { }
+      try { localStorage.removeItem('firebase:host:*'); } catch { }
+      try { localStorage.removeItem('firebase:authUser'); } catch { }
+      try { localStorage.removeItem('firebase:authUser:${firebaseConfig.apiKey}:[DEFAULT]'); } catch { }
+
+      window.location.replace('../index.html');
+    }
+
+    const btnSair = document.getElementById('btnSair');
+    if (btnSair) {
+      btnSair.addEventListener('click', async (e) => {
+        e.preventDefault();
+        btnSair.setAttribute('aria-busy', 'true');
+        btnSair.style.pointerEvents = 'none';
+        btnSair.textContent = 'Saindo…';
+        await doLogout();
+      });
+    }
+
+    // =====================================================
+    // Variáveis de estado da UI
+    // =====================================================
     let currentUser = null;
     let dadosBrutos = [];
     let dadosFiltrados = [];
     let activeTab = 'pendentes';
     let isSendingStatus = false;
 
-    onAuthStateChanged(auth, async (user) => {
-      const adminEmailEl = $('#adminEmail');
+    let page = 1;
+    const pageSize = 3;
 
-      if (!user) {
-        await doLogout();
-        return;
-      }
-
-      const isAllowed = !!user.email && ALLOWED_EMAILS.has(user.email.toLowerCase());
-      if (!isAllowed) {
-        alert('Acesso restrito.');
-        await doLogout();
-        return;
-      }
-
-      currentUser = user;
-      if (adminEmailEl) adminEmailEl.textContent = user.email;
-
-      carregarLista();
-    });
-
+    // =====================================================
+    // Função para chamadas ao Apps Script (com fallback no-cors)
+    // =====================================================
     async function chamarAPI(url, opts = {}) {
       try {
         const resp = await fetch(url, opts);
@@ -762,14 +805,28 @@
       }
     }
 
+    // =====================================================
+    // Carregar lista da planilha
+    // =====================================================
     async function carregarLista() {
-      $('#tbody').innerHTML = `<tr><td colspan="10" class="p-6 text-center text-slate-600">Carregando…</td></tr>`;
+      const tbody = $('#tbody');
+
+      if (!WEBAPP_URL) {
+        tbody.innerHTML = `
+          <tr><td colspan="10" class="p-6 text-center text-red-700">
+            Não consegui conectar ao setor de compras (WEBAPP_URL vazio). Tente novamente.
+          </td></tr>`;
+        toast('Conectando ao setor de compras... tente novamente.', 'error');
+        return;
+      }
+
+      tbody.innerHTML = `<tr><td colspan="10" class="p-6 text-center text-slate-600">Carregando…</td></tr>`;
 
       const url = WEBAPP_URL + '?action=list&email=' + encodeURIComponent(currentUser.email);
       const { ok, data, error, opaque } = await chamarAPI(url);
 
       if (opaque) {
-        $('#tbody').innerHTML = `
+        tbody.innerHTML = `
           <tr><td colspan="10" class="p-6 text-center text-red-700">
             O navegador bloqueou a resposta (CORS).<br>
             Isso é limitação do Apps Script rodando público.
@@ -781,7 +838,7 @@
         const msg = data?.error === 'forbidden'
           ? 'Sem permissão para acessar. Fale com o administrador.'
           : `Falha ao carregar (${error || 'erro'}).`;
-        $('#tbody').innerHTML = `<tr><td colspan="10" class="p-6 text-center text-red-700">${msg}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="10" class="p-6 text-center text-red-700">${msg}</td></tr>`;
         return;
       }
 
@@ -791,7 +848,15 @@
       toast('Lista atualizada', 'success');
     }
 
+    // =====================================================
+    // Atualizar status (aprovar / reprovar)
+    // =====================================================
     async function atualizarStatus(submissionId, novoStatus, observacao = '', extraNotify = '') {
+      if (!WEBAPP_URL) {
+        toast('Sem conexão com o backend.', 'error');
+        throw new Error('WEBAPP_URL vazio');
+      }
+
       const body = new URLSearchParams({
         action: 'updatestatus',
         submissionId,
@@ -810,9 +875,9 @@
       if (!ok) throw new Error(error || 'Falha ao atualizar');
     }
 
-    let page = 1;
-    const pageSize = 3;
-
+    // =====================================================
+    // Paginação helpers
+    // =====================================================
     function getPageSlice(list) {
       const total = list.length;
       const totalPages = Math.max(1, Math.ceil(total / pageSize));
@@ -876,6 +941,9 @@
       });
     }
 
+    // =====================================================
+    // Tab / filtros / contadores
+    // =====================================================
     function inTab(item) {
       const st = String(item.status || 'pendente');
       return activeTab === 'pendentes'
@@ -910,6 +978,9 @@
       $('#countHistorico').style.display = hist ? 'inline-block' : 'none';
     }
 
+    // =====================================================
+    // Helpers de render
+    // =====================================================
     function parseLinks(links) {
       if (Array.isArray(links)) return links;
       if (typeof links === 'string') {
@@ -921,6 +992,15 @@
         }
       }
       return [];
+    }
+
+    function esc(s) {
+      return String(s ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
     }
 
     function renderTabela(lista) {
@@ -973,7 +1053,7 @@
 
         const showActions = (String(item.status || 'pendente') === 'pendente');
 
-        // NOVO layout de ações (✓ verde / ✕ vermelho) --------------------- //
+        // ações ✓ ✕
         const acoes = showActions ? `
           <div class="flex items-center gap-1">
             <button class="action-btn aprovar" data-act="aprovar" data-id="${item.submissionId}" title="Aprovar">
@@ -984,7 +1064,6 @@
             </button>
           </div>
         ` : `<div class='text-xs text-slate-500'>—</div>`;
-        // ------------------------------------------------------------------ //
 
         const enviadoInfo = popText('Enviado', esc(fmtDate(item.timestamp)));
         const btnEnviado = `
@@ -1081,12 +1160,12 @@
         </tr>`;
       }).join('');
 
-      // agora só precisamos ouvir os botões data-act direto
+      // bind botões de ação
       tbody.querySelectorAll('button[data-act]').forEach(btn => {
         btn.addEventListener('click', () => {
           const id = btn.getAttribute('data-id');
           const act = btn.getAttribute('data-act');
-          abrirModal(id, act); // mesma função que já existe
+          abrirModal(id, act);
         });
       });
 
@@ -1094,6 +1173,9 @@
       tbody.querySelectorAll('.js-pop').forEach(bindPopoverTrigger);
     }
 
+    // =====================================================
+    // MODAL Aprovar/Reprovar
+    // =====================================================
     let modalState = { id: null, act: null, noJustify: false };
 
     function updateNoJustifyUI() {
@@ -1163,7 +1245,7 @@
       if (len > 0) $('#modalError').classList.add('hidden');
     });
 
-    // CONFIRMAR (UI otimista permanece igual)
+    // CONFIRMAR (UI otimista)
     $('#modalConfirmar').addEventListener('click', async () => {
       if (isSendingStatus) return;
       isSendingStatus = true;
@@ -1216,8 +1298,9 @@
       }
     });
 
-    $('#btnAtualizar').addEventListener('click', carregarLista);
-
+    // =====================================================
+    // Tabs Pendentes / Histórico
+    // =====================================================
     function setTab(tab) {
       activeTab = tab;
       const p = $('#tabPendentes'), h = $('#tabHistorico');
@@ -1236,17 +1319,12 @@
     $('#tabPendentes').addEventListener('click', () => setTab('pendentes'));
     $('#tabHistorico').addEventListener('click', () => setTab('historico'));
 
-    // ======= POPOVER =======
-    let popEl, popTitleEl, popBodyEl, popPinnedBy = null, hoverTimer = null;
+    $('#btnAtualizar').addEventListener('click', carregarLista);
 
-    function esc(s) {
-      return String(s ?? '')
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-    }
+    // =====================================================
+    // POPOVER
+    // =====================================================
+    let popEl, popTitleEl, popBodyEl, popPinnedBy = null, hoverTimer = null;
 
     function ensurePopover() {
       if (popEl) return popEl;
@@ -1390,7 +1468,39 @@
         if (!clickedInsidePop) hidePopover();
       }
     });
-    // ======= FIM =======
+
+    // =====================================================
+    // Auth listener
+    // =====================================================
+    onAuthStateChanged(auth, async (user) => {
+      const adminEmailEl = $('#adminEmail');
+
+      // NÃO LOGADO
+      if (!user) {
+        await doLogout();
+        return;
+      }
+
+      // só quem está em adminAprovacao OU admSupremo
+      const isAllowed = !!user.email && ALLOWED_EMAILS.has(user.email.toLowerCase());
+      if (!isAllowed) {
+        alert('Acesso restrito.');
+        await doLogout();
+        return;
+      }
+
+      currentUser = user;
+
+      // mostra o e-mail logado no header
+      if (adminEmailEl) {
+        adminEmailEl.style.display = 'block';
+        adminEmailEl.textContent = user.email;
+      }
+
+      // carrega dados da planilha
+      carregarLista();
+    });
+
   </script>
 </body>
 
