@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Admin • Aprovação de Compras</title>
 
   <!-- Fonte + Tailwind -->
@@ -15,7 +16,9 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
   <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
-  <link rel="shortcut icon" href="https://storage.googleapis.com/ecdt-logo-saida/1ebe52af502e25d3521cb9dad62bb72f6bc1c347353cdda5fa381ef8627a9eb8/COLEGIO-E-CURSO-ICONE.webp" type="image/x-icon">
+  <link rel="shortcut icon"
+    href="https://storage.googleapis.com/ecdt-logo-saida/1ebe52af502e25d3521cb9dad62bb72f6bc1c347353cdda5fa381ef8627a9eb8/COLEGIO-E-CURSO-ICONE.webp"
+    type="image/x-icon">
 
   <script>
     tailwind.config = {
@@ -30,137 +33,319 @@
   </script>
 
   <style>
-    html { scroll-behavior: smooth; }
-    body { font-family: 'Poppins', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
-
-    :root{
-      --brand:#F1663C;
-      --white:#FFFFFF;
-      --cantina-primary:#FD7F08;
-      --cantina-secondary:#253237;
-      --cantina-text:#FD7F08;
-      --cantina-border:#e2e8f0;
+    html {
+      scroll-behavior: smooth;
     }
 
-    nav.cantina-nav{
-      position:sticky; top:0; z-index:50;
-      background:var(--cantina-secondary);
-      border-bottom:3px solid var(--cantina-primary);
-      color:var(--cantina-text);
-      font-family: 'Poppins', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    body {
+      font-family: 'Poppins', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     }
-    nav.cantina-nav .cantina-container{
-      max-width:min(98vw, 1400px); margin:0 auto; padding:0 12px;
-      height:96px; display:flex; align-items:center; justify-content:space-between;
+
+    :root {
+      --brand: #F1663C;
+      --white: #FFFFFF;
+      --cantina-primary: #FD7F08;
+      --cantina-secondary: #253237;
+      --cantina-text: #FD7F08;
+      --cantina-border: #e2e8f0;
     }
-    nav.cantina-nav a{ display:flex; align-items:center; text-decoration:none; }
-    nav.cantina-nav img{ height:64px; width:auto; }
-    nav.cantina-nav .brand{ display:flex; align-items:center; gap:12px; color:var(--cantina-text); height:100%; }
-    nav.cantina-nav .brand .divider{ width:2px; height:70%; align-self:center; background:var(--cantina-primary); border-radius:2px; }
-    nav.cantina-nav .brand .title{
-      font-weight:800; letter-spacing:.5px;
-      font-size:clamp(18px, 3.8vw, 32px);
-      line-height:1.15; white-space:normal; word-break:keep-all;
-      color:var(--cantina-text);
-      text-transform:uppercase;
+
+    nav.cantina-nav {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: var(--cantina-secondary);
+      border-bottom: 3px solid var(--cantina-primary);
+      color: var(--cantina-text);
+      font-family: 'Poppins', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
     }
-    nav.cantina-nav .actions{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
-    nav.cantina-nav .btn{
-      padding:10px 12px; border-radius:12px; border:1px solid var(--cantina-border);
-      background:#fff; color:#000; cursor:pointer; transition:transform .15s ease, box-shadow .15s ease;
-      font-weight:600;
+
+    nav.cantina-nav .cantina-container {
+      max-width: min(98vw, 1400px);
+      margin: 0 auto;
+      padding: 0 12px;
+      height: 96px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
-    nav.cantina-nav .btn:hover{ transform:translateY(-1px); box-shadow:0 2px 10px rgba(2,8,23,.06); }
-    nav.cantina-nav .menu-toggle{
-      display:none; border:1px solid var(--cantina-border);
-      background:#fff; color:#000; border-radius:10px;
-      padding:8px; cursor:pointer;
+
+    nav.cantina-nav a {
+      display: flex;
+      align-items: center;
+      text-decoration: none;
     }
+
+    nav.cantina-nav img {
+      height: 64px;
+      width: auto;
+    }
+
+    nav.cantina-nav .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--cantina-text);
+      height: 100%;
+    }
+
+    nav.cantina-nav .brand .divider {
+      width: 2px;
+      height: 70%;
+      align-self: center;
+      background: var(--cantina-primary);
+      border-radius: 2px;
+    }
+
+    nav.cantina-nav .brand .title {
+      font-weight: 800;
+      letter-spacing: .5px;
+      font-size: clamp(18px, 3.8vw, 32px);
+      line-height: 1.15;
+      white-space: normal;
+      word-break: keep-all;
+      color: var(--cantina-text);
+      text-transform: uppercase;
+    }
+
+    nav.cantina-nav .actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    nav.cantina-nav .btn {
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--cantina-border);
+      background: #fff;
+      color: #000;
+      cursor: pointer;
+      transition: transform .15s ease, box-shadow .15s ease;
+      font-weight: 600;
+    }
+
+    nav.cantina-nav .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 10px rgba(2, 8, 23, .06);
+    }
+
+    nav.cantina-nav .menu-toggle {
+      display: none;
+      border: 1px solid var(--cantina-border);
+      background: #fff;
+      color: #000;
+      border-radius: 10px;
+      padding: 8px;
+      cursor: pointer;
+    }
+
     nav.cantina-nav .menu-toggle:focus-visible,
-    nav.cantina-nav .btn:focus-visible{
-      outline:2px solid var(--cantina-primary);
-      outline-offset:2px;
-    }
-    nav.cantina-nav .email{
-      color:#e2e8f0; font-size:12px; padding:6px 10px; border-radius:10px; background:rgba(255,255,255,0.06);
-      border:1px solid rgba(226,232,240,0.18); max-width:52ch; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+    nav.cantina-nav .btn:focus-visible {
+      outline: 2px solid var(--cantina-primary);
+      outline-offset: 2px;
     }
 
-    @media (max-width: 640px){
-      nav.cantina-nav .cantina-container{ height:72px; position:relative; }
-      nav.cantina-nav img{ height:48px; }
-      nav.cantina-nav .brand{ flex:1; min-width:0; }
-      nav.cantina-nav .menu-toggle{
-        display:inline-flex; align-items:center; justify-content:center;
-        width:40px; height:40px; padding:6px; border-radius:10px;
+    nav.cantina-nav .email {
+      color: #e2e8f0;
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(226, 232, 240, 0.18);
+      max-width: 52ch;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    @media (max-width: 640px) {
+      nav.cantina-nav .cantina-container {
+        height: 72px;
+        position: relative;
       }
-      nav.cantina-nav .menu-toggle svg{ width:18px; height:18px; }
-      nav.cantina-nav .actions{
-        position:absolute; right:12px; top:calc(100% + 8px); z-index:60;
-        display:none; flex-direction:column; gap:6px;
-        background:#ffffff; border:1px solid var(--cantina-border); border-radius:12px;
-        padding:10px; width:min(78vw, 280px); box-shadow:0 12px 30px rgba(2,8,23,.18);
+
+      nav.cantina-nav img {
+        height: 48px;
       }
-      nav.cantina-nav .actions.open{ display:flex; }
-      nav.cantina-nav .actions .btn{ width:100%; justify-content:center; }
-      nav.cantina-nav .actions .email{ color:#0f172a; background:#f8fafc; border-color:#e2e8f0; }
+
+      nav.cantina-nav .brand {
+        flex: 1;
+        min-width: 0;
+      }
+
+      nav.cantina-nav .menu-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        padding: 6px;
+        border-radius: 10px;
+      }
+
+      nav.cantina-nav .menu-toggle svg {
+        width: 18px;
+        height: 18px;
+      }
+
+      nav.cantina-nav .actions {
+        position: absolute;
+        right: 12px;
+        top: calc(100% + 8px);
+        z-index: 60;
+        display: none;
+        flex-direction: column;
+        gap: 6px;
+        background: #ffffff;
+        border: 1px solid var(--cantina-border);
+        border-radius: 12px;
+        padding: 10px;
+        width: min(78vw, 280px);
+        box-shadow: 0 12px 30px rgba(2, 8, 23, .18);
+      }
+
+      nav.cantina-nav .actions.open {
+        display: flex;
+      }
+
+      nav.cantina-nav .actions .btn {
+        width: 100%;
+        justify-content: center;
+      }
+
+      nav.cantina-nav .actions .email {
+        color: #0f172a;
+        background: #f8fafc;
+        border-color: #e2e8f0;
+      }
     }
-    @media (max-width: 400px){
-      nav.cantina-nav .brand .title{ font-size:clamp(16px, 5vw, 22px); }
+
+    @media (max-width: 400px) {
+      nav.cantina-nav .brand .title {
+        font-size: clamp(16px, 5vw, 22px);
+      }
     }
 
-    .badge { display:inline-flex; align-items:center; padding:2px 8px; border-radius:9999px; font-size:12px; font-weight:600; border-width:1px; }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 600;
+      border-width: 1px;
+    }
 
-    #toggleNoJustify.active { background-color: #F1663C; }
-    #toggleNoJustify.active span { transform: translateX(1.25rem); }
+    #toggleNoJustify.active {
+      background-color: #F1663C;
+    }
 
-    .tab-btn { border-radius:0.5rem; padding:0.375rem 0.75rem; font-size:0.875rem; font-weight:600; border:1px solid; transition: all .2s ease; }
-    .tab-active { background:#fff; color:#0f172a; border-color:#fff; box-shadow: 0 8px 16px -8px rgba(0,0,0,.25); }
-    .tab-idle { background:rgba(255,255,255,.7); color:#475569; border-color:rgba(255,255,255,.6); }
-    .tab-idle:hover { background:#fff; }
+    #toggleNoJustify.active span {
+      transform: translateX(1.25rem);
+    }
 
-    .grid-table{
+    .tab-btn {
+      border-radius: 0.5rem;
+      padding: 0.375rem 0.75rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      border: 1px solid;
+      transition: all .2s ease;
+    }
+
+    .tab-active {
+      background: #fff;
+      color: #0f172a;
+      border-color: #fff;
+      box-shadow: 0 8px 16px -8px rgba(0, 0, 0, .25);
+    }
+
+    .tab-idle {
+      background: rgba(255, 255, 255, .7);
+      color: #475569;
+      border-color: rgba(255, 255, 255, .6);
+    }
+
+    .tab-idle:hover {
+      background: #fff;
+    }
+
+    .grid-table {
       border-collapse: separate;
       border-spacing: 0;
       background-color: #f8fafc;
       width: 100%;
       table-layout: fixed;
     }
-    .grid-table thead th{
-      background-color: rgba(255,255,255,.85);
+
+    .grid-table thead th {
+      background-color: rgba(255, 255, 255, .85);
       backdrop-filter: saturate(1.2);
     }
+
     .grid-table th,
-    .grid-table td{
+    .grid-table td {
       border-right: 1px solid #e2e8f0;
       border-bottom: 1px solid #e2e8f0;
       overflow: hidden;
       text-overflow: ellipsis;
       vertical-align: top;
     }
-    .grid-table tr > *:first-child{ border-left: 1px solid #e2e8f0; }
-    .grid-table thead tr:first-child th{ border-top: 1px solid #e2e8f0; }
-    .grid-table tbody tr:hover td{ background-color: #f1f5f9; }
+
+    .grid-table tr>*:first-child {
+      border-left: 1px solid #e2e8f0;
+    }
+
+    .grid-table thead tr:first-child th {
+      border-top: 1px solid #e2e8f0;
+    }
+
+    .grid-table tbody tr:hover td {
+      background-color: #f1f5f9;
+    }
 
     .grid-table th.p-3,
-    .grid-table td.p-3{ padding: .5rem .5rem; }
+    .grid-table td.p-3 {
+      padding: .5rem .5rem;
+    }
 
-    .grid-table td.col-solicitante{ width: 200px; }
-    .grid-table td.col-detalhes{ width: 280px; }
-    .grid-table td.col-status{ width: 160px; }
+    .grid-table td.col-solicitante {
+      width: 200px;
+    }
 
-    .clamp-2, .clamp-3, .clamp-4{
+    .grid-table td.col-detalhes {
+      width: 280px;
+    }
+
+    .grid-table td.col-status {
+      width: 160px;
+    }
+
+    .clamp-2,
+    .clamp-3,
+    .clamp-4 {
       display: -webkit-box;
       -webkit-box-orient: vertical;
       overflow: hidden;
       word-break: break-word;
     }
-    .clamp-2{ -webkit-line-clamp: 2; }
-    .clamp-3{ -webkit-line-clamp: 3; }
-    .clamp-4{ -webkit-line-clamp: 4; }
 
-    .scroll-3{
-      display:block;
+    .clamp-2 {
+      -webkit-line-clamp: 2;
+    }
+
+    .clamp-3 {
+      -webkit-line-clamp: 3;
+    }
+
+    .clamp-4 {
+      -webkit-line-clamp: 4;
+    }
+
+    .scroll-3 {
+      display: block;
       line-height: 1.35;
       max-height: calc(3 * 1.35em);
       overflow-y: auto;
@@ -168,9 +353,19 @@
       scrollbar-width: thin;
       scrollbar-color: #cbd5e1 transparent;
     }
-    .scroll-3::-webkit-scrollbar{ width:6px; }
-    .scroll-3::-webkit-scrollbar-thumb{ background:#cbd5e1; border-radius:8px; }
-    .scroll-3:hover::-webkit-scrollbar-thumb{ background:#94a3b8; }
+
+    .scroll-3::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .scroll-3::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 8px;
+    }
+
+    .scroll-3:hover::-webkit-scrollbar-thumb {
+      background: #94a3b8;
+    }
 
     .__pop {
       position: fixed;
@@ -186,43 +381,51 @@
     }
 
     /* NOVO estilo dos botões de ação diretos (✓ e ✕)  ------------------ */
-    .action-btn{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      width:32px;
-      height:30px;
-      border:1px solid #e2e8f0;
-      border-radius:10px;
-      background:#fff;
-      font-weight:600;
-      font-size:14px;
-      line-height:1;
-      box-shadow:0 1px 2px rgba(0,0,0,.05);
-      transition:transform .15s ease, box-shadow .15s ease;
+    .action-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 30px;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      background: #fff;
+      font-weight: 600;
+      font-size: 14px;
+      line-height: 1;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
+      transition: transform .15s ease, box-shadow .15s ease;
     }
-    .action-btn:hover{
-      transform:translateY(-1px);
-      box-shadow:0 6px 14px rgba(2,8,23,.10);
+
+    .action-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 14px rgba(2, 8, 23, .10);
     }
-    .action-btn.aprovar{
-      color:#15803d; /* verde */
+
+    .action-btn.aprovar {
+      color: #15803d;
+      /* verde */
     }
-    .action-btn.reprovar{
-      color:#b91c1c; /* vermelho */
+
+    .action-btn.reprovar {
+      color: #b91c1c;
+      /* vermelho */
     }
+
     /* -------------------------------------------------------- */
   </style>
 </head>
+
 <body class="min-h-screen text-black antialiased" style="background: var(--cantina-secondary);">
 
   <!-- ===== NAVBAR ===== -->
   <nav class="cantina-nav" aria-label="Barra superior">
     <div class="cantina-container">
       <a class="brand" href="#">
-        <img src="https://iconecolegioecurso.com.br/wp-content/uploads/2022/08/xlogo_icone_site.png.pagespeed.ic_.QgXP3GszLC.webp"
-             alt="Logo Ícone Colégio e Curso"
-             onerror="this.onerror=null;this.src='https://placehold.co/150x50/eeeeee/333333?text=Logo';">
+        <img
+          src="https://iconecolegioecurso.com.br/wp-content/uploads/2022/08/xlogo_icone_site.png.pagespeed.ic_.QgXP3GszLC.webp"
+          alt="Logo Ícone Colégio e Curso"
+          onerror="this.onerror=null;this.src='https://placehold.co/150x50/eeeeee/333333?text=Logo';">
         <span class="divider" aria-hidden="true"></span>
         <span class="title">Aprovação de Compras</span>
       </a>
@@ -230,7 +433,9 @@
       <!-- Botão hamburguer (mobile) -->
       <button id="menuToggle" class="menu-toggle" aria-label="Abrir menu" aria-expanded="false">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-          <path fill-rule="evenodd" d="M3.75 5.25a.75.75 0 0 1 .75-.75h15a.75.75 0 0 1 0 1.5h-15a.75.75 0 0 1-.75-.75Zm0 6a.75.75 0 0 1 .75-.75h15a.75.75 0 0 1 0 1.5h-15a.75.75 0 0 1-.75-.75Zm0 6a.75.75 0 0 1 .75-.75h15a.75.75 0 0 1 0 1.5h-15a.75.75 0 0 1-.75-.75Z" clip-rule="evenodd"/>
+          <path fill-rule="evenodd"
+            d="M3.75 5.25a.75.75 0 0 1 .75-.75h15a.75.75 0 0 1 0 1.5h-15a.75.75 0 0 1-.75-.75Zm0 6a.75.75 0 0 1 .75-.75h15a.75.75 0 0 1 0 1.5h-15a.75.75 0 0 1-.75-.75Zm0 6a.75.75 0 0 1 .75-.75h15a.75.75 0 0 1 0 1.5h-15a.75.75 0 0 1-.75-.75Z"
+            clip-rule="evenodd" />
         </svg>
       </button>
 
@@ -243,7 +448,8 @@
 
   <!-- CONTEÚDO -->
   <main class="w-full max-w-7xl mx-auto px-4 pb-20 pt-6">
-    <div class="bg-[#3A474C] border border-white/60 rounded-xl sm:rounded-2xl shadow-2xl shadow-glow p-4 xs:p-5 sm:p-6 md:p-8">
+    <div
+      class="bg-[#3A474C] border border-white/60 rounded-xl sm:rounded-2xl shadow-2xl shadow-glow p-4 xs:p-5 sm:p-6 md:p-8">
 
       <!-- Top bar -->
       <div class="flex flex-col gap-3">
@@ -252,7 +458,8 @@
             <span style="color:#e2e8f0" id="contador"></span>
           </div>
           <div class="flex items-center gap-2 order-1 sm:order-2">
-            <button id="btnAtualizar" class="rounded-lg bg-white px-3 py-2 text-sm font-semibold shadow hover:-translate-y-0.5 hover:shadow-md transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primaria/30">Atualizar</button>
+            <button id="btnAtualizar"
+              class="rounded-lg bg-white px-3 py-2 text-sm font-semibold shadow hover:-translate-y-0.5 hover:shadow-md transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primaria/30">Atualizar</button>
           </div>
         </div>
 
@@ -260,12 +467,14 @@
         <div class="flex flex-wrap items-center gap-2">
           <button id="tabPendentes" class="tab-btn tab-active" data-tab="pendentes">
             Pendentes
-            <span style="display: none;" id="countPendentes" class="ml-1 text-xs font-semibold px-2 py-0.5 rounded-full bg-orange-100 text-orange-700">0</span>
+            <span style="display: none;" id="countPendentes"
+              class="ml-1 text-xs font-semibold px-2 py-0.5 rounded-full bg-orange-100 text-orange-700">0</span>
           </button>
 
           <button id="tabHistorico" class="tab-btn tab-idle" data-tab="historico">
             Histórico
-            <span style="display: none;" id="countHistorico" class="ml-1 text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">0</span>
+            <span style="display: none;" id="countHistorico"
+              class="ml-1 text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">0</span>
           </button>
         </div>
       </div>
@@ -305,32 +514,36 @@
             <!-- TOGGLE NÃO JUSTIFICAR -->
             <label class="flex items-center gap-2 cursor-pointer select-none">
               <span class="text-xs font-medium text-slate-700">Não justificar</span>
-              <div id="toggleNoJustify" class="relative inline-block w-11 h-6 bg-slate-300 rounded-full transition-colors duration-300">
-                <span class="absolute left-0.5 top-0.5 w-5 h-5 bg-white rounded-full shadow transform transition-transform duration-300"></span>
+              <div id="toggleNoJustify"
+                class="relative inline-block w-11 h-6 bg-slate-300 rounded-full transition-colors duration-300">
+                <span
+                  class="absolute left-0.5 top-0.5 w-5 h-5 bg-white rounded-full shadow transform transition-transform duration-300"></span>
               </div>
             </label>
           </div>
 
-          <textarea id="modalObs" class="mt-3 w-full min-h[110px] rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20" placeholder="Escreva sua observação…"></textarea>
+          <textarea id="modalObs"
+            class="mt-3 w-full min-h[110px] rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20"
+            placeholder="Escreva sua observação…"></textarea>
 
           <div class="mt-3">
             <label class="block text-sm text-slate-700 font-medium mb-1">
               Enviar cópia para (opcional)
             </label>
-            <input id="modalExtras" type="text"
-                  placeholder="digite e-mails separados por vírgula"
-                  class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20">
-            <p class="mt-1 text-xs text-slate-500">Ex.: fulano@icone.g12.br, atendimento@icone.g12.br</p>
+            <input id="modalExtras" type="text" placeholder="digite e-mails separados por vírgula"
+              class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20">
           </div>
 
           <div class="mt-1 flex items-center justify-between">
-            <span id="modalError" class="text-xs text-red-600 hidden">Informe o motivo da reprovação ou ative “Não justificar”.</span>
+            <span id="modalError" class="text-xs text-red-600 hidden">Informe o motivo da reprovação ou ative “Não
+              justificar”.</span>
             <span id="modalCount" class="text-xs text-slate-500"></span>
           </div>
 
           <div class="mt-4 flex flex-col xs:flex-row justify-end gap-2">
             <button id="modalCancelar" class="rounded-lg border px-3 py-2 text-sm">Cancelar</button>
-            <button id="modalConfirmar" class="rounded-lg bg-primaria text-white px-3 py-2 text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed">Confirmar</button>
+            <button id="modalConfirmar"
+              class="rounded-lg bg-primaria text-white px-3 py-2 text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed">Confirmar</button>
           </div>
         </div>
       </div>
@@ -339,33 +552,33 @@
   </main>
 
   <script>
-    (function(){
-      const menuToggle  = document.getElementById('menuToggle');
-      const menuActions = document.getElementById('menuActions');
+      (function () {
+        const menuToggle = document.getElementById('menuToggle');
+        const menuActions = document.getElementById('menuActions');
 
-      if(menuToggle && menuActions){
-        menuToggle.addEventListener('click', () => {
-          const isOpen = menuActions.classList.toggle('open');
-          menuToggle.setAttribute('aria-expanded', String(isOpen));
-        });
+        if (menuToggle && menuActions) {
+          menuToggle.addEventListener('click', () => {
+            const isOpen = menuActions.classList.toggle('open');
+            menuToggle.setAttribute('aria-expanded', String(isOpen));
+          });
 
-        document.addEventListener('click', (e) => {
-          if(!menuActions.classList.contains('open')) return;
-          const clickedInside = menuActions.contains(e.target) || menuToggle.contains(e.target);
-          if(!clickedInside){
-            menuActions.classList.remove('open');
-            menuToggle.setAttribute('aria-expanded', 'false');
-          }
-        });
+          document.addEventListener('click', (e) => {
+            if (!menuActions.classList.contains('open')) return;
+            const clickedInside = menuActions.contains(e.target) || menuToggle.contains(e.target);
+            if (!clickedInside) {
+              menuActions.classList.remove('open');
+              menuToggle.setAttribute('aria-expanded', 'false');
+            }
+          });
 
-        window.addEventListener('resize', () => {
-          if(window.innerWidth > 640 && menuActions.classList.contains('open')){
-            menuActions.classList.remove('open');
-            menuToggle.setAttribute('aria-expanded', 'false');
-          }
-        });
-      }
-    })();
+          window.addEventListener('resize', () => {
+            if (window.innerWidth > 640 && menuActions.classList.contains('open')) {
+              menuActions.classList.remove('open');
+              menuToggle.setAttribute('aria-expanded', 'false');
+            }
+          });
+        }
+      })();
   </script>
 
   <script type="module">
@@ -382,9 +595,9 @@
       appId: "1:831706842201:web:9b68ae4f98ad93c5a99d48",
     };
 
-    const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbyXgFaJa-Ig6Z_bS7KXiqRbcAWAZlsgB0CIXkuZGB2by9W6H65VS58zr3HqBmG672Yr/exec';
+    const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbxmeqdNoh_bFbajZuKNAAi30cbwztE78SIGBJccwnGnuv8va_MxMsq_DwpGiJ1Onfae/exec';
 
-    const app  = initializeApp(firebaseConfig);
+    const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
     let ALLOWED_EMAILS = new Set();
@@ -399,7 +612,7 @@
 
         const data = await resp.json();
         const listaAprovacao = Array.isArray(data.adminAprovacao) ? data.adminAprovacao : [];
-        const listaSupremo   = Array.isArray(data.admSupremo)     ? data.admSupremo     : [];
+        const listaSupremo = Array.isArray(data.admSupremo) ? data.admSupremo : [];
 
         ALLOWED_EMAILS = new Set(
           [...listaAprovacao, ...listaSupremo].map(e => e.toLowerCase())
@@ -418,11 +631,11 @@
         console.warn('Erro no signOut Firebase:', err);
       }
 
-      try { sessionStorage.clear(); } catch {}
-      try { localStorage.removeItem('sessionUser'); } catch {}
-      try { localStorage.removeItem('firebase:host:*'); } catch {}
-      try { localStorage.removeItem('firebase:authUser'); } catch {}
-      try { localStorage.removeItem('firebase:authUser:${firebaseConfig.apiKey}:[DEFAULT]'); } catch {}
+      try { sessionStorage.clear(); } catch { }
+      try { localStorage.removeItem('sessionUser'); } catch { }
+      try { localStorage.removeItem('firebase:host:*'); } catch { }
+      try { localStorage.removeItem('firebase:authUser'); } catch { }
+      try { localStorage.removeItem('firebase:authUser:${firebaseConfig.apiKey}:[DEFAULT]'); } catch { }
 
       window.location.replace('../index.html');
     }
@@ -438,12 +651,12 @@
       });
     }
 
-    const $  = (sel)=>document.querySelector(sel);
-    const $$ = (sel)=>Array.from(document.querySelectorAll(sel));
+    const $ = (sel) => document.querySelector(sel);
+    const $$ = (sel) => Array.from(document.querySelectorAll(sel));
 
-    function toast(msg, type='info'){
-      const isSuccess = type==='success';
-      const isError   = type==='error';
+    function toast(msg, type = 'info') {
+      const isSuccess = type === 'success';
+      const isError = type === 'error';
       Toastify({
         text: msg,
         duration: 3200,
@@ -455,37 +668,37 @@
           background: isSuccess
             ? 'linear-gradient(90deg,#16a34a,#22c55e)'
             : isError
-            ? 'linear-gradient(90deg,#dc2626,#ef4444)'
-            : 'linear-gradient(90deg,#334155,#64748b)',
-          color:'#fff',
-          fontWeight:'600',
-          borderRadius:'10px',
-          padding:'10px 16px',
-          boxShadow:'0 10px 25px -10px rgba(0,0,0,.35)'
+              ? 'linear-gradient(90deg,#dc2626,#ef4444)'
+              : 'linear-gradient(90deg,#334155,#64748b)',
+          color: '#fff',
+          fontWeight: '600',
+          borderRadius: '10px',
+          padding: '10px 16px',
+          boxShadow: '0 10px 25px -10px rgba(0,0,0,.35)'
         },
-        offset: {x:8, y:10}
+        offset: { x: 8, y: 10 }
       }).showToast();
     }
 
-    function fmtDate(d){
-      if(!d) return '-';
+    function fmtDate(d) {
+      if (!d) return '-';
       const dt = new Date(d);
       return isNaN(dt.getTime()) ? '-' : dt.toLocaleString('pt-BR');
     }
 
-    function badgeStatus(s){
+    function badgeStatus(s) {
       const base = 'inline-flex items-center px-2 py-0.5 rounded-full text-[11px] sm:text-xs font-semibold border';
       const map = {
         pendente: 'bg-yellow-50 text-yellow-800 border-yellow-200',
         aprovado: 'bg-green-50 text-green-800 border-green-200',
         reprovado: 'bg-red-50 text-red-800 border-red-200'
       };
-      return `<span class="${base} ${map[s]||'bg-slate-50 text-slate-700 border-slate-200'}">${(s||'pendente').toUpperCase()}</span>`;
+      return `<span class="${base} ${map[s] || 'bg-slate-50 text-slate-700 border-slate-200'}">${(s || 'pendente').toUpperCase()}</span>`;
     }
 
-    function humanTipo(item){
-      if(item.tipo==='servico') return `Serviço`;
-      if(item.tipo==='produto') return `Produto`;
+    function humanTipo(item) {
+      if (item.tipo === 'servico') return `Serviço`;
+      if (item.tipo === 'produto') return `Produto`;
       return '-';
     }
 
@@ -516,13 +729,13 @@
       carregarLista();
     });
 
-    async function chamarAPI(url, opts={}) {
+    async function chamarAPI(url, opts = {}) {
       try {
         const resp = await fetch(url, opts);
 
         if (resp.type === 'opaque') {
           console.warn('[chamarAPI] resposta opaqua (provável CORS bloqueado)');
-          return { ok:true, opaque:true };
+          return { ok: true, opaque: true };
         }
 
         const data = await resp.json().catch(err => {
@@ -539,23 +752,23 @@
         console.error('[chamarAPI] falhou geral:', err);
 
         try {
-          await fetch(url, { ...opts, mode:'no-cors' });
+          await fetch(url, { ...opts, mode: 'no-cors' });
           console.warn('[chamarAPI] fallback no-cors usado, resposta não legível');
-          return { ok:true, opaque:true };
+          return { ok: true, opaque: true };
         } catch (err2) {
           console.error('[chamarAPI] fallback também falhou:', err2);
-          return { ok:false, error: err2?.message || String(err2) };
+          return { ok: false, error: err2?.message || String(err2) };
         }
       }
     }
 
-    async function carregarLista(){
+    async function carregarLista() {
       $('#tbody').innerHTML = `<tr><td colspan="10" class="p-6 text-center text-slate-600">Carregando…</td></tr>`;
 
       const url = WEBAPP_URL + '?action=list&email=' + encodeURIComponent(currentUser.email);
       const { ok, data, error, opaque } = await chamarAPI(url);
 
-      if(opaque){
+      if (opaque) {
         $('#tbody').innerHTML = `
           <tr><td colspan="10" class="p-6 text-center text-red-700">
             O navegador bloqueou a resposta (CORS).<br>
@@ -564,10 +777,10 @@
         return;
       }
 
-      if(!ok){
+      if (!ok) {
         const msg = data?.error === 'forbidden'
           ? 'Sem permissão para acessar. Fale com o administrador.'
-          : `Falha ao carregar (${error||'erro'}).`;
+          : `Falha ao carregar (${error || 'erro'}).`;
         $('#tbody').innerHTML = `<tr><td colspan="10" class="p-6 text-center text-red-700">${msg}</td></tr>`;
         return;
       }
@@ -578,7 +791,7 @@
       toast('Lista atualizada', 'success');
     }
 
-    async function atualizarStatus(submissionId, novoStatus, observacao='', extraNotify=''){
+    async function atualizarStatus(submissionId, novoStatus, observacao = '', extraNotify = '') {
       const body = new URLSearchParams({
         action: 'updatestatus',
         submissionId,
@@ -589,18 +802,18 @@
       });
 
       const { ok, error } = await chamarAPI(WEBAPP_URL, {
-        method:'POST',
-        headers:{'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8'},
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
         body
       });
 
-      if(!ok) throw new Error(error||'Falha ao atualizar');
+      if (!ok) throw new Error(error || 'Falha ao atualizar');
     }
 
     let page = 1;
     const pageSize = 3;
 
-    function getPageSlice(list){
+    function getPageSlice(list) {
       const total = list.length;
       const totalPages = Math.max(1, Math.ceil(total / pageSize));
       if (page > totalPages) page = totalPages;
@@ -613,21 +826,21 @@
       };
     }
 
-    function goToPage(n){
+    function goToPage(n) {
       page = n;
       aplicarFiltrosERender(true);
     }
 
-    function renderPaginacao(totalPages, total){
+    function renderPaginacao(totalPages, total) {
       const el = document.getElementById('pager');
       if (!el) return;
 
-      if (total <= pageSize){
+      if (total <= pageSize) {
         el.innerHTML = `<div class="text-slate-600">${total} registro(s)</div>`;
         return;
       }
 
-      const mkBtn = (lbl, p, disabled=false, aria='') =>
+      const mkBtn = (lbl, p, disabled = false, aria = '') =>
         `<button ${aria} ${disabled ? 'disabled' : ''} data-page="${p}"
           class="px-2.5 py-1.5 rounded border text-sm font-semibold
                   ${disabled ? 'opacity-50 cursor-not-allowed' : 'bg-white hover:-translate-y-0.5 hover:shadow transition'}">
@@ -635,10 +848,10 @@
         </button>`;
 
       const start = Math.max(1, page - 2);
-      const end   = Math.min(totalPages, start + 4);
+      const end = Math.min(totalPages, start + 4);
 
-      const nums  = Array.from({length: end - start + 1}, (_,i)=> start+i).map(n=>{
-        const active = n===page;
+      const nums = Array.from({ length: end - start + 1 }, (_, i) => start + i).map(n => {
+        const active = n === page;
         return `<button data-page="${n}"
                   class="px-2.5 py-1.5 rounded border text-sm font-semibold
                         ${active ? 'bg-primaria text-white border-primaria' : 'bg-white hover:-translate-y-0.5 hover:shadow transition'}">
@@ -647,49 +860,49 @@
       }).join('');
 
       el.innerHTML = `
-        <div class="text-slate-600">Exibindo ${Math.min(page*pageSize, total)} de ${total}</div>
+        <div class="text-slate-600">Exibindo ${Math.min(page * pageSize, total)} de ${total}</div>
         <div class="flex items-center gap-1">
-          ${mkBtn('‹ Anterior', page-1, page===1, 'aria-label="Página anterior"')}
+          ${mkBtn('‹ Anterior', page - 1, page === 1, 'aria-label="Página anterior"')}
           ${nums}
-          ${mkBtn('Próxima ›', page+1, page===totalPages, 'aria-label="Próxima página"')}
+          ${mkBtn('Próxima ›', page + 1, page === totalPages, 'aria-label="Próxima página"')}
         </div>
       `;
 
-      el.querySelectorAll('button[data-page]').forEach(b=>{
-        b.addEventListener('click', ()=>{
+      el.querySelectorAll('button[data-page]').forEach(b => {
+        b.addEventListener('click', () => {
           const p = parseInt(b.getAttribute('data-page'), 10);
           if (!Number.isNaN(p)) goToPage(p);
         });
       });
     }
 
-    function inTab(item){
-      const st = String(item.status||'pendente');
-      return activeTab==='pendentes'
-        ? (st==='pendente')
-        : (st!=='pendente');
+    function inTab(item) {
+      const st = String(item.status || 'pendente');
+      return activeTab === 'pendentes'
+        ? (st === 'pendente')
+        : (st !== 'pendente');
     }
 
-    function aplicarFiltrosERender(keepPage=false){
+    function aplicarFiltrosERender(keepPage = false) {
       if (!keepPage) page = 1;
 
       dadosFiltrados = dadosBrutos
         .filter(it => inTab(it))
-        .sort((a,b)=> new Date(b.timestamp||0) - new Date(a.timestamp||0));
+        .sort((a, b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0));
 
       const { rows, total, totalPages } = getPageSlice(dadosFiltrados);
       renderTabela(rows);
       renderPaginacao(totalPages, total);
 
       $('#contador').textContent =
-        `${total} registro(s) ${activeTab==='pendentes' ? 'pendente(s)' : 'no histórico'}`;
+        `${total} registro(s) ${activeTab === 'pendentes' ? 'pendente(s)' : 'no histórico'}`;
 
       refreshCounters();
     }
 
-    function refreshCounters(){
-      const pend = dadosBrutos.filter(x=>String(x.status||'pendente')==='pendente').length;
-      const hist = dadosBrutos.filter(x=>String(x.status||'pendente')!=='pendente').length;
+    function refreshCounters() {
+      const pend = dadosBrutos.filter(x => String(x.status || 'pendente') === 'pendente').length;
+      const hist = dadosBrutos.filter(x => String(x.status || 'pendente') !== 'pendente').length;
 
       $('#countPendentes').textContent = pend;
       $('#countHistorico').textContent = hist;
@@ -697,54 +910,54 @@
       $('#countHistorico').style.display = hist ? 'inline-block' : 'none';
     }
 
-    function parseLinks(links){
-      if(Array.isArray(links)) return links;
-      if(typeof links==='string'){
-        try{
+    function parseLinks(links) {
+      if (Array.isArray(links)) return links;
+      if (typeof links === 'string') {
+        try {
           const j = JSON.parse(links);
-          return Array.isArray(j)? j : [];
-        }catch{
+          return Array.isArray(j) ? j : [];
+        } catch {
           return links.split(/\s+/).filter(Boolean);
         }
       }
       return [];
     }
 
-    function renderTabela(lista){
+    function renderTabela(lista) {
       const tbody = $('#tbody');
-      if(!lista.length){
+      if (!lista.length) {
         tbody.innerHTML =
           `<tr><td colspan="10" class="p-6 text-center text-slate-600">Nenhum registro encontrado.</td></tr>`;
         return;
       }
 
-      const popDetalhes = (it)=>{
-        if(it.tipo==='produto'){
+      const popDetalhes = (it) => {
+        if (it.tipo === 'produto') {
           return `
             <div class="space-y-2">
               <div class="text-xs uppercase tracking-wide text-slate-500">Produto</div>
-              <div class="font-semibold">${esc(it.nomeProduto||'-')}</div>
-              <div class="text-sm">Quantidade: <span class="font-medium">${esc(it.quantidadeProduto||'-')}</span></div>
-              ${it.observacao ? `<div class="text-sm"><span class="text-slate-500">Obs:</span> ${esc(it.observacao)}</div>`:''}
+              <div class="font-semibold">${esc(it.nomeProduto || '-')}</div>
+              <div class="text-sm">Quantidade: <span class="font-medium">${esc(it.quantidadeProduto || '-')}</span></div>
+              ${it.observacao ? `<div class="text-sm"><span class="text-slate-500">Obs:</span> ${esc(it.observacao)}</div>` : ''}
             </div>`;
-        }else{
+        } else {
           return `
             <div class="space-y-2">
               <div class="text-xs uppercase tracking-wide text-slate-500">Serviço</div>
-              <div class="font-semibold break-words">${esc(it.descricaoServico||'-')}</div>
-              ${it.quemIndicar ? `<div class="text-sm"><span class="text-slate-500">Indicação:</span> ${esc(it.quemIndicar)}</div>`:''}
-              ${it.observacao ? `<div class="text-sm"><span class="text-slate-500">Obs:</span> ${esc(it.observacao)}</div>`:''}
+              <div class="font-semibold break-words">${esc(it.descricaoServico || '-')}</div>
+              ${it.quemIndicar ? `<div class="text-sm"><span class="text-slate-500">Indicação:</span> ${esc(it.quemIndicar)}</div>` : ''}
+              ${it.observacao ? `<div class="text-sm"><span class="text-slate-500">Obs:</span> ${esc(it.observacao)}</div>` : ''}
             </div>`;
         }
       };
 
-      const popLinks = (arr)=>{
-        if(!arr.length) return `<div class="text-sm text-slate-600">Sem links.</div>`;
+      const popLinks = (arr) => {
+        if (!arr.length) return `<div class="text-sm text-slate-600">Sem links.</div>`;
         return `
           <div class="space-y-2">
             <div class="text-xs uppercase tracking-wide text-slate-500">Links</div>
             <ul class="list-disc pl-5 space-y-1">
-              ${arr.map((l,i)=>`<li class="break-all"><a class="underline text-primaria" href="${l}" target="_blank" rel="noopener">Link ${i+1}</a></li>`).join('')}
+              ${arr.map((l, i) => `<li class="break-all"><a class="underline text-primaria" href="${l}" target="_blank" rel="noopener">Link ${i + 1}</a></li>`).join('')}
             </ul>
           </div>`;
       };
@@ -754,11 +967,11 @@
         content: `<div class="text-sm">${html}</div>`
       });
 
-      tbody.innerHTML = lista.map(item=>{
+      tbody.innerHTML = lista.map(item => {
         const links = parseLinks(item.links);
-        const prazoStr = (item.prazo==='sim' && item.dataPrazo) ? fmtDate(item.dataPrazo) : '-';
+        const prazoStr = (item.prazo === 'sim' && item.dataPrazo) ? fmtDate(item.dataPrazo) : '-';
 
-        const showActions = (String(item.status||'pendente')==='pendente');
+        const showActions = (String(item.status || 'pendente') === 'pendente');
 
         // NOVO layout de ações (✓ verde / ✕ vermelho) --------------------- //
         const acoes = showActions ? `
@@ -785,26 +998,26 @@
         const solicitanteHtml = `
           <div class="space-y-1">
             <div class="text-xs uppercase tracking-wide text-slate-500">Solicitante</div>
-            <div class="font-semibold break-words">${esc(item.nome||'-')}</div>
-            <div class="text-sm break-all">${esc(item.email||'-')}</div>
+            <div class="font-semibold break-words">${esc(item.nome || '-')}</div>
+            <div class="text-sm break-all">${esc(item.email || '-')}</div>
           </div>`;
         const btnSolicitante = `
           <button type="button"
             class="js-pop block text-left hover:bg-orange-50/50 rounded px-1 -mx-1 transition w-full">
-            <div class='font-semibold'>${esc(item.nome||'-')}</div>
-            <div class='text-[11px] sm:text-xs text-slate-600 break-all'>${esc(item.email||'-')}</div>
+            <div class='font-semibold'>${esc(item.nome || '-')}</div>
+            <div class='text-[11px] sm:text-xs text-slate-600 break-all'>${esc(item.email || '-')}</div>
           </button>
           <span class="hidden"
             data-pop-title="Solicitante"
             data-pop-content="${encodeURIComponent(solicitanteHtml)}"></span>`;
 
-        const unidadeInfo = popText('Unidade', `Unidade ${esc(item.unidade||'-')}`);
+        const unidadeInfo = popText('Unidade', `Unidade ${esc(item.unidade || '-')}`);
         const btnUnidade = `
           <button type="button"
             class="js-pop inline-flex hover:bg-orange-50/50 rounded px-1 -mx-1 transition"
             data-pop-title="${unidadeInfo.title}"
             data-pop-content="${encodeURIComponent(unidadeInfo.content)}">
-            U${esc(item.unidade||'-')}
+            U${esc(item.unidade || '-')}
           </button>`;
 
         const tipoStr = humanTipo(item);
@@ -823,7 +1036,7 @@
             data-pop-title="Detalhes"
             data-pop-content="${encodeURIComponent(popDetalhes(item))}">
             <div class="font-semibold scroll-3">
-              ${esc(item.tipo==='produto' ? (item.nomeProduto||'-') : (item.descricaoServico||'-'))}
+              ${esc(item.tipo === 'produto' ? (item.nomeProduto || '-') : (item.descricaoServico || '-'))}
             </div>
           </button>`;
 
@@ -836,7 +1049,7 @@
             ${esc(prazoStr)}
           </button>`;
 
-        const urgStr = (item.urgencia||'-').toString().toUpperCase();
+        const urgStr = (item.urgencia || '-').toString().toUpperCase();
         const urgInfo = popText('Urgência', esc(urgStr));
         const btnUrgencia = `
           <button type="button"
@@ -863,15 +1076,15 @@
           <td class='p-3 whitespace-nowrap hidden sm:table-cell'>${btnPrazo}</td>
           <td class='p-3 uppercase hidden sm:table-cell'>${btnUrgencia}</td>
           <td class='p-3 hidden lg:table-cell'>${btnLinks}</td>
-          <td class='p-3 col-status'>${badgeStatus(item.status||'pendente')}</td>
+          <td class='p-3 col-status'>${badgeStatus(item.status || 'pendente')}</td>
           <td class='p-3 col-acoes'>${acoes}</td>
         </tr>`;
       }).join('');
 
       // agora só precisamos ouvir os botões data-act direto
-      tbody.querySelectorAll('button[data-act]').forEach(btn=>{
-        btn.addEventListener('click', ()=>{
-          const id  = btn.getAttribute('data-id');
+      tbody.querySelectorAll('button[data-act]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = btn.getAttribute('data-id');
           const act = btn.getAttribute('data-act');
           abrirModal(id, act); // mesma função que já existe
         });
@@ -881,38 +1094,38 @@
       tbody.querySelectorAll('.js-pop').forEach(bindPopoverTrigger);
     }
 
-    let modalState = { id:null, act:null, noJustify:false };
+    let modalState = { id: null, act: null, noJustify: false };
 
-    function updateNoJustifyUI(){
-      const sw  = $('#toggleNoJustify');
-      const ta  = $('#modalObs');
+    function updateNoJustifyUI() {
+      const sw = $('#toggleNoJustify');
+      const ta = $('#modalObs');
       const errorEl = $('#modalError');
       const isOn = modalState.noJustify;
 
       if (isOn) sw.classList.add('active'); else sw.classList.remove('active');
 
-      if(isOn){
+      if (isOn) {
         ta.value = '';
-        ta.setAttribute('disabled','true');
-        ta.classList.add('bg-slate-100','cursor-not-allowed','opacity-70');
+        ta.setAttribute('disabled', 'true');
+        ta.classList.add('bg-slate-100', 'cursor-not-allowed', 'opacity-70');
         errorEl.classList.add('hidden');
         $('#modalCount').textContent = '';
-      }else{
+      } else {
         ta.removeAttribute('disabled');
-        ta.classList.remove('bg-slate-100','cursor-not-allowed','opacity-70');
+        ta.classList.remove('bg-slate-100', 'cursor-not-allowed', 'opacity-70');
       }
     }
 
-    function abrirModal(id, act){
-      modalState = { id, act, noJustify:false };
+    function abrirModal(id, act) {
+      modalState = { id, act, noJustify: false };
 
-      $('#modalTitulo').textContent = act==='aprovar'
+      $('#modalTitulo').textContent = act === 'aprovar'
         ? 'Confirmar aprovação'
         : 'Confirmar reprovação';
 
       $('#modalHelp').textContent = 'Você pode adicionar uma observação.';
-      $('#modalObs').value='';
-      $('#modalExtras').value='';
+      $('#modalObs').value = '';
+      $('#modalExtras').value = '';
       $('#modalError').classList.add('hidden');
       $('#modalConfirmar').disabled = false;
       $('#toggleNoJustify')?.classList.remove('active');
@@ -921,18 +1134,18 @@
 
       $('#modal').classList.remove('hidden');
       $('#modal').classList.add('flex');
-      setTimeout(()=> $('#modalObs').focus(), 0);
+      setTimeout(() => $('#modalObs').focus(), 0);
     }
 
-    function fecharModal(){
+    function fecharModal() {
       $('#modal').classList.add('hidden');
       $('#modal').classList.remove('flex');
-      modalState = { id:null, act:null, noJustify:false };
+      modalState = { id: null, act: null, noJustify: false };
     }
 
     $('#modalCancelar').addEventListener('click', fecharModal);
-    $('#modal').addEventListener('click', (e)=>{
-      if(e.target.id==='modal') fecharModal();
+    $('#modal').addEventListener('click', (e) => {
+      if (e.target.id === 'modal') fecharModal();
     });
 
     const toggleNoJustify = document.getElementById('toggleNoJustify');
@@ -943,20 +1156,20 @@
       });
     }
 
-    $('#modalObs').addEventListener('input', ()=>{
+    $('#modalObs').addEventListener('input', () => {
       const txt = $('#modalObs').value;
       const len = txt.trim().length;
       $('#modalCount').textContent = len ? `${len} caractere(s)` : '';
-      if(len>0) $('#modalError').classList.add('hidden');
+      if (len > 0) $('#modalError').classList.add('hidden');
     });
 
     // CONFIRMAR (UI otimista permanece igual)
-    $('#modalConfirmar').addEventListener('click', async ()=>{
+    $('#modalConfirmar').addEventListener('click', async () => {
       if (isSendingStatus) return;
       isSendingStatus = true;
 
       const { id, act, noJustify } = modalState;
-      if(!id||!act) {
+      if (!id || !act) {
         isSendingStatus = false;
         return;
       }
@@ -964,18 +1177,18 @@
       const obs = noJustify ? '' : $('#modalObs').value.trim();
       const extras = ($('#modalExtras')?.value || '').trim();
 
-      if(act==='reprovar' && !noJustify && !obs){
+      if (act === 'reprovar' && !noJustify && !obs) {
         $('#modalError').classList.remove('hidden');
         $('#modalObs').focus();
         isSendingStatus = false;
         return;
       }
 
-      const newStatus = act==='aprovar' ? 'aprovado' : 'reprovado';
+      const newStatus = act === 'aprovar' ? 'aprovado' : 'reprovado';
 
       // aplica UI local antes do backend
-      const alvo = dadosBrutos.find(x=>x.submissionId===id);
-      if(alvo){
+      const alvo = dadosBrutos.find(x => x.submissionId === id);
+      if (alvo) {
         alvo.status = newStatus;
         alvo.observacao = obs;
         alvo.aprovadoPor = currentUser?.email || '';
@@ -984,59 +1197,59 @@
 
       aplicarFiltrosERender(true);
 
-      toast(act==='aprovar' ? 'Aprovado!' : 'Reprovado!', 'success');
+      toast(act === 'aprovar' ? 'Aprovado!' : 'Reprovado!', 'success');
 
       fecharModal();
 
-      try{
+      try {
         await atualizarStatus(
           id,
           newStatus,
           obs,
           extras
         );
-      }catch(err){
+      } catch (err) {
         toast('Erro ao salvar no servidor. Tente novamente.', 'error');
         console.error('Erro atualizar status:', err);
-      }finally{
+      } finally {
         isSendingStatus = false;
       }
     });
 
     $('#btnAtualizar').addEventListener('click', carregarLista);
 
-    function setTab(tab){
+    function setTab(tab) {
       activeTab = tab;
       const p = $('#tabPendentes'), h = $('#tabHistorico');
 
-      if(tab==='pendentes'){
+      if (tab === 'pendentes') {
         p.classList.add('tab-active'); p.classList.remove('tab-idle');
-        h.classList.add('tab-idle');   h.classList.remove('tab-active');
-      }else{
+        h.classList.add('tab-idle'); h.classList.remove('tab-active');
+      } else {
         h.classList.add('tab-active'); h.classList.remove('tab-idle');
-        p.classList.add('tab-idle');   p.classList.remove('tab-active');
+        p.classList.add('tab-idle'); p.classList.remove('tab-active');
       }
 
       aplicarFiltrosERender();
     }
 
-    $('#tabPendentes').addEventListener('click', ()=> setTab('pendentes'));
-    $('#tabHistorico').addEventListener('click', ()=> setTab('historico'));
+    $('#tabPendentes').addEventListener('click', () => setTab('pendentes'));
+    $('#tabHistorico').addEventListener('click', () => setTab('historico'));
 
     // ======= POPOVER =======
-    let popEl, popTitleEl, popBodyEl, popPinnedBy = null, hoverTimer=null;
+    let popEl, popTitleEl, popBodyEl, popPinnedBy = null, hoverTimer = null;
 
-    function esc(s){
+    function esc(s) {
       return String(s ?? '')
-        .replace(/&/g,'&amp;')
-        .replace(/</g,'&lt;')
-        .replace(/>/g,'&gt;')
-        .replace(/"/g,'&quot;')
-        .replace(/'/g,'&#39;');
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
     }
 
-    function ensurePopover(){
-      if(popEl) return popEl;
+    function ensurePopover() {
+      if (popEl) return popEl;
       popEl = document.createElement('div');
       popEl.className = '__pop bg-white rounded-xl shadow-2xl border border-slate-200 p-3 sm:p-4 transition opacity-0 pointer-events-none';
       popEl.innerHTML = `
@@ -1057,25 +1270,25 @@
       `;
       document.body.appendChild(popEl);
       popTitleEl = popEl.querySelector('#__pop_title');
-      popBodyEl  = popEl.querySelector('#__pop_body');
-      popEl.querySelector('#__pop_close').addEventListener('click', ()=> hidePopover());
+      popBodyEl = popEl.querySelector('#__pop_body');
+      popEl.querySelector('#__pop_close').addEventListener('click', () => hidePopover());
 
-      document.addEventListener('keydown', (e)=>{
-        if(e.key==='Escape') hidePopover();
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') hidePopover();
       });
 
-      window.addEventListener('scroll', ()=>{
-        if(!popPinnedBy) hidePopover();
+      window.addEventListener('scroll', () => {
+        if (!popPinnedBy) hidePopover();
       }, true);
 
-      window.addEventListener('resize', ()=>{
-        if(!popPinnedBy) hidePopover();
+      window.addEventListener('resize', () => {
+        if (!popPinnedBy) hidePopover();
       });
 
       return popEl;
     }
 
-    function showPopoverFor(trigger){
+    function showPopoverFor(trigger) {
       ensurePopover();
       const title = trigger.getAttribute('data-pop-title')
         || trigger.nextElementSibling?.getAttribute?.('data-pop-title')
@@ -1083,7 +1296,7 @@
       const contentAttr = trigger.getAttribute('data-pop-content')
         || trigger.nextElementSibling?.getAttribute?.('data-pop-content')
         || '';
-      const content = decodeURIComponent(contentAttr||'');
+      const content = decodeURIComponent(contentAttr || '');
 
       popTitleEl.textContent = title;
       popBodyEl.innerHTML = content;
@@ -1094,27 +1307,27 @@
       popEl.style.pointerEvents = 'auto';
     }
 
-    function positionPopover(trigger){
+    function positionPopover(trigger) {
       const rect = trigger.getBoundingClientRect();
-      const pad  = 8;
-      const vw   = window.innerWidth;
-      const vh   = window.innerHeight;
+      const pad = 8;
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
 
       popEl.style.opacity = '0';
       popEl.style.pointerEvents = 'none';
       popEl.style.top = '-9999px';
       popEl.style.left = '-9999px';
 
-      requestAnimationFrame(()=>{
+      requestAnimationFrame(() => {
         const pw = popEl.offsetWidth;
         const ph = popEl.offsetHeight;
 
-        let top  = rect.top - ph - 8;
+        let top = rect.top - ph - 8;
         let left = rect.left;
 
-        if (top < pad){
+        if (top < pad) {
           top = rect.bottom + 8;
-          if (top + ph + pad > vh){
+          if (top + ph + pad > vh) {
             top = Math.max(pad, vh - ph - pad);
           }
         }
@@ -1123,61 +1336,62 @@
         if (left < pad) left = pad;
 
         popEl.style.left = `${left}px`;
-        popEl.style.top  = `${top}px`;
+        popEl.style.top = `${top}px`;
         popEl.style.opacity = '1';
         popEl.style.pointerEvents = 'auto';
       });
     }
 
-    function hidePopover(){
-      if(!popEl) return;
+    function hidePopover() {
+      if (!popEl) return;
       popEl.style.opacity = '0';
       popEl.style.pointerEvents = 'none';
       popPinnedBy = null;
     }
 
-    function bindPopoverTrigger(el){
-      el.addEventListener('mouseenter', ()=>{
-        if(popPinnedBy) return;
+    function bindPopoverTrigger(el) {
+      el.addEventListener('mouseenter', () => {
+        if (popPinnedBy) return;
         hoverTimer && clearTimeout(hoverTimer);
-        hoverTimer = setTimeout(()=> showPopoverFor(el), 150);
+        hoverTimer = setTimeout(() => showPopoverFor(el), 150);
       });
 
-      el.addEventListener('mouseleave', ()=>{
+      el.addEventListener('mouseleave', () => {
         hoverTimer && clearTimeout(hoverTimer);
-        if(!popPinnedBy) hidePopover();
+        if (!popPinnedBy) hidePopover();
       });
 
-      el.addEventListener('click', (e)=>{
+      el.addEventListener('click', (e) => {
         e.stopPropagation();
         const isSame = (popPinnedBy === el);
-        if(isSame){
+        if (isSame) {
           popPinnedBy = null;
           hidePopover();
-        }else{
+        } else {
           popPinnedBy = el;
           showPopoverFor(el);
         }
       });
     }
 
-    document.addEventListener('click', (e)=>{
-      if(!popEl) return;
+    document.addEventListener('click', (e) => {
+      if (!popEl) return;
 
-      if(popPinnedBy) {
+      if (popPinnedBy) {
         const clickedInsidePop = popEl.contains(e.target);
-        const clickedTrigger   = popPinnedBy.contains(e.target);
+        const clickedTrigger = popPinnedBy.contains(e.target);
 
-        if(!clickedInsidePop && !clickedTrigger){
+        if (!clickedInsidePop && !clickedTrigger) {
           popPinnedBy = null;
           hidePopover();
         }
-      }else{
+      } else {
         const clickedInsidePop = popEl.contains(e.target);
-        if(!clickedInsidePop) hidePopover();
+        if (!clickedInsidePop) hidePopover();
       }
     });
     // ======= FIM =======
   </script>
 </body>
+
 </html>
