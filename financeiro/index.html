@@ -95,6 +95,42 @@
     nav.cantina-nav .actions{padding:5px;gap:6px;width:min(70vw,150px)}
     nav.cantina-nav .btn{width:100%;justify-content:center;padding:8px 10px;font-size:.7rem;line-height:1.1;border-radius:8px;gap:6px}
     nav.cantina-nav .btn svg{width:18px;height:18px}
+
+    /* ======= ADIÇÕES ======= */
+    /* Tabela com altura fixa (scroll interno) */
+    #tableWrapper{ height:520px; overflow:auto; }
+    /* Truncar em 1 linha com ellipsis */
+    .single-line{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .clickable{ cursor:pointer; }
+
+    /* —— Modal Detalhes: visual mais bonito —— */
+    .md-subtle {
+      font-size: 12px; line-height: 1.2; color: #64748b;
+    }
+    .md-chip {
+      display:inline-flex; align-items:center; gap:6px;
+      padding:2px 8px; border-radius:9999px; font-size:11px; font-weight:700;
+      background:#eef2ff; color:#3730a3; border:1px solid #c7d2fe;
+    }
+    .md-section {
+      margin-top:14px; padding-top:12px; border-top:1px solid #e2e8f0;
+    }
+    .md-title {
+      font-weight:700; color:#0f172a; font-size:14px; margin-bottom:8px;
+    }
+    .dl-grid {
+      display:grid; grid-template-columns: 150px 1fr; gap:8px 16px;
+    }
+    .dl-grid dt {
+      color:#475569; font-weight:600; text-transform:uppercase; font-size:11px;
+    }
+    .dl-grid dd {
+      color:#0f172a; font-weight:600; font-size:13px;
+    }
+    .md-links ul { list-style: disc; padding-left: 1.25rem; }
+    .md-links a { text-decoration: underline; }
+    .md-muted { color:#475569; font-weight:500; }
+
   </style>
 </head>
 
@@ -260,6 +296,22 @@
     </div>
   </div>
 
+  <!-- Modal de leitura de detalhes -->
+  <div id="modalDetalhes" class="fixed inset-0 hidden items-center justify-center bg-black/40 z-50 px-3">
+    <div class="w-full max-w-xl bg-white rounded-2xl shadow-2xl max-h-[90vh] flex flex-col overflow-hidden">
+      <div class="flex items-center justify-between p-4 border-b">
+        <h3 id="mdTitle" class="text-base sm:text-lg font-bold">Detalhes</h3>
+        <button id="mdClose" class="p-1 rounded hover:bg-slate-100" aria-label="Fechar">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div id="mdBody" class="p-4 text-sm text-slate-800 whitespace-pre-wrap break-words"></div>
+    </div>
+  </div>
+
   <script>
     const menuWrapper=document.getElementById('menuWrapper');
     const menuCheckbox=document.getElementById('menuCheckbox');
@@ -335,7 +387,170 @@
 
     function esc(s){ return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
     function fmtDate(d){ if(!d) return '-'; const dt=new Date(d); return isNaN(dt.getTime())?'-':dt.toLocaleString('pt-BR'); }
-    function humanTipo(item){ if(item.tipo==='servico') return 'Serviço'; if(item.tipo==='produto') return 'Produto'; return '-'; }
+    function humanTipo(item){
+      const t=String(item.tipo||'').toLowerCase();
+      if(t.includes('serv')) return 'Serviço';
+      if(t.includes('prod')) return 'Produto';
+      return '-';
+    }
+
+    // ===== NOVOS HELPERS =====
+    function toBRDateOnly(v){
+      if(!v) return '-';
+      const s=String(v).trim();
+      if(/^(\d{2})\/(\d{2})\/(\d{4})$/.test(s)) return s; // já está dd/mm/aaaa
+      const d=new Date(s);
+      return isNaN(d.getTime()) ? s : d.toLocaleDateString('pt-BR');
+    }
+
+    function abrirModalDetalhesHTML(title, html){
+  $('#mdTitle').textContent = title || 'Detalhes';
+  const body = $('#mdBody');
+  body.innerHTML = html || '<div class="md-muted">Sem conteúdo</div>';
+  const m=$('#modalDetalhes'); m.classList.remove('hidden'); m.classList.add('flex');
+}
+
+function buildLinksListProduto(linkCompra, link2, link3, valor2, valor3){
+  const items = [];
+  items.push(`<li>Link comprado: ${linkCompra ? `<a class="text-primaria break-all" href="${esc(linkCompra)}" target="_blank" rel="noopener">${esc(linkCompra)}</a>` : '<span class="md-muted">-</span>'}</li>`);
+  items.push(`<li>Link 2: ${link2 ? `<a class="text-primaria break-all" href="${esc(link2)}" target="_blank" rel="noopener">${esc(link2)}</a>` : '<span class="md-muted">-</span>'}${valor2?` <span class="md-muted">(Valor 2: ${esc(valor2)})</span>`:''}</li>`);
+  items.push(`<li>Link 3: ${link3 ? `<a class="text-primaria break-all" href="${esc(link3)}" target="_blank" rel="noopener">${esc(link3)}</a>` : '<span class="md-muted">-</span>'}${valor3?` <span class="md-muted">(Valor 3: ${esc(valor3)})</span>`:''}</li>`);
+  return `<div class="md-section md-links"><div class="md-title">Links</div><ul class="space-y-1">${items.join('')}</ul></div>`;
+}
+
+function buildLinksListGeneric(links){
+  const list = (links||[]).filter(Boolean);
+  return `
+    <div class="md-section md-links">
+      <div class="md-title">Links</div>
+      ${list.length ? `<ul class="space-y-1">
+        ${list.map((l,i)=>`<li><a class="text-primaria break-all" href="${esc(l)}" target="_blank" rel="noopener">${esc(l)}</a></li>`).join('')}
+      </ul>` : `<div class="md-muted">Sem links</div>`}
+    </div>
+  `;
+}
+
+function buildDetalhesHTML(item){
+  const tipo = String(item.tipo||'').toLowerCase();
+  const isServico = tipo.includes('serv');
+  const status = (item.status||'-').toUpperCase();
+  const compradoEm = item.compradoEm ? fmtDate(item.compradoEm) : '-';
+  const compradoPor = item.compradoPor || '-';
+
+  if(isServico){
+    const dataServico = toBRDateOnly(item.dataServico);
+    const html = `
+      <div class="flex items-center justify-between">
+        <span class="md-chip">SERVIÇO</span>
+        <span class="md-subtle">${status}</span>
+      </div>
+
+      <div class="md-section">
+        <div class="dl-grid">
+          <dt>Solicitado</dt><dd>${esc(item.descricaoServico||item.tipoServicoSolicitado||'-')}</dd>
+          <dt>A ser feito</dt><dd>${esc(item.tipoServicoFinal||'-')}</dd>
+          <dt>Prestador</dt><dd>${esc(item.prestadorServico||'-')}</dd>
+          <dt>Execução</dt><dd>${esc(dataServico)}</dd>
+          <dt>Valor total</dt><dd>${esc(item.valorCompra||'-')}</dd>
+        </div>
+      </div>
+
+      ${item.observacao ? `<div class="md-section"><div class="md-title">Observações</div><div>${esc(item.observacao)}</div></div>`:''}
+
+      <div class="md-section">
+        <div class="dl-grid">
+          <dt>Comprado em</dt><dd>${esc(compradoEm)}</dd>
+          <dt>Comprado por</dt><dd>${esc(compradoPor)}</dd>
+        </div>
+      </div>
+    `;
+    return html;
+  }
+
+  // PRODUTO
+  const linksOrig = parseLinks(item.links);
+  const valoresArr = parseValoresCotacoes(item.valoresCotacoes||item.valoresLinks||item.valoresLinksCotacao||item.cotacaoValores||item.cotacoesValores||[]);
+  const linkCompra=item.linkCompra||linksOrig[0]||'';
+  const link2=item.linkOpcao2||linksOrig[1]||'';
+  const link3=item.linkOpcao3||linksOrig[2]||'';
+  const valor2=item.valorOpcao2||valoresArr[1]||'';
+  const valor3=item.valorOpcao3||valoresArr[2]||'';
+
+  const prazo = toBRDateOnly(item.prazoEntrega);
+  const html = `
+    <div class="flex items-center justify-between">
+      <span class="md-chip">PRODUTO</span>
+      <span class="md-subtle">${status}</span>
+    </div>
+
+    <div class="md-section">
+      <div class="dl-grid">
+        <dt>Produto</dt><dd>${esc(item.nomeProduto||'-')}</dd>
+        <dt>Quantidade</dt><dd>${esc(item.quantidadeProduto||'-')}</dd>
+        <dt>Valor total</dt><dd>${esc(item.valorCompra||'-')}</dd>
+        <dt>Prazo / Entrega</dt><dd>${esc(prazo||'-')}</dd>
+      </div>
+    </div>
+
+    ${item.motivoEscolha ? `<div class="md-section"><div class="md-title">Motivo da escolha</div><div>${esc(item.motivoEscolha)}</div></div>`:''}
+    ${item.observacao ? `<div class="md-section"><div class="md-title">Observações</div><div>${esc(item.observacao)}</div></div>`:''}
+
+    ${buildLinksListProduto(linkCompra, link2, link3, valor2, valor3)}
+
+    <div class="md-section">
+      <div class="dl-grid">
+        <dt>Comprado em</dt><dd>${esc(compradoEm)}</dd>
+        <dt>Comprado por</dt><dd>${esc(compradoPor)}</dd>
+      </div>
+    </div>
+  `;
+  return html;
+}
+
+
+    function abrirModalDetalhes(title, body){
+      $('#mdTitle').textContent=title||'Detalhes';
+      $('#mdBody').textContent=body||'';
+      const m=$('#modalDetalhes'); m.classList.remove('hidden'); m.classList.add('flex');
+    }
+    function fecharModalDetalhes(){
+      const m=$('#modalDetalhes'); m.classList.add('hidden'); m.classList.remove('flex');
+    }
+    $('#mdClose')?.addEventListener('click', fecharModalDetalhes);
+    $('#modalDetalhes')?.addEventListener('click',(e)=>{ if(e.target.id==='modalDetalhes') fecharModalDetalhes(); });
+    document.addEventListener('keydown',(e)=>{ if(e.key==='Escape'){ const m=$('#modalDetalhes'); if(m && !m.classList.contains('hidden')) fecharModalDetalhes(); } });
+
+    function attachDetalhesHandlers(){
+      document.querySelectorAll('.detalhes-trigger').forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          const id = btn.getAttribute('data-id');
+          const onlyLinks = btn.getAttribute('data-view') === 'links';
+
+          if(id){
+            const item = dadosBrutos.find(x=>x.submissionId===id);
+            if(!item){ abrirModalDetalhesHTML('Detalhes', '<div class="md-muted">Item não encontrado.</div>'); return; }
+
+            if(onlyLinks){
+              // Abre modal só com os links (qualquer tipo)
+              const links = parseLinks(item.links);
+              const html = buildLinksListGeneric(links);
+              abrirModalDetalhesHTML('Links do item', html);
+            }else{
+              // Abre modal completo bonito
+              const html = buildDetalhesHTML(item);
+              abrirModalDetalhesHTML('Detalhes do item', html);
+            }
+            return;
+          }
+
+          // Fallback antigo (usa texto puro)
+          const title=btn.getAttribute('data-title')||'Detalhes';
+          const full=btn.getAttribute('data-full')||'';
+          abrirModalDetalhes(title, full);
+        });
+      });
+    }
+
 
     function badgeStatus(s){
       const base='inline-flex items-center px-2 py-0.5 rounded-full text-[11px] sm:text-xs font-semibold border';
@@ -444,29 +659,57 @@
 
     function rowPendentes(item){
       const links=parseLinks(item.links);
-      const prazoStr=(item.prazo==='sim' && item.dataPrazo)?fmtDate(item.dataPrazo):'-';
-      const isServico=String(item.tipo||'').toLowerCase()==='serviço solicitado';
+      const prazoStr=(item.prazo==='sim' && item.dataPrazo)? toBRDateOnly(item.dataPrazo) : '-';
+      const isServico=String(item.tipo||'').toLowerCase().includes('serv');
       const botaoLabel=isServico?'Serviço':'compra solicitada';
+
+      const full = isServico
+        ? [
+            `Tipo: ${humanTipo(item)}`,
+            `Descrição do serviço: ${item.descricaoServico||item.tipoServicoSolicitado||'-'}`,
+            item.quemIndicar? `Indicação: ${item.quemIndicar}` : null,
+            `Urgência: ${item.urgencia||'-'}`,
+            `Prazo: ${prazoStr}`,
+            item.observacao? `Observação: ${item.observacao}` : null,
+            `Links:`,
+            ...(links.length ? links : ['-'])
+          ].filter(Boolean).join('\n')
+        : [
+            `Tipo: ${humanTipo(item)}`,
+            `Produto: ${item.nomeProduto||'-'}`,
+            `Quantidade: ${item.quantidadeProduto||'-'}`,
+            `Urgência: ${item.urgencia||'-'}`,
+            `Prazo: ${prazoStr}`,
+            item.observacao? `Observação: ${item.observacao}` : null,
+            `Links:`,
+            ...(links.length ? links : ['-'])
+          ].filter(Boolean).join('\n');
+
+      const titulo = isServico
+        ? (item.descricaoServico||item.tipoServicoSolicitado||'Serviço')
+        : (item.nomeProduto||'Produto');
+
       return `
         <tr class='align-top'>
           <td class='p-3 hidden md:table-cell'>U${esc(item.unidade||'-')}</td>
           <td class='p-3'>${esc(humanTipo(item))}</td>
           <td class='p-3 col-detalhes'>
-            <div class="font-semibold scroll-3">
-              ${esc(item.tipo==='produto'?(item.nomeProduto||'-'):(item.descricaoServico||'-'))}
-            </div>
-            ${item.tipo==='produto'
-              ? `<div class="text-xs text-slate-600">Qtd: ${esc(item.quantidadeProduto||'-')}</div>`
-              : (item.quemIndicar?`<div class="text-xs text-slate-600 break-words">Indicação: ${esc(item.quemIndicar)}</div>`:'')}
-            ${item.observacao?`<div class="text-xs text-slate-600 break-words">${esc(item.observacao)}</div>`:''}
+            <button class="detalhes-trigger single-line clickable text-left w-full font-semibold"
+                    title="Ver detalhes"
+                    data-title="Detalhes do item"
+                    data-full="${esc(full)}">
+              ${esc(titulo)}
+            </button>
           </td>
           <td class='p-3 whitespace-nowrap hidden sm:table-cell'>${esc(prazoStr)}</td>
           <td class='p-3 uppercase hidden sm:table-cell'>${esc((item.urgencia||'-').toString().toUpperCase())}</td>
           <td class='p-3 hidden lg:table-cell'>
             ${links.length
-              ? `<ul class="list-disc pl-4 text-xs break-all">
-                  ${links.map((l,i)=>`<li><a class="underline text-primaria" href="${esc(l)}" target="_blank" rel="noopener">Link ${i+1}</a></li>`).join('')}
-                 </ul>`
+              ? `<button class="detalhes-trigger clickable text-left underline text-primaria"
+                         data-title="Links / Fornecedor"
+                         data-full="${esc(links.join('\n'))}">
+                   Ver links (${links.length})
+                 </button>`
               : `<div class="text-sm text-slate-600">Sem links.</div>`}
           </td>
           <td class='p-3 col-status'>
@@ -483,7 +726,7 @@
 
     function rowComprados(item){
       const tipoLower=String(item.tipo||'').toLowerCase();
-      const isServico=tipoLower.startsWith('serv');
+      const isServico=tipoLower.includes('serv');
       const linksOriginais=parseLinks(item.links);
       const valoresArr=parseValoresCotacoes(item.valoresCotacoes||item.valoresLinks||item.valoresLinksCotacao||item.cotacaoValores||item.cotacoesValores||[]);
       const linkCompra=item.linkCompra||linksOriginais[0]||'';
@@ -491,55 +734,72 @@
       const link3=item.linkOpcao3||linksOriginais[2]||'';
       const valor2=item.valorOpcao2||valoresArr[1]||'';
       const valor3=item.valorOpcao3||valoresArr[2]||'';
-      let historicoLinksHTML='';
-      if(isServico){
-        historicoLinksHTML=`<div class="text-sm text-slate-600 text-center">-</div>`;
-      }else{
-        historicoLinksHTML=`
-          <ul class="list-disc pl-4 text-xs break-all">
-            <li class="break-all">
-              ${linkCompra?`<a class="underline text-primaria" href="${esc(linkCompra)}" target="_blank" rel="noopener">Link comprado</a>`:`<span class="text-slate-500">Link comprado -</span>`}
-            </li>
-            <li class="break-all">
-              ${link2?`<a class="underline text-primaria" href="${esc(link2)}" target="_blank" rel="noopener">Link 2</a>`:`<span class="text-slate-500">Link 2 -</span>`}
-              <span class="text-[11px] text-slate-500 ml-1">${esc(valor2||'-')}</span>
-            </li>
-            <li class="break-all">
-              ${link3?`<a class="underline text-primaria" href="${esc(link3)}" target="_blank" rel="noopener">Link 3</a>`:`<span class="text-slate-500">Link 3 -</span>`}
-              <span class="text-[11px] text-slate-500 ml-1">${esc(valor3||'-')}</span>
-            </li>
-          </ul>`;
-      }
       const valorStr=item.valorCompra?item.valorCompra:'-';
-      const entregaStr=isServico?(item.dataServico||'-'):(item.prazoEntrega||'-');
-      let detalhesHTML='';
-      if(isServico){
-        detalhesHTML=`
-          <div class="font-semibold scroll-3">Serviço</div>
-          <div class="text-xs text-slate-600 break-words leading-relaxed mt-1">
-            <div><span class="font-semibold text-slate-700">Solicitado:</span> ${esc(item.descricaoServico||item.tipoServicoSolicitado||'-')}</div>
-            <div><span class="font-semibold text-slate-700">A ser feito:</span> ${esc(item.tipoServicoFinal||'-')}</div>
-            <div><span class="font-semibold text-slate-700">Prestador:</span> ${esc(item.prestadorServico||'-')}</div>
-            <div><span class="font-semibold text-slate-700">Data do serviço:</span> ${esc(item.dataServico||'-')}</div>
-            ${item.quemIndicar?`<div><span class="font-semibold text-slate-700">Indicação:</span> ${esc(item.quemIndicar)}</div>`:''}
-            ${item.observacao?`<div><span class="font-semibold text-slate-700">Obs.:</span> ${esc(item.observacao)}</div>`:''}
-          </div>
-        `;
-      }else{
-        detalhesHTML=`
-          <div class="font-semibold scroll-3">${esc(item.nomeProduto||'-')}</div>
-          <div class="text-xs text-slate-600">Qtd: ${esc(item.quantidadeProduto||'-')}</div>
-          ${item.observacao?`<div class="text-xs text-slate-600 break-words">${esc(item.observacao)}</div>`:''}
-        `;
-      }
+      const entregaStr=isServico? toBRDateOnly(item.dataServico) : toBRDateOnly(item.prazoEntrega);
+
+      const full = isServico
+        ? [
+            `Tipo: Serviço`,
+            `Solicitado: ${item.descricaoServico||item.tipoServicoSolicitado||'-'}`,
+            `A ser feito: ${item.tipoServicoFinal||'-'}`,
+            `Prestador: ${item.prestadorServico||'-'}`,
+            `Data do serviço: ${toBRDateOnly(item.dataServico)}`,
+            item.quemIndicar? `Indicação: ${item.quemIndicar}` : null,
+            item.observacao? `Observação: ${item.observacao}` : null,
+            `Valor total: ${valorStr}`,
+            `Status: ${(item.status||'comprado').toUpperCase()}`,
+            `Comprado em: ${item.compradoEm?fmtDate(item.compradoEm):'-'}`,
+            `Comprado por: ${item.compradoPor||'-'}`
+          ].filter(Boolean).join('\n')
+        : [
+            `Tipo: Produto`,
+            `Produto: ${item.nomeProduto||'-'}`,
+            `Quantidade: ${item.quantidadeProduto||'-'}`,
+            `Valor total: ${valorStr}`,
+            `Prazo / Entrega: ${entregaStr||'-'}`,
+            `Links:`,
+            linkCompra? `• Link comprado: ${linkCompra}` : '• Link comprado: -',
+            `• Link 2: ${link2||'-'}  ${valor2?`(Valor 2: ${valor2})`:''}`,
+            `• Link 3: ${link3||'-'}  ${valor3?`(Valor 3: ${valor3})`:''}`,
+            item.motivoEscolha? `Motivo da escolha: ${item.motivoEscolha}` : null,
+            item.observacao? `Observação: ${item.observacao}` : null,
+            `Status: ${(item.status||'comprado').toUpperCase()}`,
+            `Comprado em: ${item.compradoEm?fmtDate(item.compradoEm):'-'}`,
+            `Comprado por: ${item.compradoPor||'-'}`
+          ].filter(Boolean).join('\n');
+
+      const titulo = isServico
+        ? `Serviço — ${item.tipoServicoFinal||item.descricaoServico||'-'}`
+        : (item.nomeProduto||'Produto');
+
       return `
         <tr class='align-top'>
           <td class='p-3 hidden md:table-cell'>U${esc(item.unidade||'-')}</td>
           <td class='p-3'>${esc(humanTipo(item))}</td>
-          <td class='p-3 col-detalhes'>${detalhesHTML}</td>
+          <td class='p-3 col-detalhes'>
+            <button class="detalhes-trigger single-line clickable text-left w-full font-semibold"
+                    title="Ver detalhes"
+                    data-title="Detalhes do item"
+                    data-full="${esc(full)}">
+              ${esc(titulo)}
+            </button>
+          </td>
           <td class='p-3 whitespace-nowrap'>${esc(valorStr)}</td>
-          <td class='p-3 whitespace-nowrap'>${esc(entregaStr)}</td>
-          <td class='p-3 hidden lg:table-cell'>${historicoLinksHTML}</td>
+          <td class='p-3 whitespace-nowrap'>${esc(entregaStr||'-')}</td>
+          <td class='p-3 hidden lg:table-cell'>
+            ${isServico
+              ? `<div class="text-sm text-slate-600 text-center">-</div>`
+              : `<button class="detalhes-trigger clickable text-left underline text-primaria"
+                      data-title="Links do histórico"
+                      data-full="${esc([
+                        linkCompra?`Link comprado: ${linkCompra}`:'Link comprado: -',
+                        `Link 2: ${link2||'-'} ${valor2?`(Valor 2: R$ ${valor2})`:''}`,
+                        `Link 3: ${link3||'-'} ${valor3?`(Valor 3: R$ ${valor3})`:''}`
+                      ].join('\n'))}">
+                 Ver links
+               </button>`
+            }
+          </td>
           <td class='p-3 col-status'>
             ${badgeStatus(item.status||'comprado')}
             <div class="text-[10px] text-slate-500 leading-tight mt-1">Comprado em:<br>${item.compradoEm?esc(fmtDate(item.compradoEm)):'-'}</div>
@@ -602,12 +862,11 @@
       const servicoSectionEl=$('#mcServicoSection');
       const cotacoesWrapperEl=$('#mcCotacoesWrapper');
       const tipo=String(itemObj.tipo||'').toLowerCase();
-      const isServico=tipo==='servico';
 
-      $('#mcHeaderTitle').textContent=isServico?'Serviço':'Marcar como Comprado';
-      $('#mcHeaderDesc').textContent=isServico?'Informe os detalhes do serviço.':'Informe os detalhes da compra.';
+      $('#mcHeaderTitle').textContent=tipo.includes('serv')?'Serviço':'Marcar como Comprado';
+      $('#mcHeaderDesc').textContent=tipo.includes('serv')?'Informe os detalhes do serviço.':'Informe os detalhes da compra.';
 
-      if(tipo==='produto'){
+      if(tipo.includes('prod')){
         produtoSectionEl.classList.remove('hidden'); cotacoesWrapperEl.classList.remove('hidden'); servicoSectionEl.classList.add('hidden');
         $('#mcValor').value=itemObj.valorCompra||''; $('#mcPrazo').value=itemObj.prazoEntrega||''; if(itemObj.linkCompra) $('#mcLink').value=itemObj.linkCompra;
         const linksArr=parseLinks(itemObj.links);
@@ -618,11 +877,11 @@
         $('#mcMotivo').value=itemObj.motivoEscolha||'';
       }else{
         servicoSectionEl.classList.remove('hidden'); produtoSectionEl.classList.add('hidden'); cotacoesWrapperEl.classList.add('hidden');
-        $('#mcValorServico').value=itemObj.valorCompra||''; $('#mcPrestador').value=itemObj.prestadorServico||''; $('#mcTipoServicoSolicitado').value=itemObj.descricaoServico||itemObj.tipoServicoSolicitado||''; $('#mcTipoServicoFinal').value=itemObj.tipoServicoFinal||''; $('#mcDataServico').value=itemObj.dataServico||'';
+        $('#mcValorServico').value=itemObj.valorCompra||''; $('#mcPrestador').value=itemObj.prestadorServico||''; $('#mcTipoServicoSolicitado').value=itemObj.descricaoServico||itemObj.tipoServicoSolicitado||''; $('#mcTipoServicoFinal').value=itemObj.tipoServicoFinal||''; $('#mcDataServico').value=toBRDateOnly(itemObj.dataServico)||'';
       }
 
       const modal=$('#modalCompra'); modal.classList.remove('hidden'); modal.classList.add('flex');
-      setTimeout(()=>{ if(tipo==='produto'){ $('#mcValor').focus(); } else { $('#mcValorServico').focus(); } },0);
+      setTimeout(()=>{ if(tipo.includes('prod')){ $('#mcValor').focus(); } else { $('#mcValorServico').focus(); } },0);
     }
 
     function fecharModalCompra(){
@@ -681,7 +940,7 @@
       const tableAreaEl=$('#tableArea'); if(tableAreaEl){ tableAreaEl.innerHTML=buildTableHTML(rows,activeTab); }
       renderPaginacao(totalPages,total);
       if(activeTab==='pendentes'){ $('#contador').textContent=`${total} item(ns) aguardando compra/serviço`; } else { $('#contador').textContent=`${total} item(ns) no histórico`; }
-      updateTabsUI(); attachRowHandlers();
+      updateTabsUI(); attachRowHandlers(); attachDetalhesHandlers();
     }
 
     async function carregarLista(){
@@ -727,7 +986,7 @@
       const id=modalCompraState.id; if(!id){ isSavingCompra=false; return; }
       const tipoAtual=String(modalCompraState.item?.tipo||'').toLowerCase();
 
-      if(tipoAtual==='produto'){
+      if(tipoAtual.includes('prod')){
         const valor=($('#mcValor').value||'').trim();
         const prazo=($('#mcPrazo').value||'').trim();
         const linkCompra=($('#mcLink').value||'').trim();
