@@ -1,32 +1,24 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Formulário - Ícone Colégio e Curso</title>
 
-  <!-- Fonts -->
+  <!-- ===== BLOCO: Fontes & Favicon ===== -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <!-- Poppins (form) -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-  <!-- Inter (navbar Cantina) -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <!-- Roboto -->
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
-    rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <link rel="shortcut icon" href="https://storage.googleapis.com/ecdt-logo-saida/1ebe52af502e25d3521cb9dad62bb72f6bc1c347353cdda5fa381ef8627a9eb8/COLEGIO-E-CURSO-ICONE.webp" type="image/x-icon">
 
-  <link rel="shortcut icon"
-    href="https://storage.googleapis.com/ecdt-logo-saida/1ebe52af502e25d3521cb9dad62bb72f6bc1c347353cdda5fa381ef8627a9eb8/COLEGIO-E-CURSO-ICONE.webp"
-    type="image/x-icon">
-
+  <!-- ===== BLOCO: Tailwind & Toastify ===== -->
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Toastify -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
   <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
+  <!-- ===== BLOCO: Tailwind Config ===== -->
   <script>
     tailwind.config = {
       theme: {
@@ -39,32 +31,18 @@
     }
   </script>
 
+  <!-- ===== BLOCO: CSS Global & Navbar ===== -->
   <style>
     /* ===== Base ===== */
-    html {
-      scroll-behavior: smooth;
-    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Roboto', system-ui, -apple-system, Segoe UI, Poppins, Arial, sans-serif; color: #000; }
+    * { color: #000; }
 
-    body {
-      font-family: 'Roboto', system-ui, -apple-system, Segoe UI, Poppins, Arial, sans-serif;
-      color: #000;
-    }
+    /* Toastify (tema claro no site, toasts brancos forçam contraste) */
+    .toastify, .toastify * { color: #fff !important; }
+    .toastify .toast-close { color: #fff !important; opacity: .9; }
 
-    * {
-      color: #000;
-    }
-
-    .toastify,
-    .toastify * {
-      color: #fff !important;
-    }
-
-    .toastify .toast-close {
-      color: #fff !important;
-      opacity: 0.9;
-    }
-
-    /* ===== Header Cantina (escopo isolado) ===== */
+    /* ===== Tema Cantina (variáveis) ===== */
     :root {
       --cantina-primary: #FD7F08;
       --cantina-secondary: #253237;
@@ -72,333 +50,130 @@
       --cantina-border: #e2e8f0;
     }
 
-    nav.cantina-nav {
-      position: sticky;
-      top: 0;
-      z-index: 50;
-      background: var(--cantina-secondary);
-      border-bottom: 3px solid var(--cantina-primary);
-      color: var(--cantina-text);
-      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
-    }
+    /* ===== Navbar Cantina ===== */
+    nav.cantina-nav { position: sticky; top: 0; z-index: 50; background: var(--cantina-secondary); border-bottom: 3px solid var(--cantina-primary); color: var(--cantina-text); font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"; }
+    nav.cantina-nav .cantina-container { max-width: min(98vw, 1400px); margin: 0 auto; padding: 0 12px; height: 96px; display: flex; align-items: center; justify-content: space-between; }
+    nav.cantina-nav a { display: flex; align-items: center; text-decoration: none; }
+    nav.cantina-nav img { height: 64px; width: auto; }
 
-    nav.cantina-nav .cantina-container {
-      max-width: min(98vw, 1400px);
-      margin: 0 auto;
-      padding: 0 12px;
-      height: 96px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
+    /* Marca */
+    nav.cantina-nav .brand { display: flex; align-items: center; gap: 12px; color: var(--cantina-text); height: 100%; }
+    nav.cantina-nav .brand .divider { width: 2px; height: 70%; align-self: center; background: var(--cantina-primary); border-radius: 2px; }
+    nav.cantina-nav .brand .title { font-weight: 800; letter-spacing: .5px; font-size: clamp(18px, 3.8vw, 32px); line-height: 1.15; white-space: normal; word-break: keep-all; }
 
-    nav.cantina-nav a {
-      display: flex;
-      align-items: center;
-      text-decoration: none;
-    }
+    /* ===== Menu Hambúrguer ===== */
+    nav.cantina-nav .menu-wrapper { position: relative; display: inline-block; }
+    nav.cantina-nav .menu-checkbox { position: absolute; opacity: 0; pointer-events: none; }
 
-    nav.cantina-nav img {
-      height: 64px;
-      width: auto;
-    }
+    /* Botão */
+    nav.cantina-nav .menu-button { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 10px; cursor: pointer; user-select: none; background-color: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.18); transition: background-color .15s ease, transform .15s ease, box-shadow .15s ease; }
+    nav.cantina-nav .menu-button:hover { background-color: rgba(255,255,255,0.12); box-shadow: 0 2px 10px rgba(2,8,23,.5); }
+    nav.cantina-nav .menu-button:active { transform: scale(0.96); }
+    nav.cantina-nav .menu-button:focus-visible { outline: 2px solid var(--cantina-primary); outline-offset: 2px; }
 
-    nav.cantina-nav .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      color: var(--cantina-text);
-      height: 100%;
-    }
+    /* Ícones */
+    nav.cantina-nav .icon { width: 24px; height: 24px; stroke: #fff; }
+    nav.cantina-nav .icon-menu { display: block; }
+    nav.cantina-nav .icon-close { display: none; }
+    nav.cantina-nav .menu-checkbox:checked + label .icon-menu { display: none; }
+    nav.cantina-nav .menu-checkbox:checked + label .icon-close { display: block; }
 
-    nav.cantina-nav .brand .divider {
-      width: 2px;
-      height: 70%;
-      align-self: center;
-      background: var(--cantina-primary);
-      border-radius: 2px;
-    }
+    /* ===== Dropdown ===== */
+    nav.cantina-nav .actions { position: absolute; top: calc(100% + 8px); right: 0; z-index: 60; display: none; flex-direction: column; gap: 6px; background: #ffffff; border: 1px solid var(--cantina-border); border-radius: 12px; padding: 5px; width: min(70vw, 150px); box-shadow: 0 24px 60px rgba(2, 8, 23, .45), 0 2px 6px rgba(2, 8, 23, .2); }
+    nav.cantina-nav .menu-checkbox:checked ~ .actions { display: flex; }
 
-    nav.cantina-nav .brand .title {
-      font-weight: 800;
-      letter-spacing: .5px;
-      font-size: clamp(18px, 3.8vw, 32px);
-      line-height: 1.15;
-      white-space: normal;
-      word-break: keep-all;
-    }
+    /* Botões do dropdown */
+    nav.cantina-nav .btn { width: 100%; justify-content: center; border-radius: 8px; padding: 8px 10px; border: 1px solid var(--cantina-border); background: #fff; color: #000; cursor: pointer; transition: background-color .15s ease, box-shadow .15s ease, transform .15s ease; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; text-align: center; font-size: .7rem; line-height: 1.1; }
+    nav.cantina-nav .btn:hover { background-color: #f8fafc; box-shadow: 0 2px 8px rgba(0,0,0,.06); transform: translateY(-1px); }
+    nav.cantina-nav .btn:focus-visible { outline: 2px solid var(--cantina-primary); outline-offset: 2px; }
+    nav.cantina-nav .btn svg { width: 18px; height: 18px; }
 
-    /* ===== MENU HAMBÚRGUER WRAPPER ===== */
-    nav.cantina-nav .menu-wrapper {
-      position: relative;
-      display: inline-block;
-    }
-
-    /* checkbox invisível que controla o estado visual do ícone (menu vs X)
-       e também abre/fecha o dropdown via CSS */
-    nav.cantina-nav .menu-checkbox {
-      position: absolute;
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    /* Botão hamburguer estilizado (dark mode friendly) */
-    nav.cantina-nav .menu-button {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 44px;
-      height: 44px;
-      border-radius: 10px;
-      cursor: pointer;
-      user-select: none;
-      background-color: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.18);
-      transition: background-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
-    }
-
-    nav.cantina-nav .menu-button:hover {
-      background-color: rgba(255, 255, 255, 0.12);
-      box-shadow: 0 2px 10px rgba(2, 8, 23, .5);
-    }
-
-    nav.cantina-nav .menu-button:active {
-      transform: scale(0.96);
-    }
-
-    nav.cantina-nav .menu-button:focus-visible {
-      outline: 2px solid var(--cantina-primary);
-      outline-offset: 2px;
-    }
-
-    /* Ícones dentro do botão */
-    nav.cantina-nav .icon {
-      width: 24px;
-      height: 24px;
-      stroke: #fff;
-    }
-
-    /* por padrão (menu fechado): mostra hamburguer, esconde X */
-    nav.cantina-nav .icon-menu {
-      display: block;
-    }
-
-    nav.cantina-nav .icon-close {
-      display: none;
-    }
-
-    /* quando checkbox marcado (= aberto), troca os ícones */
-    nav.cantina-nav .menu-checkbox:checked+label .icon-menu {
-      display: none;
-    }
-
-    nav.cantina-nav .menu-checkbox:checked+label .icon-close {
-      display: block;
-    }
-
-    /* ===== DROPDOWN DO MENU ===== */
-    nav.cantina-nav .actions {
-      position: absolute;
-      top: calc(100% + 8px);
-      right: 0;
-      z-index: 60;
-      display: none;
-      flex-direction: column;
-      gap: 8px;
-      background: #ffffff;
-      border: 1px solid var(--cantina-border);
-      border-radius: 12px;
-      padding: 12px;
-      width: min(78vw, 240px);
-      box-shadow:
-        0 24px 60px rgba(2, 8, 23, .45),
-        0 2px 6px rgba(2, 8, 23, .2);
-    }
-
-    /* quando checkbox marcado, mostra o dropdown */
-    nav.cantina-nav .menu-checkbox:checked~.actions {
-      display: flex;
-    }
-
-    /* Botões dentro do dropdown */
-    nav.cantina-nav .btn {
-      width: 100%;
-      justify-content: center;
-      border-radius: 10px;
-      padding: 12px;
-      border: 1px solid var(--cantina-border);
-      background: #fff;
-      color: #000;
-      cursor: pointer;
-      transition: background-color .15s ease, box-shadow .15s ease, transform .15s ease;
-      font-weight: 600;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      text-align: center;
-    }
-
-    nav.cantina-nav .btn:hover {
-      background-color: #f8fafc;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, .06);
-      transform: translateY(-1px);
-    }
-
-    nav.cantina-nav .btn:focus-visible {
-      outline: 2px solid var(--cantina-primary);
-      outline-offset: 2px;
-    }
-
-    /* ===== Mobile (<=640px): ajustes ===== */
+    /* ===== Mobile (<=640px) ===== */
     @media (max-width: 640px) {
-      nav.cantina-nav .cantina-container {
-        height: 72px;
-      }
-
-      nav.cantina-nav img {
-        height: 48px;
-      }
-
-      nav.cantina-nav .brand {
-        flex: 1;
-        min-width: 0;
-      }
-
-      nav.cantina-nav .menu-button {
-        width: 40px;
-        height: 40px;
-        border-radius: 10px;
-      }
-
-      nav.cantina-nav .icon {
-        width: 20px;
-        height: 20px;
-      }
-
-      nav.cantina-nav .brand .title {
-        font-size: clamp(16px, 5vw, 22px);
-      }
+      nav.cantina-nav .cantina-container { height: 72px; }
+      nav.cantina-nav img { height: 48px; }
+      nav.cantina-nav .brand { flex: 1; min-width: 0; }
+      nav.cantina-nav .menu-button { width: 40px; height: 40px; border-radius: 10px; }
+      nav.cantina-nav .icon { width: 20px; height: 20px; }
+      nav.cantina-nav .brand .title { font-size: clamp(16px, 5vw, 22px); }
     }
 
-    #formulario label,
-    #formulario p.font-semibold,
-    #formulario .font-semibold {
-      color: #f1f5f9;
-      /* branco-cinza (tipo slate-100) */
-    }
+    /* ===== Ajustes do Form ===== */
+    #formulario label, #formulario p.font-semibold, #formulario .font-semibold { color: #f1f5f9; }
+
+    /*Diminuindo tamanho dos botões do menu hambúrguer*/
+    nav.cantina-nav .actions {padding: 5px; gap: 6px; width: min(70vw, 150px);}
+    nav.cantina-nav .btn{width: 100%; justify-content: center; padding: 8px 10px; font-size: 0.7rem; line-height: 1.1; border-radius: 8px; gap: 6px;}
+    nav.cantina-nav .btn svg{ width: 18px; height: 18px;}
   </style>
 </head>
 
 <body class="min-h-screen text-white antialiased" style="background: var(--cantina-secondary);">
-
+  <!-- ===== BLOCO: Navbar Cantina ===== -->
   <nav class="cantina-nav">
     <div class="cantina-container">
       <a class="brand" href="#">
-        <img
-          src="https://iconecolegioecurso.com.br/wp-content/uploads/2022/08/xlogo_icone_site.png.pagespeed.ic_.QgXP3GszLC.webp"
-          alt="Logo Ícone Colégio e Curso"
-          onerror="this.onerror=null;this.src='https://placehold.co/150x50/eeeeee/333333?text=Logo';">
+        <img src="https://iconecolegioecurso.com.br/wp-content/uploads/2022/08/xlogo_icone_site.png.pagespeed.ic_.QgXP3GszLC.webp" alt="Logo Ícone Colégio e Curso" onerror="this.onerror=null;this.src='https://placehold.co/150x50/eeeeee/333333?text=Logo';">
         <span class="divider" aria-hidden="true"></span>
         <span class="title text-[#FD7F08]">FORMULÁRIO DE COMPRAS</span>
       </a>
 
-      <!-- MENU HAMBÚRGUER + DROPDOWN (tudo agrupado para o dropdown ficar grudado embaixo) -->
       <div class="menu-wrapper" id="menuWrapper">
-        <!-- checkbox controla estado visual e abertura -->
         <input type="checkbox" id="menuCheckbox" class="menu-checkbox" aria-label="Abrir / fechar menu">
-
-        <!-- label atua como botão -->
-        <label id="menuToggle" for="menuCheckbox" class="menu-button" aria-expanded="false"
-          aria-controls="menuActions">
-
-          <!-- ÍCONE HAMBÚRGUER -->
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="menu"
-            class="icon icon-menu">
+        <label id="menuToggle" for="menuCheckbox" class="menu-button" aria-expanded="false" aria-controls="menuActions">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="menu" class="icon icon-menu">
             <line x1="4" y1="6" x2="20" y2="6"></line>
             <line x1="4" y1="12" x2="20" y2="12"></line>
             <line x1="4" y1="18" x2="20" y2="18"></line>
           </svg>
-
-          <!-- ÍCONE X / FECHAR -->
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="x"
-            class="icon icon-close">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="x" class="icon icon-close">
             <line x1="18" y1="6" x2="6" y2="18"></line>
             <line x1="6" y1="6" x2="18" y2="18"></line>
           </svg>
-
         </label>
 
-        <!-- Dropdown de ações (grudado exatamente abaixo do hambúrguer) -->
         <div id="menuActions" class="actions">
-          <!-- MOSTRA SÓ pra adminCompras (ou admSupremo) -->
           <button id="btnSetorCompras" style="display:none" class="btn">Setor Compras</button>
-
-          <!-- MOSTRA SÓ pra adminAprovacao (ou admSupremo) -->
           <button id="btnAdminAprovacao" style="display:none" class="btn">Admin</button>
-
-          <!-- Dashboards (visível pra quem está logado) -->
           <button id="btnDashboards" style="display:none" class="btn">Dashboards</button>
-
-          <!-- Sair ícone -->
           <button id="btnSair" class="btn" aria-label="Sair" title="Sair">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-              data-lucide="log-out" class="lucide lucide-log-out w-6 h-6">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="log-out" class="lucide lucide-log-out w-6 h-6">
               <path d="m16 17 5-5-5-5"></path>
               <path d="M21 12H9"></path>
               <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
             </svg>
-            <span class="sr-only">Sair</span>
+            <span>Sair</span>
           </button>
         </div>
       </div>
-      <!-- /menu-wrapper -->
     </div>
   </nav>
 
-  <!-- Anchors ocultos para navegar por HREF -->
-  <!-- Painel de aprovação (/admin) -->
+  <!-- ===== BLOCO: Âncoras de Navegação Ocultas ===== -->
   <a id="hrefAdminAprovacao" href="/admin/" style="display:none;"></a>
-
-  <!-- Painel compras (/financeiro) -->
   <a id="hrefAdminCompras" href="/financeiro/" style="display:none;"></a>
-
-  <!-- Login -->
   <a id="hrefLogin" href="../index.html" style="display:none;"></a>
-
-  <!-- Painel Dashboards (/dashboards) -->
   <a id="hrefDashboards" href="/dashboards/" style="display:none;"></a>
 
-
-  <!-- Main -->
+  <!-- ===== BLOCO: Main + Formulário ===== -->
   <main class="w-full px-4 sm:px-6 pb-16 mt-6 sm:mt-8">
     <div class="relative max-w-5xl mx-auto">
-
-      <!-- Aura decorativa -->
       <div class="pointer-events-none absolute inset-0 -z-10 hidden sm:block blur-3xl opacity-30" aria-hidden="true">
         <div class="w-56 h-56 lg:w-72 lg:h-72 bg-primaria/30 rounded-full absolute -top-10 -left-10"></div>
         <div class="w-56 h-56 lg:w-72 lg:h-72 bg-orange-300/30 rounded-full absolute bottom-0 right-0"></div>
       </div>
 
-      <form id="formulario" novalidate
-        class="mx-auto bg-[#3A474C] backdrop-blur-xl border border-white/60 shadow-2xl shadow-glow rounded-xl sm:rounded-2xl p-4 xs:p-6 sm:p-8 md:p-10 transition-[transform,box-shadow] hover:shadow-glow hover:-translate-y-0.5 max-w-3xl lg:max-w-4xl">
-
+      <form id="formulario" novalidate class="mx-auto bg-[#3A474C] backdrop-blur-xl border border-white/60 shadow-2xl shadow-glow rounded-xl sm:rounded-2xl p-4 xs:p-6 sm:p-8 md:p-10 transition-[transform,box-shadow] hover:shadow-glow hover:-translate-y-0.5 max-w-3xl lg:max-w-4xl">
         <div class="grid grid-cols-1 md:grid-cols-2 md:gap-x-10 gap-y-4">
-          <!-- COLUNA ESQUERDA -->
           <div class="col-esq">
             <label for="nome" class="font-semibold mb-1 block">Nome</label>
-            <input type="text" id="nome" name="nome" placeholder="Digite seu nome" required
-              class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm sm:text-base outline-none ring-0 focus:border-primaria focus:ring-4 focus:ring-primaria/20 transition" />
+            <input type="text" id="nome" name="nome" placeholder="Digite seu nome" required class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm sm:text-base outline-none ring-0 focus:border-primaria focus:ring-4 focus:ring-primaria/20 transition" />
 
             <label for="email" class="font-semibold mb-1 block mt-2">E-mail</label>
-            <input type="email" id="email" name="email" placeholder="Digite seu e-mail" required
-              class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm sm:text-base outline-none ring-0 focus:border-primaria focus:ring-4 focus:ring-primaria/20 transition" />
+            <input type="email" id="email" name="email" placeholder="Digite seu e-mail" required class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm sm:text-base outline-none ring-0 focus:border-primaria focus:ring-4 focus:ring-primaria/20 transition" />
 
             <label for="unidade" class="font-semibold mb-1 block mt-2">Selecione a unidade</label>
-            <select id="unidade" name="unidade" required
-              class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm sm:text-base outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20 transition">
+            <select id="unidade" name="unidade" required class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm sm:text-base outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20 transition">
               <option value="">Escolha uma unidade</option>
               <option value="1">Unidade 1</option>
               <option value="2">Unidade 2</option>
@@ -420,13 +195,11 @@
 
             <div id="prazoCampos" class="hidden mt-2">
               <label for="dataPrazo" class="font-semibold mb-1 block">Data e hora do prazo</label>
-              <input type="datetime-local" id="dataPrazo" name="dataPrazo"
-                class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm sm:text-base outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20 transition" />
+              <input type="datetime-local" id="dataPrazo" name="dataPrazo" class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm sm:text-base outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20 transition" />
             </div>
 
             <label for="urgencia" class="font-semibold mb-1 block mt-2">Grau de urgência</label>
-            <select id="urgencia" name="urgencia" required
-              class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm sm:text-base outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20 transition">
+            <select id="urgencia" name="urgencia" required class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm sm:text-base outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20 transition">
               <option value="">Selecione o grau</option>
               <option value="baixa">Baixa</option>
               <option value="media">Média</option>
@@ -435,11 +208,9 @@
             </select>
           </div>
 
-          <!-- COLUNA DIREITA -->
           <div class="col-dir md:pl-6 md:border-l md:border-white/40">
             <label for="tipo" class="font-semibold mb-1 block">Tipo</label>
-            <select id="tipo" name="tipo" required
-              class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm sm:text-base outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20 transition">
+            <select id="tipo" name="tipo" required class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm sm:text-base outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20 transition">
               <option value="">Selecione uma opção</option>
               <option value="servico">Serviço</option>
               <option value="produto">Produto</option>
@@ -447,8 +218,7 @@
 
             <div id="servicoCampos" class="hidden mt-2">
               <label for="descricaoServico" class="font-semibold mb-1 block">Descrição do serviço</label>
-              <textarea id="descricaoServico" name="descricaoServico" placeholder="Descreva o serviço a ser realizado"
-                class="w-full min-h-[90px] rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm sm:text-base outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20 transition resize-y"></textarea>
+              <textarea id="descricaoServico" name="descricaoServico" placeholder="Descreva o serviço a ser realizado" class="w-full min-h-[90px] rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm sm:text-base outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20 transition resize-y"></textarea>
 
               <p class="font-semibold mt-2">Tem alguém para indicar?</p>
               <div class="flex flex-wrap items-center gap-4 text-sm sm:text-base" id="temIndicacaoGroup">
@@ -462,20 +232,16 @@
 
               <div id="indicacaoQuem" class="hidden mt-2">
                 <label for="quemIndicar" class="font-semibold mb-1 block">Quem?</label>
-                <input type="text" id="quemIndicar" name="quemIndicar" placeholder="Nome e/ou contato da indicação"
-                  class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm sm:text-base outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20 transition" />
+                <input type="text" id="quemIndicar" name="quemIndicar" placeholder="Nome e/ou contato da indicação" class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm sm:text-base outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20 transition" />
               </div>
             </div>
 
             <div id="produtoCampos" class="hidden mt-2">
               <label for="nomeProduto" class="font-semibold mb-1 block">Produto (nome)</label>
-              <input type="text" id="nomeProduto" name="nomeProduto" placeholder="Ex.: Caneca, Banner..."
-                class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm sm:text-base outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20 transition" />
+              <input type="text" id="nomeProduto" name="nomeProduto" placeholder="Ex.: Caneca, Banner..." class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm sm:text-base outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20 transition" />
 
               <label for="quantidadeProduto" class="font-semibold mb-1 block mt-2">Quantidade</label>
-              <input type="number" id="quantidadeProduto" name="quantidadeProduto" min="1" step="1"
-                placeholder="Ex.: 100"
-                class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm sm:text-base outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20 transition" />
+              <input type="number" id="quantidadeProduto" name="quantidadeProduto" min="1" step="1" placeholder="Ex.: 100" class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm sm:text-base outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20 transition" />
 
               <p class="font-semibold mt-2">Tem algum link?</p>
               <div class="flex flex-wrap items-center gap-4 text-sm sm:text-base" id="temLinkGroup">
@@ -489,21 +255,16 @@
 
               <div id="linkCampos" class="hidden mt-2">
                 <div id="listaLinks" class="space-y-2"></div>
-                <button type="button"
-                  class="small-btn mt-2 inline-flex w-full xs:w-auto justify-center items-center gap-2 rounded-lg bg-white px-3 py-2 text-sm font-semibold shadow hover:-translate-y-0.5 hover:shadow-md active:translate-y-0 transition"
-                  id="adicionarLink">+ Adicionar outro link</button>
+                <button type="button" class="small-btn mt-2 inline-flex w-full xs:w-auto justify-center items-center gap-2 rounded-lg bg-white px-3 py-2 text-sm font-semibold shadow hover:-translate-y-0.5 hover:shadow-md active:translate-y-0 transition" id="adicionarLink">+ Adicionar outro link</button>
               </div>
             </div>
           </div>
         </div>
 
-        <button type="submit"
-          class="group mt-6 w-full rounded-xl bg-white text-black font-semibold px-5 py-3 shadow-lg shadow-primaria/30 ring-0 outline-none transition hover:-translate-y-0.5 hover:shadow-xl focus-visible:ring-4 focus-visible:ring-primaria/30">
+        <button type="submit" class="group mt-6 w-full rounded-xl bg-white text-black font-semibold px-5 py-3 shadow-lg shadow-primaria/30 ring-0 outline-none transition hover:-translate-y-0.5 hover:shadow-xl focus-visible:ring-4 focus-visible:ring-primaria/30">
           <span class="inline-flex items-center gap-2 justify-center">Enviar
-            <svg class="size-5 transition-transform group-hover:translate-x-0.5" xmlns="http://www.w3.org/2000/svg"
-              fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                d="M17.25 8.25L21 12l-3.75 3.75M21 12H3" />
+            <svg class="size-5 transition-transform group-hover:translate-x-0.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.25 8.25L21 12l-3.75 3.75M21 12H3" />
             </svg>
           </span>
         </button>
@@ -511,8 +272,9 @@
     </div>
   </main>
 
-  <!-- Firebase Auth + Checagem de Admin / Controle de login -->
+  <!-- ===== BLOCO: Firebase Auth + Níveis de Acesso ===== -->
   <script type="module">
+    // [SEÇÃO] SDK e Configuração
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
 
@@ -522,293 +284,121 @@
       projectId: "compras-icone",
       storageBucket: "compras-icone.firebasestorage.app",
       messagingSenderId: "831706842201",
-      appId: "1:831706842201:web:9b68ae4f98ad93c5a99d48",
+      appId: "1:831706842201:web:9b68ae4f98ad93c5a99d48"
     };
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    // =====================================================
-    // ESTADO GLOBAL COMPARTILHADO
-    // =====================================================
-    // (esses valores são lidos também pelo outro <script> abaixo)
+    // [SEÇÃO] Estado Global Compartilhado (visível ao script abaixo)
     window.isUserAuthed = false;
     window.currentUserEmail = null;
     window.currentUserName = null;
 
-    // =====================================================
-    // NÍVEIS DE ACESSO
-    // =====================================================
-    // adminCompras     -> só botão "Setor Compras"
-    // adminAprovacao   -> só botão "Admin"
-    // admSupremo       -> vê os dois
-    //
-    // Vamos carregar essas listas do JSON.
-    //
-    let ADMIN_COMPRAS_EMAILS = new Set(); // compra/financeiro
-    let ADMIN_APROVACAO_EMAILS = new Set(); // aprovação/admin
-    let ADMIN_SUPREMO_EMAILS = new Set(); // tudo
+    // [SEÇÃO] Listas de Admin (carregadas via JSON)
+    let ADMIN_COMPRAS_EMAILS = new Set();
+    let ADMIN_APROVACAO_EMAILS = new Set();
+    let ADMIN_SUPREMO_EMAILS = new Set();
 
     async function carregarAdmins() {
       try {
-        const resp = await fetch('../config/adminEmails.json', {
-          cache: 'no-cache'
-        });
-
-        if (!resp.ok) {
-          console.error('Não consegui carregar adminEmails.json', resp.status);
-          return;
-        }
-
+        const resp = await fetch('../config/adminEmails.json', { cache: 'no-cache' });
+        if (!resp.ok) return;
         const data = await resp.json();
-
-        ADMIN_APROVACAO_EMAILS = new Set(
-          (data.adminAprovacao || []).map(e => e.toLowerCase())
-        );
-
-        ADMIN_COMPRAS_EMAILS = new Set(
-          (data.adminCompras || []).map(e => e.toLowerCase())
-        );
-
-        ADMIN_SUPREMO_EMAILS = new Set(
-          (data.admSupremo || []).map(e => e.toLowerCase())
-        );
-      } catch (err) {
-        console.error('Erro buscando adminEmails.json:', err);
-      }
+        ADMIN_APROVACAO_EMAILS = new Set((data.adminAprovacao || []).map(e => e.toLowerCase()));
+        ADMIN_COMPRAS_EMAILS = new Set((data.adminCompras || []).map(e => e.toLowerCase()));
+        ADMIN_SUPREMO_EMAILS = new Set((data.admSupremo || []).map(e => e.toLowerCase()));
+      } catch (_) {}
     }
-
-    // carrega a lista de admins antes de seguir
     await carregarAdmins();
 
-    // =====================================================
-    // Elementos da UI (botões / anchors do header)
-    // =====================================================
+    // [SEÇÃO] Referências de UI
     const btnSair = document.getElementById('btnSair');
-
-    const btnAdminAprovacao = document.getElementById('btnAdminAprovacao'); // botão "Admin"
-    const btnSetorCompras = document.getElementById('btnSetorCompras');   // botão "Setor Compras"
-
+    const btnAdminAprovacao = document.getElementById('btnAdminAprovacao');
+    const btnSetorCompras = document.getElementById('btnSetorCompras');
     const hrefLogin = document.getElementById('hrefLogin');
     const hrefAdminAprovacao = document.getElementById('hrefAdminAprovacao');
     const hrefAdminCompras = document.getElementById('hrefAdminCompras');
     const btnDashboards = document.getElementById('btnDashboards');
     const hrefDashboards = document.getElementById('hrefDashboards');
 
-    // =====================================================
-    // Função global para preencher nome/e-mail no form
-    // - chamada quando loga
-    // - chamada depois que a gente limpa o formulário
-    // =====================================================
+    // [SEÇÃO] Preenchimento Automático de Nome/E-mail
     function preencherCamposUsuario() {
       const nomeEl = document.getElementById('nome');
       const emailEl = document.getElementById('email');
-
-      if (!window.isUserAuthed) {
-        // usuário não logado -> campo e-mail deve ficar editável e vazio
-        if (emailEl) {
-          emailEl.readOnly = false;
-        }
-        return;
-      }
-
-      // usuário logado -> nome e email automáticos
-      if (emailEl) {
-        emailEl.value = window.currentUserEmail || '';
-        emailEl.readOnly = true; // garante que o envio use SEMPRE o email logado
-      }
-
-      if (nomeEl && !nomeEl.value) {
-        nomeEl.value = window.currentUserName || '';
-      }
+      if (!window.isUserAuthed) { if (emailEl) emailEl.readOnly = false; return; }
+      if (emailEl) { emailEl.value = window.currentUserEmail || ''; emailEl.readOnly = true; }
+      if (nomeEl && !nomeEl.value) { nomeEl.value = window.currentUserName || ''; }
     }
-    // torna acessível no outro script
     window.preencherCamposUsuario = preencherCamposUsuario;
 
-    // =====================================================
-    // Botão "Sair"
-    // =====================================================
+    // [SEÇÃO] Ações do Header
     btnSair?.addEventListener('click', async (e) => {
       e.preventDefault();
-
-      try {
-        // 1. Sai do Firebase (Google, etc.)
-        await signOut(auth);
-      } catch (err) {
-        console.error('Erro ao sair do Firebase:', err);
-        // mesmo se der erro aqui, a gente continua limpando a sessão local
-      }
-
-      // 2. Limpa a sessão local usada pelo index.html
-      try {
-        localStorage.removeItem('sessionUser');
-      } catch (err) {
-        console.warn('Não consegui limpar sessionUser do localStorage:', err);
-      }
-
-      // 3. Atualiza flags globais dessa página
-      window.isUserAuthed = false;
-      window.currentUserEmail = null;
-      window.currentUserName = null;
-
-      // 4. Esconde botões de admin
+      try { await signOut(auth); } catch (_) {}
+      try { localStorage.removeItem('sessionUser'); } catch (_) {}
+      window.isUserAuthed = false; window.currentUserEmail = null; window.currentUserName = null;
       if (btnAdminAprovacao) btnAdminAprovacao.style.display = 'none';
       if (btnSetorCompras) btnSetorCompras.style.display = 'none';
       if (btnDashboards) btnDashboards.style.display = 'none';
-
-
-      // 5. Reconfigura campos do formulário (tira readOnly do e-mail etc.)
       preencherCamposUsuario();
-
-      // 6. Redireciona pra tela de login
-      if (hrefLogin) {
-        hrefLogin.click();
-      } else {
-        // garante caminho certo relativo
-        location.href = '../index.html';
-      }
+      if (hrefLogin) hrefLogin.click(); else location.href = '../index.html';
     });
 
-    // =====================================================
-    // Botão "Admin"
-    // =====================================================
-    btnAdminAprovacao?.addEventListener('click', (e) => {
-      e.preventDefault();
-      if (hrefAdminAprovacao) {
-        hrefAdminAprovacao.click();
-      } else {
-        location.href = '/admin/';
-      }
-    });
+    btnAdminAprovacao?.addEventListener('click', (e) => { e.preventDefault(); if (hrefAdminAprovacao) hrefAdminAprovacao.click(); else location.href = '/admin/'; });
+    btnDashboards?.addEventListener('click', (e) => { e.preventDefault(); if (hrefDashboards) hrefDashboards.click(); else location.href = '/dashboards/'; });
+    btnSetorCompras?.addEventListener('click', (e) => { e.preventDefault(); if (hrefAdminCompras) hrefAdminCompras.click(); else location.href = '/financeiro/'; });
 
-    // =====================================================
-    // Botão "Dashboards"
-    // =====================================================
-    btnDashboards?.addEventListener('click', (e) => {
-      e.preventDefault();
-      if (hrefDashboards) {
-        // usa o anchor oculto pra navegar
-        hrefDashboards.click();
-      } else {
-        // fallback direto
-        location.href = '/dashboards/';
-      }
-    });
-
-    // =====================================================
-    // Botão "Setor Compras"
-    // =====================================================
-    btnSetorCompras?.addEventListener('click', (e) => {
-      e.preventDefault();
-      if (hrefAdminCompras) {
-        hrefAdminCompras.click();
-      } else {
-        // rota dedicada ao painel financeiro/compras
-        location.href = '/financeiro/';
-      }
-    });
-
-    // =====================================================
-    // Verificação de login + nível de admin
-    // =====================================================
+    // [SEÇÃO] Login e Nível de Acesso
     onAuthStateChanged(auth, async (user) => {
-      // NÃO LOGADO
       if (!user) {
-        window.isUserAuthed = false;
-        window.currentUserEmail = null;
-        window.currentUserName = null;
-
-        // esconde botões de admin e dashboards
+        window.isUserAuthed = false; window.currentUserEmail = null; window.currentUserName = null;
         if (btnAdminAprovacao) btnAdminAprovacao.style.display = 'none';
-        if (btnSetorCompras)   btnSetorCompras.style.display   = 'none';
-        if (btnDashboards)     btnDashboards.style.display     = 'none';
-
-        // Prepara form (email editável e vazio)
+        if (btnSetorCompras) btnSetorCompras.style.display = 'none';
+        if (btnDashboards) btnDashboards.style.display = 'none';
         preencherCamposUsuario();
         return;
       }
-
-      // LOGADO
-      window.isUserAuthed = true;
-      window.currentUserEmail = user.email || '';
-      window.currentUserName = user.displayName || '';
-
-      // Preenche campos automáticos (nome/email no formulário)
+      window.isUserAuthed = true; window.currentUserEmail = user.email || ''; window.currentUserName = user.displayName || '';
       preencherCamposUsuario();
-
-      // Checa nível do usuário usando as listas carregadas
       const emailLower = (user.email || '').toLowerCase();
-
       const isAprovacao = ADMIN_APROVACAO_EMAILS.has(emailLower);
-      const isCompras   = ADMIN_COMPRAS_EMAILS.has(emailLower);
-      const isSupremo   = ADMIN_SUPREMO_EMAILS.has(emailLower);
-
-      // VISIBILIDADE:
-      // - adminCompras        -> "Setor Compras"
-      // - adminAprovacao      -> "Admin"
-      // - admSupremo          -> "Setor Compras" + "Admin" + "Dashboards"
-
-      if (btnAdminAprovacao) {
-        btnAdminAprovacao.style.display = (isSupremo || isAprovacao) ? 'inline-flex' : 'none';
-      }
-
-      if (btnSetorCompras) {
-        btnSetorCompras.style.display = (isSupremo || isCompras) ? 'inline-flex' : 'none';
-      }
-
-      // Dashboards -> SOMENTE admSupremo
-      if (btnDashboards) {
-        btnDashboards.style.display = isSupremo ? 'inline-flex' : 'none';
-      }
+      const isCompras = ADMIN_COMPRAS_EMAILS.has(emailLower);
+      const isSupremo = ADMIN_SUPREMO_EMAILS.has(emailLower);
+      if (btnAdminAprovacao) btnAdminAprovacao.style.display = (isSupremo || isAprovacao) ? 'inline-flex' : 'none';
+      if (btnSetorCompras) btnSetorCompras.style.display = (isSupremo || isCompras) ? 'inline-flex' : 'none';
+      if (btnDashboards) btnDashboards.style.display = isSupremo ? 'inline-flex' : 'none';
     });
-
   </script>
 
-
-  <!-- Lógica do formulário + envio para Google Sheets + menu dropdown -->
+  <!-- ===== BLOCO: Lógica do Formulário & Envio ===== -->
   <script>
+    // [SEÇÃO] Referências do Form
     const form = document.getElementById('formulario');
-
-    // Prazo
     const radiosPrazo = document.getElementsByName('prazo');
     const prazoCampos = document.getElementById('prazoCampos');
     const inputDataPrazo = document.getElementById('dataPrazo');
-
-    // Tipo
     const selectTipo = document.getElementById('tipo');
-
-    // Serviço
     const servicoCampos = document.getElementById('servicoCampos');
     const descricaoServico = document.getElementById('descricaoServico');
     const temIndicacaoGroup = document.getElementById('temIndicacaoGroup');
     const indicacaoQuem = document.getElementById('indicacaoQuem');
     const quemIndicar = document.getElementById('quemIndicar');
-
-    // Produto
     const produtoCampos = document.getElementById('produtoCampos');
     const nomeProduto = document.getElementById('nomeProduto');
     const quantidadeProduto = document.getElementById('quantidadeProduto');
-
-    // Links
     const temLinkGroup = document.getElementById('temLinkGroup');
     const linkCampos = document.getElementById('linkCampos');
     const listaLinks = document.getElementById('listaLinks');
     const btnAddLink = document.getElementById('adicionarLink');
-
-    // Menu
     const menuWrapper = document.getElementById('menuWrapper');
     const menuCheckbox = document.getElementById('menuCheckbox');
     const menuToggleLabel = document.getElementById('menuToggle');
 
-    let linkCount = 0;
-    const maxLinks = 3;
+    // [SEÇÃO] Estado Interno
+    let linkCount = 0; const maxLinks = 3; let isSubmitting = false;
 
-    // trava anti duplo-clique simultâneo
-    // OBS: agora vamos liberar o form logo após o clique,
-    // mas esse flag impede que o MESMO envio dispare várias vezes rapidamente.
-    let isSubmitting = false;
-
-    // Toast helper
+    // [SEÇÃO] Toast Utilitário
     function toast(msg, type = 'info') {
       const isSuccess = type === 'success';
       const isError = type === 'error';
@@ -820,269 +410,119 @@
         position: "right",
         stopOnFocus: true,
         style: {
-          background: isSuccess
-            ? "linear-gradient(90deg,#16a34a,#22c55e)"
-            : isError
-              ? "linear-gradient(90deg,#dc2626,#ef4444)"
-              : "linear-gradient(90deg,#334155,#64748b)",
+          background: isSuccess ? "linear-gradient(90deg,#16a34a,#22c55e)" : isError ? "linear-gradient(90deg,#dc2626,#ef4444)" : "linear-gradient(90deg,#334155,#64748b)",
           color: "#ffffff",
           fontWeight: "600",
           boxShadow: "0 10px 25px -10px rgba(0,0,0,.35)",
           borderRadius: "10px",
-          padding: "10px 16px",
+          padding: "10px 16px"
         },
-        offset: { x: 8, y: 10 },
+        offset: { x: 8, y: 10 }
       }).showToast();
     }
 
-    function atualizarBotaoAddLink() {
-      if (!btnAddLink) return;
-      btnAddLink.style.display = linkCount >= maxLinks ? "none" : "inline-flex";
-    }
-
+    // [SEÇÃO] Links Dinâmicos
+    function atualizarBotaoAddLink() { if (!btnAddLink) return; btnAddLink.style.display = linkCount >= maxLinks ? "none" : "inline-flex"; }
+    function atualizarPlaceholders() { const inputs = listaLinks.querySelectorAll('input[type="url"]'); inputs.forEach((i, idx) => i.placeholder = `Cole o link ${idx + 1}`); }
     function criarCampoLink() {
       linkCount++;
       const div = document.createElement('div');
       div.className = 'flex items-center gap-2';
-
       if (linkCount === 1) {
         div.innerHTML = `<input type="url" name="linkProduto${linkCount}" placeholder="Cole o link ${linkCount}" required class="flex-1 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm sm:text-base outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20 transition"/>`;
       } else {
         div.innerHTML = `
-        <input type="url" name="linkProduto${linkCount}" placeholder="Cole o link ${linkCount}" required class="flex-1 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm sm:text-base outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20 transition"/>
-        <button type="button" class="grid place-items-center rounded-full w-7 h-7 bg-white text-primaria border border-primaria/30 shadow hover:scale-105 active:scale-100 transition remove-link" aria-label="Remover link">&times;</button>
-      `;
-        div.querySelector('.remove-link').addEventListener('click', () => {
-          div.remove();
-          linkCount--;
-          atualizarBotaoAddLink();
-          atualizarPlaceholders();
-        });
+          <input type="url" name="linkProduto${linkCount}" placeholder="Cole o link ${linkCount}" required class="flex-1 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm sm:text-base outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20 transition"/>
+          <button type="button" class="grid place-items-center rounded-full w-7 h-7 bg-white text-primaria border border-primaria/30 shadow hover:scale-105 active:scale-100 transition remove-link" aria-label="Remover link">&times;</button>
+        `;
+        div.querySelector('.remove-link').addEventListener('click', () => { div.remove(); linkCount--; atualizarBotaoAddLink(); atualizarPlaceholders(); });
       }
       listaLinks.appendChild(div);
       atualizarBotaoAddLink();
     }
 
-    function atualizarPlaceholders() {
-      const inputs = listaLinks.querySelectorAll('input[type="url"]');
-      inputs.forEach((input, index) => input.placeholder = `Cole o link ${index + 1}`);
-    }
-
-    btnAddLink?.addEventListener('click', () => {
-      if (linkCount < maxLinks) {
-        criarCampoLink();
-        atualizarPlaceholders();
-      }
-    });
-
+    // [SEÇÃO] Trocas de UI (Prazo/Tipo/Indicação/Link)
     function atualizarPrazo() {
       const selecionado = [...radiosPrazo].find(r => r.checked)?.value;
-      if (selecionado === 'sim') {
-        prazoCampos.classList.remove('hidden');
-        inputDataPrazo.required = true;
-      } else {
-        prazoCampos.classList.add('hidden');
-        inputDataPrazo.required = false;
-        inputDataPrazo.value = '';
-      }
+      if (selecionado === 'sim') { prazoCampos.classList.remove('hidden'); inputDataPrazo.required = true; }
+      else { prazoCampos.classList.add('hidden'); inputDataPrazo.required = false; inputDataPrazo.value = ''; }
     }
-    radiosPrazo.forEach(r => r.addEventListener('change', atualizarPrazo));
-    atualizarPrazo();
-
     function atualizarTipo() {
       if (selectTipo.value === 'servico') {
-        servicoCampos.classList.remove('hidden');
-        descricaoServico.required = true;
-
-        produtoCampos.classList.add('hidden');
-        nomeProduto.required = false; nomeProduto.value = '';
-        quantidadeProduto.required = false; quantidadeProduto.value = '';
-
-        document.querySelector('input[name="temLink"][value="nao"]').checked = true;
-        linkCampos.classList.add('hidden');
-        listaLinks.innerHTML = ''; linkCount = 0; atualizarBotaoAddLink();
-
+        servicoCampos.classList.remove('hidden'); descricaoServico.required = true;
+        produtoCampos.classList.add('hidden'); nomeProduto.required = false; nomeProduto.value = ''; quantidadeProduto.required = false; quantidadeProduto.value = '';
+        document.querySelector('input[name="temLink"][value="nao"]').checked = true; linkCampos.classList.add('hidden'); listaLinks.innerHTML = ''; linkCount = 0; atualizarBotaoAddLink();
       } else if (selectTipo.value === 'produto') {
-        produtoCampos.classList.remove('hidden');
-        nomeProduto.required = true;
-        quantidadeProduto.required = true;
-
-        servicoCampos.classList.add('hidden');
-        descricaoServico.required = false; descricaoServico.value = '';
-
-        document.querySelector('input[name="temIndicacao"][value="nao"]').checked = true;
-        indicacaoQuem.classList.add('hidden');
-        quemIndicar.required = false; quemIndicar.value = '';
-
-      } else {
-        servicoCampos.classList.add('hidden');
-        produtoCampos.classList.add('hidden');
-      }
+        produtoCampos.classList.remove('hidden'); nomeProduto.required = true; quantidadeProduto.required = true;
+        servicoCampos.classList.add('hidden'); descricaoServico.required = false; descricaoServico.value = '';
+        document.querySelector('input[name="temIndicacao"][value="nao"]').checked = true; indicacaoQuem.classList.add('hidden'); quemIndicar.required = false; quemIndicar.value = '';
+      } else { servicoCampos.classList.add('hidden'); produtoCampos.classList.add('hidden'); }
     }
-    selectTipo.addEventListener('change', atualizarTipo);
-    atualizarTipo();
-
     function atualizarIndicacao() {
       const temIndicacao = document.querySelector('input[name="temIndicacao"]:checked')?.value;
-      if (temIndicacao === 'sim') {
-        indicacaoQuem.classList.remove('hidden');
-        // se quiser tornar obrigatório, mude aqui:
-        quemIndicar.required = false;
-      } else {
-        indicacaoQuem.classList.add('hidden');
-        quemIndicar.required = false;
-        quemIndicar.value = '';
-      }
+      if (temIndicacao === 'sim') { indicacaoQuem.classList.remove('hidden'); quemIndicar.required = false; }
+      else { indicacaoQuem.classList.add('hidden'); quemIndicar.required = false; quemIndicar.value = ''; }
     }
-    temIndicacaoGroup.addEventListener('change', atualizarIndicacao);
-
     function atualizarLink() {
       const temLink = document.querySelector('input[name="temLink"]:checked')?.value;
-      if (temLink === 'sim') {
-        linkCampos.classList.remove('hidden');
-        if (linkCount === 0) criarCampoLink();
-      } else {
-        linkCampos.classList.add('hidden');
-        listaLinks.innerHTML = '';
-        linkCount = 0;
-        atualizarBotaoAddLink();
-      }
+      if (temLink === 'sim') { linkCampos.classList.remove('hidden'); if (linkCount === 0) criarCampoLink(); }
+      else { linkCampos.classList.add('hidden'); listaLinks.innerHTML = ''; linkCount = 0; atualizarBotaoAddLink(); }
     }
+
+    radiosPrazo.forEach(r => r.addEventListener('change', atualizarPrazo)); atualizarPrazo();
+    selectTipo.addEventListener('change', atualizarTipo); atualizarTipo();
+    temIndicacaoGroup.addEventListener('change', atualizarIndicacao);
     temLinkGroup.addEventListener('change', atualizarLink);
+    btnAddLink?.addEventListener('click', () => { if (linkCount < maxLinks) { criarCampoLink(); atualizarPlaceholders(); } });
 
-    // ======== INTEGRAÇÃO COM GOOGLE SHEETS (Apps Script) ========
-    // valor começa vazio e vai ser preenchido via fetch do JSON de config
+    // [SEÇÃO] Backend (Google Apps Script via URL do config)
     let WEBAPP_URL = '';
-
     async function carregarConfigBackend() {
       try {
-        const resp = await fetch('../config/appConfig.json', {
-          cache: 'no-cache'
-        });
-
-        if (!resp.ok) {
-          console.error('Não consegui carregar appConfig.json', resp.status);
-          return;
-        }
-
+        const resp = await fetch('../config/appConfig.json', { cache: 'no-cache' });
+        if (!resp.ok) return;
         const data = await resp.json();
         WEBAPP_URL = data.WEBAPP_URL || '';
-        if (!WEBAPP_URL) {
-          console.error('WEBAPP_URL não veio no JSON.');
-        }
-      } catch (err) {
-        console.error('Erro buscando appConfig.json:', err);
-      }
+      } catch (_) {}
     }
-
-    // dispara logo que o script carrega
     carregarConfigBackend();
 
-    function coletarLinks() {
-      const inputs = listaLinks.querySelectorAll('input[type="url"]');
-      const arr = [];
-      inputs.forEach(i => {
-        const v = i.value.trim();
-        if (v) arr.push(v);
-      });
-      return arr;
-    }
-
-    // Função que zera o formulário VISUALMENTE logo após o clique em "Enviar"
-    // -> comportamento otimista: já parece que deu certo
+    // [SEÇÃO] Coleta & Reset de UI
+    function coletarLinks() { const inputs = listaLinks.querySelectorAll('input[type="url"]'); const arr = []; inputs.forEach(i => { const v = i.value.trim(); if (v) arr.push(v); }); return arr; }
     function resetarUIPosEnvioOtimista() {
-      // limpa campos do form
       form.reset();
-
-      // limpa links extras
-      linkCount = 0;
-      listaLinks.innerHTML = '';
-      atualizarBotaoAddLink();
-
-      // volta pros defaults visuais
+      linkCount = 0; listaLinks.innerHTML = ''; atualizarBotaoAddLink();
       const prazoNao = document.querySelector('input[name="prazo"][value="nao"]');
       const indicacaoNao = document.querySelector('input[name="temIndicacao"][value="nao"]');
       const temLinkNao = document.querySelector('input[name="temLink"][value="nao"]');
-
-      if (prazoNao) prazoNao.checked = true;
-      if (indicacaoNao) indicacaoNao.checked = true;
-      if (temLinkNao) temLinkNao.checked = true;
-
-      atualizarPrazo();
-      atualizarTipo();
-      atualizarIndicacao();
-      atualizarLink();
-
-      // re-preencher nome/email do usuário logado
-      if (typeof window.preencherCamposUsuario === 'function') {
-        window.preencherCamposUsuario();
-      }
+      if (prazoNao) prazoNao.checked = true; if (indicacaoNao) indicacaoNao.checked = true; if (temLinkNao) temLinkNao.checked = true;
+      atualizarPrazo(); atualizarTipo(); atualizarIndicacao(); atualizarLink();
+      if (typeof window.preencherCamposUsuario === 'function') window.preencherCamposUsuario();
     }
 
-    // Função que realmente envia pro Apps Script / Planilha
-    // Retorna true/false indicando se aparentemente deu certo
+    // [SEÇÃO] Envio ao Backend
     async function enviarParaPlanilha(payload) {
       const body = new URLSearchParams(payload);
-
-      let ok = false;
-      let parseOk = false;
-
-      // segurança extra: se por algum motivo a config não carregou ainda
-      if (!WEBAPP_URL) {
-        console.error('WEBAPP_URL ainda não carregada, não posso enviar.');
-        return false;
-      }
-
+      let ok = false; let parseOk = false;
+      if (!WEBAPP_URL) return false;
       try {
-        const resp = await fetch(WEBAPP_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
-          body
-        });
-
-        if (resp.type === 'opaque') {
-          ok = true;
-        } else {
-          let data = null;
-          try { data = await resp.json(); parseOk = true; } catch (_) { }
+        const resp = await fetch(WEBAPP_URL, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }, body });
+        if (resp.type === 'opaque') ok = true; else {
+          let data = null; try { data = await resp.json(); parseOk = true; } catch (_) {}
           ok = resp.ok && (parseOk ? (data?.ok !== false) : true);
         }
-      } catch (networkErr) {
-        try {
-          await fetch(WEBAPP_URL, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
-            body
-          });
-          ok = true;
-        } catch (_) {
-          ok = false;
-        }
+      } catch (_) {
+        try { await fetch(WEBAPP_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }, body }); ok = true; } catch (_) { ok = false; }
       }
-
       return ok;
     }
 
-    // SUBMIT DO FORM
-    // UI OTIMISTA
+    // [SEÇÃO] Submit do Form (UX Otimista + validações)
     form.addEventListener('submit', async function (e) {
       e.preventDefault();
-
-      // BLOQUEIO SE NÃO LOGADO
-      if (!window.isUserAuthed) {
-        toast('Você precisa estar logado para enviar.', 'error');
-        return;
-      }
-
-      // BLOQUEIO SE A URL DO BACKEND AINDA NÃO CHEGOU
-      if (!WEBAPP_URL) {
-        toast('Conectando ao setor de compras... tente novamente em 1 segundo.', 'error');
-        return;
-      }
-
-      if (isSubmitting) return; // evita múltiplos envios simultâneos do MESMO clique
-      isSubmitting = true;
+      if (!window.isUserAuthed) { toast('Você precisa estar logado para enviar.', 'error'); return; }
+      if (!WEBAPP_URL) { toast('Conectando ao setor de compras... tente novamente em 1 segundo.', 'error'); return; }
+      if (isSubmitting) return; isSubmitting = true;
 
       const nome = document.getElementById('nome').value.trim();
       const email = document.getElementById('email').value.trim();
@@ -1092,42 +532,20 @@
       const dataPrazo = inputDataPrazo.value;
       const tipo = selectTipo.value;
 
-      // Validações básicas antes de montar payload
-      if (!nome || !email || !unidade || !urgencia || !tipo) {
-        toast('Preencha todos os campos obrigatórios.', 'error');
-        isSubmitting = false;
-        return;
-      }
-      if (prazoSelecionado === 'sim' && !dataPrazo) {
-        toast('Por favor, selecione a data e hora do prazo.', 'error');
-        isSubmitting = false;
-        return;
-      }
-      if (tipo === 'servico' && !descricaoServico.value.trim()) {
-        toast('Descreva o serviço.', 'error');
-        isSubmitting = false;
-        return;
-      }
+      if (!nome || !email || !unidade || !urgencia || !tipo) { toast('Preencha todos os campos obrigatórios.', 'error'); isSubmitting = false; return; }
+      if (prazoSelecionado === 'sim' && !dataPrazo) { toast('Por favor, selecione a data e hora do prazo.', 'error'); isSubmitting = false; return; }
+      if (tipo === 'servico' && !descricaoServico.value.trim()) { toast('Descreva o serviço.', 'error'); isSubmitting = false; return; }
       if (tipo === 'produto') {
-        if (!nomeProduto.value.trim()) {
-          toast('Informe o nome do produto.', 'error');
-          isSubmitting = false;
-          return;
-        }
-        if (!quantidadeProduto.value || Number(quantidadeProduto.value) < 1) {
-          toast('Informe a quantidade (mínimo 1).', 'error');
-          isSubmitting = false;
-          return;
-        }
+        if (!nomeProduto.value.trim()) { toast('Informe o nome do produto.', 'error'); isSubmitting = false; return; }
+        if (!quantidadeProduto.value || Number(quantidadeProduto.value) < 1) { toast('Informe a quantidade (mínimo 1).', 'error'); isSubmitting = false; return; }
       }
 
-      // Monta payload para enviar pro Apps Script
       const payload = {
         nome,
         email,
         unidade,
         prazo: prazoSelecionado,
-        dataPrazo, // "YYYY-MM-DDTHH:mm"
+        dataPrazo,
         urgencia,
         tipo,
         descricaoServico: (tipo === 'servico') ? (descricaoServico.value.trim() || '') : '',
@@ -1135,71 +553,24 @@
         quemIndicar: (tipo === 'servico') ? (quemIndicar.value.trim() || '') : '',
         nomeProduto: (tipo === 'produto') ? (nomeProduto.value.trim() || '') : '',
         quantidadeProduto: (tipo === 'produto') ? (quantidadeProduto.value || '') : '',
-        links: (tipo === 'produto' && document.querySelector('input[name="temLink"]:checked')?.value === 'sim')
-          ? JSON.stringify(coletarLinks())
-          : JSON.stringify([])
+        links: (tipo === 'produto' && document.querySelector('input[name="temLink"]:checked')?.value === 'sim') ? JSON.stringify(coletarLinks()) : JSON.stringify([])
       };
 
-      // ID único por envio (idempotência no servidor)
-      payload.submissionId = (
-        crypto.randomUUID
-          ? crypto.randomUUID()
-          : String(Date.now()) + Math.random().toString(16).slice(2)
-      );
+      payload.submissionId = (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2));
 
-      // ✅ UX OTIMISTA:
       toast('Pedido enviado com sucesso!', 'success');
-
-      // limpa o formulário e volta pro estado inicial logo após o clique
       resetarUIPosEnvioOtimista();
-
-      // libera pra próxima solicitação IMEDIATAMENTE
       isSubmitting = false;
 
-      // Agora tentamos realmente enviar pro backend/planilha
       const ok = await enviarParaPlanilha(payload);
-
-      if (!ok) {
-        console.error('Falha ao enviar pedido (fetch retornou erro).');
-        // Se der erro depois do feedback otimista, avisamos:
-        toast('Erro ao enviar. Tente novamente.', 'error');
-      }
+      if (!ok) { toast('Erro ao enviar. Tente novamente.', 'error'); }
     });
 
-    // ===== Toggle do menu hambúrguer =====
-    // Agora o open/close visual é controlado pelo checkbox CSS.
-    // Abaixo só fechamos quando clica fora ou redimensiona,
-    // e mantemos aria-expanded atualizado.
-    function closeMenu() {
-      if (menuCheckbox.checked) {
-        menuCheckbox.checked = false;
-        if (menuToggleLabel) {
-          menuToggleLabel.setAttribute('aria-expanded', 'false');
-        }
-      }
-    }
-
-    // Atualiza aria-expanded quando clicamos no botão
-    menuToggleLabel?.addEventListener('click', () => {
-      // esperar o checkbox atualizar
-      setTimeout(() => {
-        menuToggleLabel.setAttribute('aria-expanded', String(menuCheckbox.checked));
-      }, 0);
-    });
-
-    // Fecha ao clicar fora
-    document.addEventListener('click', (e) => {
-      if (!menuWrapper.contains(e.target)) {
-        closeMenu();
-      }
-    });
-
-    // Fecha ao mudar tamanho da janela (evita ficar preso aberto)
-    window.addEventListener('resize', () => {
-      closeMenu();
-    });
+    // [SEÇÃO] Acessibilidade Menu (fechar ao clicar fora/resize)
+    function closeMenu() { if (menuCheckbox.checked) { menuCheckbox.checked = false; if (menuToggleLabel) menuToggleLabel.setAttribute('aria-expanded', 'false'); } }
+    menuToggleLabel?.addEventListener('click', () => { setTimeout(() => { menuToggleLabel.setAttribute('aria-expanded', String(menuCheckbox.checked)); }, 0); });
+    document.addEventListener('click', (e) => { if (!menuWrapper.contains(e.target)) closeMenu(); });
+    window.addEventListener('resize', () => { closeMenu(); });
   </script>
-
 </body>
-
 </html>

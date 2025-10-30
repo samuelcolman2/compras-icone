@@ -1,491 +1,188 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Admin • Aprovação de Compras</title>
 
-  <!-- Fonte + Tailwind -->
+  <!-- ===== BLOCO: Fontes, Tailwind, Toastify, Favicon ===== -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Toastify -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
   <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-
-  <link rel="shortcut icon"
-    href="https://storage.googleapis.com/ecdt-logo-saida/1ebe52af502e25d3521cb9dad62bb72f6bc1c347353cdda5fa381ef8627a9eb8/COLEGIO-E-CURSO-ICONE.webp"
-    type="image/x-icon">
-
+  <link rel="shortcut icon" href="https://storage.googleapis.com/ecdt-logo-saida/1ebe52af502e25d3521cb9dad62bb72f6bc1c347353cdda5fa381ef8627a9eb8/COLEGIO-E-CURSO-ICONE.webp" type="image/x-icon">
   <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: { primaria: '#F1663C' },
-          boxShadow: { glow: '0 0 0 3px rgba(241,102,60,0.15), 0 10px 25px -5px rgba(0,0,0,0.25)' },
-          screens: { xs: '380px' }
-        }
-      }
-    }
+    tailwind.config = { theme:{ extend:{ colors:{ primaria:'#F1663C' }, boxShadow:{ glow:'0 0 0 3px rgba(241,102,60,0.15), 0 10px 25px -5px rgba(0,0,0,0.25)' }, screens:{ xs:'380px' } } } }
   </script>
 
+  <!-- ===== BLOCO: CSS ===== -->
   <style>
-    html {
-      scroll-behavior: smooth;
+    html{scroll-behavior:smooth}
+    body{font-family:'Poppins',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+
+    :root{
+      --brand:#F1663C; --white:#FFFFFF;
+      --cantina-primary:#FD7F08; --cantina-secondary:#253237; --cantina-text:#FD7F08; --cantina-border:#e2e8f0;
     }
 
-    body {
-      font-family: 'Poppins', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    /* ===== NAVBAR: base ===== */
+    nav.cantina-nav{position:sticky;top:0;z-index:50;background:var(--cantina-secondary);border-bottom:3px solid var(--cantina-primary);color:var(--cantina-text);font-family:'Poppins',system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji"}
+    nav.cantina-nav .cantina-container{max-width:min(98vw,1400px);margin:0 auto;padding:0 12px;height:96px;display:flex;align-items:center;justify-content:space-between}
+    nav.cantina-nav a{display:flex;align-items:center;text-decoration:none}
+    nav.cantina-nav img{height:64px;width:auto}
+    nav.cantina-nav .brand{display:flex;align-items:center;gap:12px;color:var(--cantina-text);height:100%}
+    nav.cantina-nav .brand .divider{width:2px;height:70%;align-self:center;background:var(--cantina-primary);border-radius:2px}
+    nav.cantina-nav .brand .title{font-weight:800;letter-spacing:.5px;font-size:clamp(18px,3.8vw,32px);line-height:1.15;white-space:normal;word-break:keep-all;color:var(--cantina-text);text-transform:uppercase}
+
+    /* ===== NAVBAR: hambúrguer (checkbox + label) ===== */
+    nav.cantina-nav .menu-wrapper{position:relative;display:inline-block}
+    nav.cantina-nav .menu-checkbox{position:absolute;opacity:0;pointer-events:none}
+    nav.cantina-nav .menu-button{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:10px;cursor:pointer;user-select:none;background-color:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.18);transition:background-color .15s ease,transform .15s ease,box-shadow .15s ease}
+    nav.cantina-nav .menu-button:hover{background-color:rgba(255,255,255,.12);box-shadow:0 2px 10px rgba(2,8,23,.5)}
+    nav.cantina-nav .menu-button:active{transform:scale(.96)}
+    nav.cantina-nav .menu-button:focus-visible{outline:2px solid var(--cantina-primary);outline-offset:2px}
+    nav.cantina-nav .icon{width:24px;height:24px;stroke:#fff}
+    nav.cantina-nav .icon-menu{display:block}
+    nav.cantina-nav .icon-close{display:none}
+    nav.cantina-nav .menu-checkbox:checked+label .icon-menu{display:none}
+    nav.cantina-nav .menu-checkbox:checked+label .icon-close{display:block}
+
+    /* ===== NAVBAR: dropdown ===== */
+    nav.cantina-nav .actions{position:absolute;top:calc(100% + 8px);right:0;z-index:60;display:none;flex-direction:column;gap:6px;background:#ffffff;border:1px solid var(--cantina-border);border-radius:12px;padding:10px;width:min(78vw,280px);box-shadow:0 12px 30px rgba(2,8,23,.18)}
+    nav.cantina-nav .menu-checkbox:checked~.actions{display:flex}
+    nav.cantina-nav .btn{display:inline-flex;align-items:center;gap:6px;padding:10px 12px;border-radius:12px;border:1px solid var(--cantina-border);background:#fff;color:#000;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease;font-weight:600}
+    nav.cantina-nav .btn:hover{transform:translateY(-1px);box-shadow:0 2px 10px rgba(2,8,23,.06)}
+    nav.cantina-nav .btn svg{width:18px;height:18px}
+    nav.cantina-nav .email{color:#0f172a;font-size:12px;line-height:1.2;padding:6px 10px;border-radius:10px;background:#f8fafc;border:1px solid #e2e8f0;max-width:100%;white-space:normal;word-break:break-word}
+
+    /* ===== NAVBAR: responsivo ===== */
+    @media (max-width:640px){
+      nav.cantina-nav .cantina-container{height:72px;position:relative}
+      nav.cantina-nav img{height:48px}
+      nav.cantina-nav .brand{flex:1;min-width:0}
+      nav.cantina-nav .menu-button{width:40px;height:40px;border-radius:10px}
+      nav.cantina-nav .icon{width:20px;height:20px}
+      nav.cantina-nav .actions{width:min(78vw,280px)}
     }
+    @media (max-width:400px){nav.cantina-nav .brand .title{font-size:clamp(16px,5vw,22px)}}
 
-    :root {
-      --brand: #F1663C;
-      --white: #FFFFFF;
+    /* ===== UI utilitários ===== */
+    .badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:9999px;font-size:12px;font-weight:600;border-width:1px}
+    #toggleNoJustify.active{background-color:#F1663C}
+    #toggleNoJustify.active span{transform:translateX(1.25rem)}
+    .tab-btn{border-radius:.5rem;padding:.375rem .75rem;font-size:.875rem;font-weight:600;border:1px solid;transition:all .2s ease}
+    .tab-active{background:#fff;color:#0f172a;border-color:#fff;box-shadow:0 8px 16px -8px rgba(0,0,0,.25)}
+    .tab-idle{background:rgba(255,255,255,.7);color:#475569;border-color:rgba(255,255,255,.6)}
+    .tab-idle:hover{background:#fff}
 
-      --cantina-primary: #FD7F08;
-      --cantina-secondary: #253237;
-      --cantina-text: #FD7F08;
-      --cantina-border: #e2e8f0;
-    }
+    /* ===== Tabela ===== */
+    .grid-table{border-collapse:separate;border-spacing:0;background-color:#f8fafc;width:100%;table-layout:fixed}
+    .grid-table thead th{background-color:rgba(255,255,255,.85);backdrop-filter:saturate(1.2)}
+    .grid-table th,.grid-table td{border-right:1px solid #e2e8f0;border-bottom:1px solid #e2e8f0;overflow:hidden;text-overflow:ellipsis;vertical-align:top}
+    .grid-table tr>*:first-child{border-left:1px solid #e2e8f0}
+    .grid-table thead tr:first-child th{border-top:1px solid #e2e8f0}
+    .grid-table tbody tr:hover td{background-color:#f1f5f9}
+    .grid-table th.p-3,.grid-table td.p-3{padding:.5rem .5rem}
+    .grid-table td.col-solicitante{width:200px}
+    .grid-table td.col-detalhes{width:280px}
+    .grid-table td.col-status{width:160px}
 
-    nav.cantina-nav {
-      position: sticky;
-      top: 0;
-      z-index: 50;
-      background: var(--cantina-secondary);
-      border-bottom: 3px solid var(--cantina-primary);
-      color: var(--cantina-text);
-      font-family: 'Poppins', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
-    }
+    /* ===== Clamps e scroll ===== */
+    .clamp-2,.clamp-3,.clamp-4{display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word}
+    .clamp-2{-webkit-line-clamp:2}
+    .clamp-3{-webkit-line-clamp:3}
+    .clamp-4{-webkit-line-clamp:4}
+    .scroll-3{display:block;line-height:1.35;max-height:calc(3 * 1.35em);overflow-y:auto;word-break:break-word;scrollbar-width:thin;scrollbar-color:#cbd5e1 transparent}
+    .scroll-3::-webkit-scrollbar{width:6px}
+    .scroll-3::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:8px}
+    .scroll-3:hover::-webkit-scrollbar-thumb{background:#94a3b8}
 
-    nav.cantina-nav .cantina-container {
-      max-width: min(98vw, 1400px);
-      margin: 0 auto;
-      padding: 0 12px;
-      height: 96px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
+    /* ===== Popover ===== */
+    .__pop{position:fixed;z-index:60;max-width:min(92vw,480px);width:min(92vw,480px)}
 
-    nav.cantina-nav a {
-      display: flex;
-      align-items: center;
-      text-decoration: none;
-    }
+    /* ===== Ações rápidas (✓ e ✕) ===== */
+    .grid-table td.col-acoes{position:relative;overflow:visible;width:72px}
+    .action-btn{display:inline-flex;align-items:center;justify-content:center;width:32px;height:30px;border:1px solid #e2e8f0;border-radius:10px;background:#fff;font-weight:600;font-size:14px;line-height:1;box-shadow:0 1px 2px rgba(0,0,0,.05);transition:transform .15s ease,box-shadow .15s ease}
+    .action-btn:hover{transform:translateY(-1px);box-shadow:0 6px 14px rgba(2,8,23,.10)}
+    .action-btn.aprovar{color:#15803d}
+    .action-btn.reprovar{color:#b91c1c}
 
-    nav.cantina-nav img {
-      height: 64px;
-      width: auto;
-    }
-
-    nav.cantina-nav .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      color: var(--cantina-text);
-      height: 100%;
-    }
-
-    nav.cantina-nav .brand .divider {
-      width: 2px;
-      height: 70%;
-      align-self: center;
-      background: var(--cantina-primary);
-      border-radius: 2px;
-    }
-
-    nav.cantina-nav .brand .title {
-      font-weight: 800;
-      letter-spacing: .5px;
-      font-size: clamp(18px, 3.8vw, 32px);
-      line-height: 1.15;
-      white-space: normal;
-      word-break: keep-all;
-      color: var(--cantina-text);
-      text-transform: uppercase;
-    }
-
-    nav.cantina-nav .actions {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-
-    nav.cantina-nav .btn {
-      padding: 10px 12px;
-      border-radius: 12px;
-      border: 1px solid var(--cantina-border);
-      background: #fff;
-      color: #000;
-      cursor: pointer;
-      transition: transform .15s ease, box-shadow .15s ease;
-      font-weight: 600;
-    }
-
-    nav.cantina-nav .btn:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 2px 10px rgba(2, 8, 23, .06);
-    }
-
-    nav.cantina-nav .menu-toggle {
-      display: none;
-      border: 1px solid var(--cantina-border);
-      background: #fff;
-      color: #000;
-      border-radius: 10px;
-      padding: 8px;
-      cursor: pointer;
-    }
-
-    nav.cantina-nav .menu-toggle:focus-visible,
-    nav.cantina-nav .btn:focus-visible {
-      outline: 2px solid var(--cantina-primary);
-      outline-offset: 2px;
-    }
-
-    nav.cantina-nav .email {
-      color: #e2e8f0;
-      font-size: 12px;
-      line-height: 1.2;
-      padding: 6px 10px;
-      border-radius: 10px;
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(226, 232, 240, 0.18);
-      max-width: 52ch;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    @media (max-width: 640px) {
-      nav.cantina-nav .cantina-container {
-        height: 72px;
-        position: relative;
-      }
-
-      nav.cantina-nav img {
-        height: 48px;
-      }
-
-      nav.cantina-nav .brand {
-        flex: 1;
-        min-width: 0;
-      }
-
-      nav.cantina-nav .menu-toggle {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 40px;
-        height: 40px;
-        padding: 6px;
-        border-radius: 10px;
-      }
-
-      nav.cantina-nav .menu-toggle svg {
-        width: 18px;
-        height: 18px;
-      }
-
-      nav.cantina-nav .actions {
-        position: absolute;
-        right: 12px;
-        top: calc(100% + 8px);
-        z-index: 60;
-        display: none;
-        flex-direction: column;
-        gap: 6px;
-        background: #ffffff;
-        border: 1px solid var(--cantina-border);
-        border-radius: 12px;
-        padding: 10px;
-        width: min(78vw, 280px);
-        box-shadow: 0 12px 30px rgba(2, 8, 23, .18);
-      }
-
-      nav.cantina-nav .actions.open {
-        display: flex;
-      }
-
-      nav.cantina-nav .actions .btn {
-        width: 100%;
-        justify-content: center;
-      }
-
-      nav.cantina-nav .actions .email {
-        color: #0f172a;
-        background: #f8fafc;
-        border-color: #e2e8f0;
-        max-width: 100%;
-        white-space: normal;
-        word-break: break-word;
-      }
-    }
-
-    @media (max-width: 400px) {
-      nav.cantina-nav .brand .title {
-        font-size: clamp(16px, 5vw, 22px);
-      }
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      padding: 2px 8px;
-      border-radius: 9999px;
-      font-size: 12px;
-      font-weight: 600;
-      border-width: 1px;
-    }
-
-    #toggleNoJustify.active {
-      background-color: #F1663C;
-    }
-
-    #toggleNoJustify.active span {
-      transform: translateX(1.25rem);
-    }
-
-    .tab-btn {
-      border-radius: 0.5rem;
-      padding: 0.375rem 0.75rem;
-      font-size: 0.875rem;
-      font-weight: 600;
-      border: 1px solid;
-      transition: all .2s ease;
-    }
-
-    .tab-active {
-      background: #fff;
-      color: #0f172a;
-      border-color: #fff;
-      box-shadow: 0 8px 16px -8px rgba(0, 0, 0, .25);
-    }
-
-    .tab-idle {
-      background: rgba(255, 255, 255, .7);
-      color: #475569;
-      border-color: rgba(255, 255, 255, .6);
-    }
-
-    .tab-idle:hover {
-      background: #fff;
-    }
-
-    .grid-table {
-      border-collapse: separate;
-      border-spacing: 0;
-      background-color: #f8fafc;
-      width: 100%;
-      table-layout: fixed;
-    }
-
-    .grid-table thead th {
-      background-color: rgba(255, 255, 255, .85);
-      backdrop-filter: saturate(1.2);
-    }
-
-    .grid-table th,
-    .grid-table td {
-      border-right: 1px solid #e2e8f0;
-      border-bottom: 1px solid #e2e8f0;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      vertical-align: top;
-    }
-
-    .grid-table tr>*:first-child {
-      border-left: 1px solid #e2e8f0;
-    }
-
-    .grid-table thead tr:first-child th {
-      border-top: 1px solid #e2e8f0;
-    }
-
-    .grid-table tbody tr:hover td {
-      background-color: #f1f5f9;
-    }
-
-    .grid-table th.p-3,
-    .grid-table td.p-3 {
-      padding: .5rem .5rem;
-    }
-
-    .grid-table td.col-solicitante {
-      width: 200px;
-    }
-
-    .grid-table td.col-detalhes {
-      width: 280px;
-    }
-
-    .grid-table td.col-status {
-      width: 160px;
-    }
-
-    .clamp-2,
-    .clamp-3,
-    .clamp-4 {
-      display: -webkit-box;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      word-break: break-word;
-    }
-
-    .clamp-2 {
-      -webkit-line-clamp: 2;
-    }
-
-    .clamp-3 {
-      -webkit-line-clamp: 3;
-    }
-
-    .clamp-4 {
-      -webkit-line-clamp: 4;
-    }
-
-    .scroll-3 {
-      display: block;
-      line-height: 1.35;
-      max-height: calc(3 * 1.35em);
-      overflow-y: auto;
-      word-break: break-word;
-      scrollbar-width: thin;
-      scrollbar-color: #cbd5e1 transparent;
-    }
-
-    .scroll-3::-webkit-scrollbar {
-      width: 6px;
-    }
-
-    .scroll-3::-webkit-scrollbar-thumb {
-      background: #cbd5e1;
-      border-radius: 8px;
-    }
-
-    .scroll-3:hover::-webkit-scrollbar-thumb {
-      background: #94a3b8;
-    }
-
-    .__pop {
-      position: fixed;
-      z-index: 60;
-      max-width: min(92vw, 480px);
-      width: min(92vw, 480px);
-    }
-
-    .grid-table td.col-acoes {
-      position: relative;
-      overflow: visible;
-      width: 72px;
-    }
-
-    /* Botões de ação diretos (✓ e ✕) */
-    .action-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 32px;
-      height: 30px;
-      border: 1px solid #e2e8f0;
-      border-radius: 10px;
-      background: #fff;
-      font-weight: 600;
-      font-size: 14px;
-      line-height: 1;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
-      transition: transform .15s ease, box-shadow .15s ease;
-    }
-
-    .action-btn:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 6px 14px rgba(2, 8, 23, .10);
-    }
-
-    .action-btn.aprovar {
-      color: #15803d;
-      /* verde */
-    }
-
-    .action-btn.reprovar {
-      color: #b91c1c;
-      /* vermelho */
-    }
+    /*Diminuindo tamanho dos botões do menu hambúrguer*/
+    nav.cantina-nav .actions {padding: 5px; gap: 6px; width: min(70vw, 150px);}
+    nav.cantina-nav .btn{width: 100%; justify-content: center; padding: 8px 10px; font-size: 0.7rem; line-height: 1.1; border-radius: 8px; gap: 6px;}
+    nav.cantina-nav .btn svg{ width: 18px; height: 18px;}
   </style>
 </head>
 
 <body class="min-h-screen text-black antialiased" style="background: var(--cantina-secondary);">
-
-  <!-- ===== NAVBAR ===== -->
+  <!-- ===== BLOCO: Navbar ===== -->
   <nav class="cantina-nav" aria-label="Barra superior">
     <div class="cantina-container">
       <a class="brand" href="#">
-        <img
-          src="https://iconecolegioecurso.com.br/wp-content/uploads/2022/08/xlogo_icone_site.png.pagespeed.ic_.QgXP3GszLC.webp"
-          alt="Logo Ícone Colégio e Curso"
-          onerror="this.onerror=null;this.src='https://placehold.co/150x50/eeeeee/333333?text=Logo';">
+        <img src="https://iconecolegioecurso.com.br/wp-content/uploads/2022/08/xlogo_icone_site.png.pagespeed.ic_.QgXP3GszLC.webp" alt="Logo Ícone Colégio e Curso" onerror="this.onerror=null;this.src='https://placehold.co/150x50/eeeeee/333333?text=Logo';">
         <span class="divider" aria-hidden="true"></span>
         <span class="title">Aprovação de Compras</span>
       </a>
 
-      <!-- Botão hamburguer (mobile) -->
-      <button id="menuToggle" class="menu-toggle" aria-label="Abrir menu" aria-expanded="false">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-          <path fill-rule="evenodd"
-            d="M3.75 5.25a.75.75 0 0 1 .75-.75h15a.75.75 0 0 1 0 1.5h-15a.75.75 0 0 1-.75-.75Zm0 6a.75.75 0 0 1 .75-.75h15a.75.75 0 0 1 0 1.5h-15a.75.75 0 0 1-.75-.75Zm0 6a.75.75 0 0 1 .75-.75h15a.75.75 0 0 1 0 1.5h-15a.75.75 0 0 1-.75-.75Z"
-            clip-rule="evenodd" />
-        </svg>
-      </button>
+      <div class="menu-wrapper" id="menuWrapper">
+        <input type="checkbox" id="menuCheckbox" class="menu-checkbox" aria-label="Abrir / fechar menu">
+        <label id="menuToggle" for="menuCheckbox" class="menu-button" aria-expanded="false" aria-controls="menuActions">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-menu">
+            <line x1="4" y1="6" x2="20" y2="6"></line><line x1="4" y1="12" x2="20" y2="12"></line><line x1="4" y1="18" x2="20" y2="18"></line>
+          </svg>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-close">
+            <line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </label>
 
-      <!-- Ações -->
-      <div id="menuActions" class="actions">
-        <!-- email do admin logado -->
+        <div id="menuActions" class="actions">
 
-        <!-- Sair -->
-        <a id="btnSair" class="btn" href="../index.html" rel="noopener">Sair</a>
+          <a id="btnVoltarForm" class="btn" href="../forms/" rel="noopener">Formulário</a>
+
+          <a id="btnSair" class="btn" href="../index.html" rel="noopener">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round"
+                 data-lucide="log-out" class="lucide lucide-log-out">
+              <path d="m16 17 5-5-5-5"></path>
+              <path d="M21 12H9"></path>
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            </svg>
+            <span>Sair</span>
+          </a>
+        </div>
       </div>
     </div>
   </nav>
 
-  <!-- CONTEÚDO -->
+  <!-- ===== BLOCO: Conteúdo ===== -->
   <main class="w-full max-w-7xl mx-auto px-4 pb-20 pt-6">
-    <div
-      class="bg-[#3A474C] border border-white/60 rounded-xl sm:rounded-2xl shadow-2xl shadow-glow p-4 xs:p-5 sm:p-6 md:p-8">
-
-      <!-- Top bar -->
+    <div class="bg-[#3A474C] border border-white/60 rounded-xl sm:rounded-2xl shadow-2xl shadow-glow p-4 xs:p-5 sm:p-6 md:p-8">
       <div class="flex flex-col gap-3">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3">
           <div class="text-sm text-slate-800 order-2 sm:order-1">
             <span style="color:#e2e8f0" id="contador"></span>
           </div>
           <div class="flex items-center gap-2 order-1 sm:order-2">
-            <button id="btnAtualizar"
-              class="rounded-lg bg-white px-3 py-2 text-sm font-semibold shadow hover:-translate-y-0.5 hover:shadow-md transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primaria/30">Atualizar</button>
+            <button id="btnAtualizar" class="rounded-lg bg-white px-3 py-2 text-sm font-semibold shadow hover:-translate-y-0.5 hover:shadow-md transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primaria/30">Atualizar</button>
           </div>
         </div>
 
-        <!-- Tabs -->
         <div class="flex flex-wrap items-center gap-2">
           <button id="tabPendentes" class="tab-btn tab-active" data-tab="pendentes">
             Pendentes
-            <span style="display: none;" id="countPendentes"
-              class="ml-1 text-xs font-semibold px-2 py-0.5 rounded-full bg-orange-100 text-orange-700">0</span>
+            <span style="display: none;" id="countPendentes" class="ml-1 text-xs font-semibold px-2 py-0.5 rounded-full bg-orange-100 text-orange-700">0</span>
           </button>
 
           <button id="tabHistorico" class="tab-btn tab-idle" data-tab="historico">
             Histórico
-            <span style="display: none;" id="countHistorico"
-              class="ml-1 text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">0</span>
+            <span style="display: none;" id="countHistorico" class="ml-1 text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">0</span>
           </button>
         </div>
       </div>
 
-      <!-- TABELA -->
       <div class="mt-4 overflow-x-auto border border-slate-200/70 rounded-xl bg-slate-50">
         <table class="min-w-full text-xs sm:text-sm grid-table">
           <thead>
@@ -506,645 +203,238 @@
         </table>
       </div>
 
-      <!-- PAGINAÇÃO -->
       <div id="pager" class="mt-3 flex flex-wrap items-center justify-between gap-2 text-sm"></div>
 
-      <!-- MODAL APROVAÇÃO/REJEIÇÃO -->
       <div id="modal" class="fixed inset-0 hidden items-center justify-center bg-black/40 z-50 px-3">
         <div class="w-full max-w-lg bg-white rounded-2xl p-4 sm:p-6 shadow-2xl">
           <h3 id="modalTitulo" class="text-base sm:text-lg font-bold"></h3>
 
           <div class="mt-2 flex items-start justify-between gap-3">
             <p id="modalHelp" class="text-sm text-slate-600 flex-1">Você pode adicionar uma observação.</p>
-
-            <!-- TOGGLE NÃO JUSTIFICAR -->
             <label class="flex items-center gap-2 cursor-pointer select-none">
               <span class="text-xs font-medium text-slate-700">Não justificar</span>
-              <div id="toggleNoJustify"
-                class="relative inline-block w-11 h-6 bg-slate-300 rounded-full transition-colors duration-300">
-                <span
-                  class="absolute left-0.5 top-0.5 w-5 h-5 bg-white rounded-full shadow transform transition-transform duration-300"></span>
+              <div id="toggleNoJustify" class="relative inline-block w-11 h-6 bg-slate-300 rounded-full transition-colors duration-300">
+                <span class="absolute left-0.5 top-0.5 w-5 h-5 bg-white rounded-full shadow transform transition-transform duration-300"></span>
               </div>
             </label>
           </div>
 
-          <textarea id="modalObs"
-            class="mt-3 w-full min-h[110px] rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20"
-            placeholder="Escreva sua observação…"></textarea>
+          <textarea id="modalObs" class="mt-3 w-full min-h[110px] rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20" placeholder="Escreva sua observação…"></textarea>
 
           <div class="mt-3">
-            <label class="block text-sm text-slate-700 font-medium mb-1">
-              Enviar cópia para (opcional)
-            </label>
-            <input id="modalExtras" type="text" placeholder="digite e-mails separados por vírgula"
-              class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20">
+            <label class="block text-sm text-slate-700 font-medium mb-1">Enviar cópia para (opcional)</label>
+            <input id="modalExtras" type="text" placeholder="digite e-mails separados por vírgula" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-primaria focus:ring-4 focus:ring-primaria/20">
           </div>
 
           <div class="mt-1 flex items-center justify-between">
-            <span id="modalError" class="text-xs text-red-600 hidden">Informe o motivo da reprovação ou ative “Não
-              justificar”.</span>
+            <span id="modalError" class="text-xs text-red-600 hidden">Informe o motivo da reprovação ou ative “Não justificar”.</span>
             <span id="modalCount" class="text-xs text-slate-500"></span>
           </div>
 
           <div class="mt-4 flex flex-col xs:flex-row justify-end gap-2">
             <button id="modalCancelar" class="rounded-lg border px-3 py-2 text-sm">Cancelar</button>
-            <button id="modalConfirmar"
-              class="rounded-lg bg-primaria text-white px-3 py-2 text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed">Confirmar</button>
+            <button id="modalConfirmar" class="rounded-lg bg-primaria text-white px-3 py-2 text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed">Confirmar</button>
           </div>
         </div>
       </div>
-
     </div>
   </main>
 
-  <!-- MENU MOBILE ABRE/FECHA -->
+  <!-- ===== BLOCO: Menu Hambúrguer (comportamento) ===== -->
   <script>
-    (function () {
-      const menuToggle = document.getElementById('menuToggle');
-      const menuActions = document.getElementById('menuActions');
-
-      if (menuToggle && menuActions) {
-        menuToggle.addEventListener('click', () => {
-          const isOpen = menuActions.classList.toggle('open');
-          menuToggle.setAttribute('aria-expanded', String(isOpen));
-        });
-
-        document.addEventListener('click', (e) => {
-          if (!menuActions.classList.contains('open')) return;
-          const clickedInside = menuActions.contains(e.target) || menuToggle.contains(e.target);
-          if (!clickedInside) {
-            menuActions.classList.remove('open');
-            menuToggle.setAttribute('aria-expanded', 'false');
-          }
-        });
-
-        window.addEventListener('resize', () => {
-          if (window.innerWidth > 640 && menuActions.classList.contains('open')) {
-            menuActions.classList.remove('open');
-            menuToggle.setAttribute('aria-expanded', 'false');
-          }
-        });
-      }
-    })();
+    const menuWrapper=document.getElementById('menuWrapper');
+    const menuCheckbox=document.getElementById('menuCheckbox');
+    const menuToggleLabel=document.getElementById('menuToggle');
+    function syncAria(){ menuToggleLabel?.setAttribute('aria-expanded', String(!!menuCheckbox?.checked)); }
+    function closeMenu(){ if(menuCheckbox?.checked){ menuCheckbox.checked=false; syncAria(); } }
+    menuCheckbox?.addEventListener('change', syncAria);
+    menuToggleLabel?.addEventListener('click', ()=>{ setTimeout(syncAria,0); });
+    document.addEventListener('click', (e)=>{ if(!menuWrapper?.contains(e.target)) closeMenu(); });
+    window.addEventListener('resize', closeMenu);
+    document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeMenu(); });
   </script>
 
-  <!-- LÓGICA PRINCIPAL ADMIN -->
+  <!-- ===== BLOCO: Lógica Principal (Admin) ===== -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
 
-    // =========================
-    // FIREBASE CONFIG
-    // (mesmo projeto do formulário)
-    // =========================
     const firebaseConfig = {
-      apiKey: "AIzaSyAEZidq8mdAUKeJXvSQeE01gVOLWe_cp78",
-      authDomain: "compras-icone.firebaseapp.com",
-      projectId: "compras-icone",
-      storageBucket: "compras-icone.firebasestorage.app",
-      messagingSenderId: "831706842201",
-      appId: "1:831706842201:web:9b68ae4f98ad93c5a99d48",
+      apiKey:"AIzaSyAEZidq8mdAUKeJXvSQeE01gVOLWe_cp78",
+      authDomain:"compras-icone.firebaseapp.com",
+      projectId:"compras-icone",
+      storageBucket:"compras-icone.firebasestorage.app",
+      messagingSenderId:"831706842201",
+      appId:"1:831706842201:web:9b68ae4f98ad93c5a99d48"
     };
 
-    // =====================================================
-    // ESTADO GLOBAL CONFIG / PERMISSÕES
-    // =====================================================
-    // WEBAPP_URL vem de appConfig.json (igual na página do formulário)
-    let WEBAPP_URL = '';
+    let WEBAPP_URL=''; let ALLOWED_EMAILS=new Set();
 
-    // adminAprovacao + admSupremo -> pode acessar essa tela
-    let ALLOWED_EMAILS = new Set();
-
-    // =====================================================
-    // Carregar adminEmails.json
-    // =====================================================
-    async function carregarAdmins() {
-      try {
-        const resp = await fetch('../config/adminEmails.json', { cache: 'no-cache' });
-        if (!resp.ok) {
-          console.error('Não consegui carregar adminEmails.json', resp.status);
-          return;
-        }
-
-        const data = await resp.json();
-
-        const listaAprovacao = Array.isArray(data.adminAprovacao) ? data.adminAprovacao : [];
-        const listaSupremo = Array.isArray(data.admSupremo) ? data.admSupremo : [];
-
-        ALLOWED_EMAILS = new Set(
-          [...listaAprovacao, ...listaSupremo].map(e => e.toLowerCase())
-        );
-      } catch (err) {
-        console.error('Erro buscando adminEmails.json:', err);
-      }
+    async function carregarAdmins(){
+      try{
+        const resp=await fetch('../config/adminEmails.json',{cache:'no-cache'}); if(!resp.ok) return;
+        const data=await resp.json();
+        const listaAprovacao=Array.isArray(data.adminAprovacao)?data.adminAprovacao:[];
+        const listaSupremo=Array.isArray(data.admSupremo)?data.admSupremo:[];
+        ALLOWED_EMAILS=new Set([...listaAprovacao,...listaSupremo].map(e=>e.toLowerCase()));
+      }catch{}
     }
-
-    // =====================================================
-    // Carregar appConfig.json (WEBAPP_URL dinâmico)
-    // =====================================================
-    async function carregarConfigBackend() {
-      try {
-        const resp = await fetch('../config/appConfig.json', {
-          cache: 'no-cache'
-        });
-
-        if (!resp.ok) {
-          console.error('Não consegui carregar appConfig.json', resp.status);
-          return;
-        }
-
-        const data = await resp.json();
-        WEBAPP_URL = data.WEBAPP_URL || '';
-        if (!WEBAPP_URL) {
-          console.error('WEBAPP_URL não veio no JSON.');
-        }
-      } catch (err) {
-        console.error('Erro buscando appConfig.json:', err);
-      }
+    async function carregarConfigBackend(){
+      try{
+        const resp=await fetch('../config/appConfig.json',{cache:'no-cache'}); if(!resp.ok) return;
+        const data=await resp.json(); WEBAPP_URL=data.WEBAPP_URL||'';
+      }catch{}
     }
+    await carregarAdmins(); await carregarConfigBackend();
 
-    // carrega permissões + endpoint antes de iniciar auth
-    await carregarAdmins();
-    await carregarConfigBackend();
+    const app=initializeApp(firebaseConfig);
+    const auth=getAuth(app);
 
-    // =====================================================
-    // Inicializa Firebase
-    // =====================================================
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
+    const $ = (sel)=>document.querySelector(sel);
 
-    // =====================================================
-    // Helpers de DOM e toast
-    // =====================================================
-    const $ = (sel) => document.querySelector(sel);
-    const $$ = (sel) => Array.from(document.querySelectorAll(sel));
-
-    function toast(msg, type = 'info') {
-      const isSuccess = type === 'success';
-      const isError = type === 'error';
-      Toastify({
-        text: msg,
-        duration: 3200,
-        close: true,
-        gravity: 'top',
-        position: 'right',
-        stopOnFocus: true,
-        style: {
-          background: isSuccess
-            ? 'linear-gradient(90deg,#16a34a,#22c55e)'
-            : isError
-              ? 'linear-gradient(90deg,#dc2626,#ef4444)'
-              : 'linear-gradient(90deg,#334155,#64748b)',
-          color: '#fff',
-          fontWeight: '600',
-          borderRadius: '10px',
-          padding: '10px 16px',
-          boxShadow: '0 10px 25px -10px rgba(0,0,0,.35)'
-        },
-        offset: { x: 8, y: 10 }
+    function toast(msg,type='info'){
+      const isSuccess=(type==='success'); const isError=(type==='error');
+      Toastify({ text:msg, duration:3200, close:true, gravity:'top', position:'right', stopOnFocus:true,
+        style:{ background: isSuccess?'linear-gradient(90deg,#16a34a,#22c55e)':(isError?'linear-gradient(90deg,#dc2626,#ef4444)':'linear-gradient(90deg,#334155,#64748b)'), color:'#fff', fontWeight:'600', borderRadius:'10px', padding:'10px 16px', boxShadow:'0 10px 25px -10px rgba(0,0,0,.35)' },
+        offset:{x:8,y:10}
       }).showToast();
     }
+    function fmtDate(d){ if(!d) return '-'; const dt=new Date(d); return isNaN(dt.getTime())?'-':dt.toLocaleString('pt-BR'); }
+    function badgeStatus(s){ const base='inline-flex items-center px-2 py-0.5 rounded-full text-[11px] sm:text-xs font-semibold border'; const map={pendente:'bg-yellow-50 text-yellow-800 border-yellow-200',aprovado:'bg-green-50 text-green-800 border-green-200',reprovado:'bg-red-50 text-red-800 border-red-200'}; return `<span class="${base} ${map[s]||'bg-slate-50 text-slate-700 border-slate-200'}">${(s||'pendente').toUpperCase()}</span>`; }
+    function humanTipo(item){ if(item.tipo==='servico') return 'Serviço'; if(item.tipo==='produto') return 'Produto'; return '-'; }
 
-    function fmtDate(d) {
-      if (!d) return '-';
-      const dt = new Date(d);
-      return isNaN(dt.getTime()) ? '-' : dt.toLocaleString('pt-BR');
-    }
-
-    function badgeStatus(s) {
-      const base = 'inline-flex items-center px-2 py-0.5 rounded-full text-[11px] sm:text-xs font-semibold border';
-      const map = {
-        pendente: 'bg-yellow-50 text-yellow-800 border-yellow-200',
-        aprovado: 'bg-green-50 text-green-800 border-green-200',
-        reprovado: 'bg-red-50 text-red-800 border-red-200'
-      };
-      return `<span class="${base} ${map[s] || 'bg-slate-50 text-slate-700 border-slate-200'}">${(s || 'pendente').toUpperCase()}</span>`;
-    }
-
-    function humanTipo(item) {
-      if (item.tipo === 'servico') return `Serviço`;
-      if (item.tipo === 'produto') return `Produto`;
-      return '-';
-    }
-
-    // =====================================================
-    // Logout
-    // =====================================================
-    async function doLogout() {
-      try {
-        await signOut(auth);
-      } catch (err) {
-        console.warn('Erro no signOut Firebase:', err);
-      }
-
-      try { sessionStorage.clear(); } catch { }
-      try { localStorage.removeItem('sessionUser'); } catch { }
-      try { localStorage.removeItem('firebase:host:*'); } catch { }
-      try { localStorage.removeItem('firebase:authUser'); } catch { }
-      try { localStorage.removeItem('firebase:authUser:${firebaseConfig.apiKey}:[DEFAULT]'); } catch { }
-
+    async function doLogout(){
+      try{ await signOut(auth); }catch{}
+      try{ sessionStorage.clear(); }catch{}
+      try{ localStorage.removeItem('sessionUser'); }catch{}
+      try{ localStorage.removeItem('firebase:host:*'); }catch{}
+      try{ localStorage.removeItem('firebase:authUser'); }catch{}
+      try{ localStorage.removeItem('firebase:authUser:${firebaseConfig.apiKey}:[DEFAULT]'); }catch{}
       window.location.replace('../index.html');
     }
 
-    const btnSair = document.getElementById('btnSair');
-    if (btnSair) {
-      btnSair.addEventListener('click', async (e) => {
+    const btnSair=document.getElementById('btnSair');
+    if(btnSair){
+      btnSair.addEventListener('click', async (e)=>{
         e.preventDefault();
-        btnSair.setAttribute('aria-busy', 'true');
-        btnSair.style.pointerEvents = 'none';
-        btnSair.textContent = 'Saindo…';
+        btnSair.setAttribute('aria-busy','true');
+        btnSair.style.pointerEvents='none';
+        btnSair.querySelector('span')?.insertAdjacentText('beforebegin','');
+        btnSair.lastChild.nodeValue=' S a i n d o…';
         await doLogout();
       });
     }
 
-    // =====================================================
-    // Variáveis de estado da UI
-    // =====================================================
-    let currentUser = null;
-    let dadosBrutos = [];
-    let dadosFiltrados = [];
-    let activeTab = 'pendentes';
-    let isSendingStatus = false;
+    let currentUser=null; let dadosBrutos=[]; let dadosFiltrados=[]; let activeTab='pendentes'; let isSendingStatus=false; let page=1; const pageSize=3;
 
-    let page = 1;
-    const pageSize = 3;
-
-    // =====================================================
-    // Função para chamadas ao Apps Script (com fallback no-cors)
-    // =====================================================
-    async function chamarAPI(url, opts = {}) {
-      try {
-        const resp = await fetch(url, opts);
-
-        if (resp.type === 'opaque') {
-          console.warn('[chamarAPI] resposta opaqua (provável CORS bloqueado)');
-          return { ok: true, opaque: true };
-        }
-
-        const data = await resp.json().catch(err => {
-          console.error('[chamarAPI] erro parse json:', err);
-          return null;
-        });
-
-        return {
-          ok: resp.ok && (data?.ok !== false),
-          data
-        };
-
-      } catch (err) {
-        console.error('[chamarAPI] falhou geral:', err);
-
-        try {
-          await fetch(url, { ...opts, mode: 'no-cors' });
-          console.warn('[chamarAPI] fallback no-cors usado, resposta não legível');
-          return { ok: true, opaque: true };
-        } catch (err2) {
-          console.error('[chamarAPI] fallback também falhou:', err2);
-          return { ok: false, error: err2?.message || String(err2) };
-        }
+    async function chamarAPI(url,opts={}){
+      try{
+        const resp=await fetch(url,opts);
+        if(resp.type==='opaque') return {ok:true,opaque:true};
+        const data=await resp.json().catch(()=>null);
+        return {ok:resp.ok && (data?.ok!==false), data};
+      }catch{
+        try{ await fetch(url,{...opts,mode:'no-cors'}); return {ok:true,opaque:true}; }catch(err2){ return {ok:false,error:err2?.message||String(err2)} }
       }
     }
 
-    // =====================================================
-    // Carregar lista da planilha
-    // =====================================================
-    async function carregarLista() {
-      const tbody = $('#tbody');
-
-      if (!WEBAPP_URL) {
-        tbody.innerHTML = `
-          <tr><td colspan="10" class="p-6 text-center text-red-700">
-            Não consegui conectar ao setor de compras (WEBAPP_URL vazio). Tente novamente.
-          </td></tr>`;
-        toast('Conectando ao setor de compras... tente novamente.', 'error');
-        return;
-      }
-
-      tbody.innerHTML = `<tr><td colspan="10" class="p-6 text-center text-slate-600">Carregando…</td></tr>`;
-
-      const url = WEBAPP_URL + '?action=list&email=' + encodeURIComponent(currentUser.email);
-      const { ok, data, error, opaque } = await chamarAPI(url);
-
-      if (opaque) {
-        tbody.innerHTML = `
-          <tr><td colspan="10" class="p-6 text-center text-red-700">
-            O navegador bloqueou a resposta (CORS).<br>
-            Isso é limitação do Apps Script rodando público.
-          </td></tr>`;
-        return;
-      }
-
-      if (!ok) {
-        const msg = data?.error === 'forbidden'
-          ? 'Sem permissão para acessar. Fale com o administrador.'
-          : `Falha ao carregar (${error || 'erro'}).`;
-        tbody.innerHTML = `<tr><td colspan="10" class="p-6 text-center text-red-700">${msg}</td></tr>`;
-        return;
-      }
-
-      dadosBrutos = Array.isArray(data?.items) ? data.items : [];
-      refreshCounters();
-      aplicarFiltrosERender();
-      toast('Lista atualizada', 'success');
+    async function carregarLista(){
+      const tbody=$('#tbody');
+      if(!WEBAPP_URL){ tbody.innerHTML=`<tr><td colspan="10" class="p-6 text-center text-red-700">Não consegui conectar ao setor de compras (WEBAPP_URL vazio). Tente novamente.</td></tr>`; toast('Conectando ao setor de compras... tente novamente.','error'); return; }
+      tbody.innerHTML=`<tr><td colspan="10" class="p-6 text-center text-slate-600">Carregando…</td></tr>`;
+      const url=WEBAPP_URL+'?action=list&email='+encodeURIComponent(currentUser.email);
+      const {ok,data,error,opaque}=await chamarAPI(url);
+      if(opaque){ tbody.innerHTML=`<tr><td colspan="10" class="p-6 text-center text-red-700">O navegador bloqueou a resposta (CORS).<br>Isso é limitação do Apps Script rodando público.</td></tr>`; return; }
+      if(!ok){ const msg=data?.error==='forbidden'?'Sem permissão para acessar. Fale com o administrador.':`Falha ao carregar (${error||'erro'}).`; tbody.innerHTML=`<tr><td colspan="10" class="p-6 text-center text-red-700">${msg}</td></tr>`; return; }
+      dadosBrutos=Array.isArray(data?.items)?data.items:[]; refreshCounters(); aplicarFiltrosERender(); toast('Lista atualizada','success');
     }
 
-    // =====================================================
-    // Atualizar status (aprovar / reprovar)
-    // =====================================================
-    async function atualizarStatus(submissionId, novoStatus, observacao = '', extraNotify = '') {
-      if (!WEBAPP_URL) {
-        toast('Sem conexão com o backend.', 'error');
-        throw new Error('WEBAPP_URL vazio');
-      }
-
-      const body = new URLSearchParams({
-        action: 'updatestatus',
-        submissionId,
-        status: novoStatus,
-        observacao,
-        aprovador: currentUser?.email || '',
-        extraNotify
-      });
-
-      const { ok, error } = await chamarAPI(WEBAPP_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
-        body
-      });
-
-      if (!ok) throw new Error(error || 'Falha ao atualizar');
+    async function atualizarStatus(submissionId,novoStatus,observacao='',extraNotify=''){
+      if(!WEBAPP_URL){ toast('Sem conexão com o backend.','error'); throw new Error('WEBAPP_URL vazio'); }
+      const body=new URLSearchParams({action:'updatestatus',submissionId,status:novoStatus,observacao,aprovador:currentUser?.email||'',extraNotify});
+      const {ok,error}=await chamarAPI(WEBAPP_URL,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8'},body});
+      if(!ok) throw new Error(error||'Falha ao atualizar');
     }
 
-    // =====================================================
-    // Paginação helpers
-    // =====================================================
-    function getPageSlice(list) {
-      const total = list.length;
-      const totalPages = Math.max(1, Math.ceil(total / pageSize));
-      if (page > totalPages) page = totalPages;
-      if (page < 1) page = 1;
-      const start = (page - 1) * pageSize;
-      return {
-        rows: list.slice(start, start + pageSize),
-        total,
-        totalPages
-      };
+    function getPageSlice(list){ const total=list.length; const totalPages=Math.max(1,Math.ceil(total/pageSize)); if(page>totalPages) page=totalPages; if(page<1) page=1; const start=(page-1)*pageSize; return {rows:list.slice(start,start+pageSize), total, totalPages}; }
+    function goToPage(n){ page=n; aplicarFiltrosERender(true); }
+    function renderPaginacao(totalPages,total){
+      const el=document.getElementById('pager'); if(!el) return;
+      if(total<=pageSize){ el.innerHTML=`<div class="text-slate-600">${total} registro(s)</div>`; return; }
+      const mkBtn=(lbl,p,disabled=false,aria='')=>`<button ${aria} ${disabled?'disabled':''} data-page="${p}" class="px-2.5 py-1.5 rounded border text-sm font-semibold ${disabled?'opacity-50 cursor-not-allowed':'bg-white hover:-translate-y-0.5 hover:shadow transition'}">${lbl}</button>`;
+      const start=Math.max(1,page-2); const end=Math.min(totalPages,start+4);
+      const nums=Array.from({length:end-start+1},(_,i)=>start+i).map(n=>{const active=(n===page); return `<button data-page="${n}" class="px-2.5 py-1.5 rounded border text-sm font-semibold ${active?'bg-primaria text-white border-primaria':'bg-white hover:-translate-y-0.5 hover:shadow transition'}">${n}</button>`;}).join('');
+      el.innerHTML=`<div class="text-slate-600">Exibindo ${Math.min(page*pageSize,total)} de ${total}</div><div class="flex items-center gap-1">${mkBtn('‹ Anterior',page-1,page===1,'aria-label="Página anterior"')}${nums}${mkBtn('Próxima ›',page+1,page===totalPages,'aria-label="Próxima página"')}</div>`;
+      el.querySelectorAll('button[data-page]').forEach(b=>{ b.addEventListener('click',()=>{ const p=parseInt(b.getAttribute('data-page'),10); if(!Number.isNaN(p)) goToPage(p); }); });
     }
 
-    function goToPage(n) {
-      page = n;
-      aplicarFiltrosERender(true);
-    }
-
-    function renderPaginacao(totalPages, total) {
-      const el = document.getElementById('pager');
-      if (!el) return;
-
-      if (total <= pageSize) {
-        el.innerHTML = `<div class="text-slate-600">${total} registro(s)</div>`;
-        return;
-      }
-
-      const mkBtn = (lbl, p, disabled = false, aria = '') =>
-        `<button ${aria} ${disabled ? 'disabled' : ''} data-page="${p}"
-          class="px-2.5 py-1.5 rounded border text-sm font-semibold
-                  ${disabled ? 'opacity-50 cursor-not-allowed' : 'bg-white hover:-translate-y-0.5 hover:shadow transition'}">
-          ${lbl}
-        </button>`;
-
-      const start = Math.max(1, page - 2);
-      const end = Math.min(totalPages, start + 4);
-
-      const nums = Array.from({ length: end - start + 1 }, (_, i) => start + i).map(n => {
-        const active = n === page;
-        return `<button data-page="${n}"
-                  class="px-2.5 py-1.5 rounded border text-sm font-semibold
-                        ${active ? 'bg-primaria text-white border-primaria' : 'bg-white hover:-translate-y-0.5 hover:shadow transition'}">
-                  ${n}
-                </button>`;
-      }).join('');
-
-      el.innerHTML = `
-        <div class="text-slate-600">Exibindo ${Math.min(page * pageSize, total)} de ${total}</div>
-        <div class="flex items-center gap-1">
-          ${mkBtn('‹ Anterior', page - 1, page === 1, 'aria-label="Página anterior"')}
-          ${nums}
-          ${mkBtn('Próxima ›', page + 1, page === totalPages, 'aria-label="Próxima página"')}
-        </div>
-      `;
-
-      el.querySelectorAll('button[data-page]').forEach(b => {
-        b.addEventListener('click', () => {
-          const p = parseInt(b.getAttribute('data-page'), 10);
-          if (!Number.isNaN(p)) goToPage(p);
-        });
-      });
-    }
-
-    // =====================================================
-    // Tab / filtros / contadores
-    // =====================================================
-    function inTab(item) {
-      const st = String(item.status || 'pendente');
-      return activeTab === 'pendentes'
-        ? (st === 'pendente')
-        : (st !== 'pendente');
-    }
-
-    function aplicarFiltrosERender(keepPage = false) {
-      if (!keepPage) page = 1;
-
-      dadosFiltrados = dadosBrutos
-        .filter(it => inTab(it))
-        .sort((a, b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0));
-
-      const { rows, total, totalPages } = getPageSlice(dadosFiltrados);
-      renderTabela(rows);
-      renderPaginacao(totalPages, total);
-
-      $('#contador').textContent =
-        `${total} registro(s) ${activeTab === 'pendentes' ? 'pendente(s)' : 'no histórico'}`;
-
+    function inTab(item){ const st=String(item.status||'pendente'); return activeTab==='pendentes' ? (st==='pendente') : (st!=='pendente'); }
+    function aplicarFiltrosERender(keepPage=false){
+      if(!keepPage) page=1;
+      dadosFiltrados=dadosBrutos.filter(it=>inTab(it)).sort((a,b)=>new Date(b.timestamp||0)-new Date(a.timestamp||0));
+      const {rows,total,totalPages}=getPageSlice(dadosFiltrados);
+      renderTabela(rows); renderPaginacao(totalPages,total);
+      $('#contador').textContent=`${total} registro(s) ${activeTab==='pendentes'?'pendente(s)':'no histórico'}`;
       refreshCounters();
     }
-
-    function refreshCounters() {
-      const pend = dadosBrutos.filter(x => String(x.status || 'pendente') === 'pendente').length;
-      const hist = dadosBrutos.filter(x => String(x.status || 'pendente') !== 'pendente').length;
-
-      $('#countPendentes').textContent = pend;
-      $('#countHistorico').textContent = hist;
-      $('#countPendentes').style.display = pend ? 'inline-block' : 'none';
-      $('#countHistorico').style.display = hist ? 'inline-block' : 'none';
+    function refreshCounters(){
+      const pend=dadosBrutos.filter(x=>String(x.status||'pendente')==='pendente').length;
+      const hist=dadosBrutos.filter(x=>String(x.status||'pendente')!=='pendente').length;
+      document.getElementById('countPendentes').textContent=pend;
+      document.getElementById('countHistorico').textContent=hist;
+      document.getElementById('countPendentes').style.display=pend?'inline-block':'none';
+      document.getElementById('countHistorico').style.display=hist?'inline-block':'none';
     }
 
-    // =====================================================
-    // Helpers de render
-    // =====================================================
-    function parseLinks(links) {
-      if (Array.isArray(links)) return links;
-      if (typeof links === 'string') {
-        try {
-          const j = JSON.parse(links);
-          return Array.isArray(j) ? j : [];
-        } catch {
-          return links.split(/\s+/).filter(Boolean);
-        }
-      }
-      return [];
-    }
+    function parseLinks(links){ if(Array.isArray(links)) return links; if(typeof links==='string'){ try{ const j=JSON.parse(links); return Array.isArray(j)?j:[]; }catch{ return links.split(/\s+/).filter(Boolean); } } return []; }
+    function esc(s){ return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
-    function esc(s) {
-      return String(s ?? '')
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-    }
+    function renderTabela(lista){
+      const tbody=document.getElementById('tbody');
+      if(!lista.length){ tbody.innerHTML=`<tr><td colspan="10" class="p-6 text-center text-slate-600">Nenhum registro encontrado.</td></tr>`; return; }
 
-    function renderTabela(lista) {
-      const tbody = $('#tbody');
-      if (!lista.length) {
-        tbody.innerHTML =
-          `<tr><td colspan="10" class="p-6 text-center text-slate-600">Nenhum registro encontrado.</td></tr>`;
-        return;
-      }
+      const popDetalhes=(it)=> it.tipo==='produto'
+        ? `<div class="space-y-2"><div class="text-xs uppercase tracking-wide text-slate-500">Produto</div><div class="font-semibold">${esc(it.nomeProduto||'-')}</div><div class="text-sm">Quantidade: <span class="font-medium">${esc(it.quantidadeProduto||'-')}</span></div>${it.observacao?`<div class="text-sm"><span class="text-slate-500">Obs:</span> ${esc(it.observacao)}</div>`:''}</div>`
+        : `<div class="space-y-2"><div class="text-xs uppercase tracking-wide text-slate-500">Serviço</div><div class="font-semibold break-words">${esc(it.descricaoServico||'-')}</div>${it.quemIndicar?`<div class="text-sm"><span class="text-slate-500">Indicação:</span> ${esc(it.quemIndicar)}</div>`:''}${it.observacao?`<div class="text-sm"><span class="text-slate-500">Obs:</span> ${esc(it.observacao)}</div>`:''}</div>`;
 
-      const popDetalhes = (it) => {
-        if (it.tipo === 'produto') {
-          return `
-            <div class="space-y-2">
-              <div class="text-xs uppercase tracking-wide text-slate-500">Produto</div>
-              <div class="font-semibold">${esc(it.nomeProduto || '-')}</div>
-              <div class="text-sm">Quantidade: <span class="font-medium">${esc(it.quantidadeProduto || '-')}</span></div>
-              ${it.observacao ? `<div class="text-sm"><span class="text-slate-500">Obs:</span> ${esc(it.observacao)}</div>` : ''}
-            </div>`;
-        } else {
-          return `
-            <div class="space-y-2">
-              <div class="text-xs uppercase tracking-wide text-slate-500">Serviço</div>
-              <div class="font-semibold break-words">${esc(it.descricaoServico || '-')}</div>
-              ${it.quemIndicar ? `<div class="text-sm"><span class="text-slate-500">Indicação:</span> ${esc(it.quemIndicar)}</div>` : ''}
-              ${it.observacao ? `<div class="text-sm"><span class="text-slate-500">Obs:</span> ${esc(it.observacao)}</div>` : ''}
-            </div>`;
-        }
-      };
+      const popLinks=(arr)=> !arr.length
+        ? `<div class="text-sm text-slate-600">Sem links.</div>`
+        : `<div class="space-y-2"><div class="text-xs uppercase tracking-wide text-slate-500">Links</div><ul class="list-disc pl-5 space-y-1">${arr.map((l,i)=>`<li class="break-all"><a class="underline text-primaria" href="${l}" target="_blank" rel="noopener">Link ${i+1}</a></li>`).join('')}</ul></div>`;
 
-      const popLinks = (arr) => {
-        if (!arr.length) return `<div class="text-sm text-slate-600">Sem links.</div>`;
-        return `
-          <div class="space-y-2">
-            <div class="text-xs uppercase tracking-wide text-slate-500">Links</div>
-            <ul class="list-disc pl-5 space-y-1">
-              ${arr.map((l, i) => `<li class="break-all"><a class="underline text-primaria" href="${l}" target="_blank" rel="noopener">Link ${i + 1}</a></li>`).join('')}
-            </ul>
-          </div>`;
-      };
+      const popText=(title,html)=>({title,content:`<div class="text-sm">${html}</div>`});
 
-      const popText = (title, html) => ({
-        title,
-        content: `<div class="text-sm">${html}</div>`
-      });
+      tbody.innerHTML=lista.map(item=>{
+        const links=parseLinks(item.links);
+        const prazoStr=(item.prazo==='sim' && item.dataPrazo)?fmtDate(item.dataPrazo):'-';
+        const showActions=(String(item.status||'pendente')==='pendente');
 
-      tbody.innerHTML = lista.map(item => {
-        const links = parseLinks(item.links);
-        const prazoStr = (item.prazo === 'sim' && item.dataPrazo) ? fmtDate(item.dataPrazo) : '-';
+        const acoes = showActions
+          ? `<div class="flex items-center gap-1"><button class="action-btn aprovar" data-act="aprovar" data-id="${item.submissionId}" title="Aprovar">✓</button><button class="action-btn reprovar" data-act="reprovar" data-id="${item.submissionId}" title="Reprovar">✕</button></div>`
+          : `<div class='text-xs text-slate-500'>—</div>`;
 
-        const showActions = (String(item.status || 'pendente') === 'pendente');
+        const enviadoInfo=popText('Enviado',esc(fmtDate(item.timestamp)));
+        const btnEnviado=`<button type="button" class="js-pop inline-flex items-center gap-1 hover:bg-orange-50/50 rounded px-1 -mx-1 transition whitespace-nowrap" data-pop-title="${enviadoInfo.title}" data-pop-content="${encodeURIComponent(enviadoInfo.content)}">${esc(fmtDate(item.timestamp))}</button>`;
 
-        // ações ✓ ✕
-        const acoes = showActions ? `
-          <div class="flex items-center gap-1">
-            <button class="action-btn aprovar" data-act="aprovar" data-id="${item.submissionId}" title="Aprovar">
-              ✓
-            </button>
-            <button class="action-btn reprovar" data-act="reprovar" data-id="${item.submissionId}" title="Reprovar">
-              ✕
-            </button>
-          </div>
-        ` : `<div class='text-xs text-slate-500'>—</div>`;
+        const solicitanteHtml=`<div class="space-y-1"><div class="text-xs uppercase tracking-wide text-slate-500">Solicitante</div><div class="font-semibold break-words">${esc(item.nome||'-')}</div><div class="text-sm break-all">${esc(item.email||'-')}</div></div>`;
+        const btnSolicitante=`<button type="button" class="js-pop block text-left hover:bg-orange-50/50 rounded px-1 -mx-1 transition w-full"><div class='font-semibold'>${esc(item.nome||'-')}</div><div class='text-[11px] sm:text-xs text-slate-600 break-all'>${esc(item.email||'-')}</div></button><span class="hidden" data-pop-title="Solicitante" data-pop-content="${encodeURIComponent(solicitanteHtml)}"></span>`;
 
-        const enviadoInfo = popText('Enviado', esc(fmtDate(item.timestamp)));
-        const btnEnviado = `
-          <button type="button"
-            class="js-pop inline-flex items-center gap-1 hover:bg-orange-50/50 rounded px-1 -mx-1 transition whitespace-nowrap"
-            data-pop-title="${enviadoInfo.title}"
-            data-pop-content="${encodeURIComponent(enviadoInfo.content)}">
-            ${esc(fmtDate(item.timestamp))}
-          </button>`;
+        const unidadeInfo=popText('Unidade',`Unidade ${esc(item.unidade||'-')}`);
+        const btnUnidade=`<button type="button" class="js-pop inline-flex hover:bg-orange-50/50 rounded px-1 -mx-1 transition" data-pop-title="${unidadeInfo.title}" data-pop-content="${encodeURIComponent(unidadeInfo.content)}">U${esc(item.unidade||'-')}</button>`;
 
-        const solicitanteHtml = `
-          <div class="space-y-1">
-            <div class="text-xs uppercase tracking-wide text-slate-500">Solicitante</div>
-            <div class="font-semibold break-words">${esc(item.nome || '-')}</div>
-            <div class="text-sm break-all">${esc(item.email || '-')}</div>
-          </div>`;
-        const btnSolicitante = `
-          <button type="button"
-            class="js-pop block text-left hover:bg-orange-50/50 rounded px-1 -mx-1 transition w-full">
-            <div class='font-semibold'>${esc(item.nome || '-')}</div>
-            <div class='text-[11px] sm:text-xs text-slate-600 break-all'>${esc(item.email || '-')}</div>
-          </button>
-          <span class="hidden"
-            data-pop-title="Solicitante"
-            data-pop-content="${encodeURIComponent(solicitanteHtml)}"></span>`;
+        const tipoStr=humanTipo(item);
+        const tipoInfo=popText('Tipo',esc(tipoStr));
+        const btnTipo=`<button type="button" class="js-pop inline-flex hover:bg-orange-50/50 rounded px-1 -mx-1 transition" data-pop-title="${tipoInfo.title}" data-pop-content="${encodeURIComponent(tipoInfo.content)}">${esc(tipoStr)}</button>`;
 
-        const unidadeInfo = popText('Unidade', `Unidade ${esc(item.unidade || '-')}`);
-        const btnUnidade = `
-          <button type="button"
-            class="js-pop inline-flex hover:bg-orange-50/50 rounded px-1 -mx-1 transition"
-            data-pop-title="${unidadeInfo.title}"
-            data-pop-content="${encodeURIComponent(unidadeInfo.content)}">
-            U${esc(item.unidade || '-')}
-          </button>`;
+        const btnDetalhes=`<button type="button" class="js-pop inline-flex text-left hover:bg-orange-50/50 rounded px-1 -mx-1 transition" data-pop-title="Detalhes" data-pop-content="${encodeURIComponent(popDetalhes(item))}"><div class="font-semibold scroll-3">${esc(item.tipo==='produto'?(item.nomeProduto||'-'):(item.descricaoServico||'-'))}</div></button>`;
 
-        const tipoStr = humanTipo(item);
-        const tipoInfo = popText('Tipo', esc(tipoStr));
-        const btnTipo = `
-          <button type="button"
-            class="js-pop inline-flex hover:bg-orange-50/50 rounded px-1 -mx-1 transition"
-            data-pop-title="${tipoInfo.title}"
-            data-pop-content="${encodeURIComponent(tipoInfo.content)}">
-            ${esc(tipoStr)}
-          </button>`;
+        const prazoInfo=popText('Prazo',esc(prazoStr));
+        const btnPrazo=`<button type="button" class="js-pop inline-flex hover:bg-orange-50/50 rounded px-1 -mx-1 transition whitespace-nowrap" data-pop-title="${prazoInfo.title}" data-pop-content="${encodeURIComponent(prazoInfo.content)}">${esc(prazoStr)}</button>`;
 
-        const btnDetalhes = `
-          <button type="button"
-            class="js-pop inline-flex text-left hover:bg-orange-50/50 rounded px-1 -mx-1 transition"
-            data-pop-title="Detalhes"
-            data-pop-content="${encodeURIComponent(popDetalhes(item))}">
-            <div class="font-semibold scroll-3">
-              ${esc(item.tipo === 'produto' ? (item.nomeProduto || '-') : (item.descricaoServico || '-'))}
-            </div>
-          </button>`;
+        const urgStr=(item.urgencia||'-').toString().toUpperCase();
+        const urgInfo=popText('Urgência',esc(urgStr));
+        const btnUrgencia=`<button type="button" class="js-pop inline-flex hover:bg-orange-50/50 rounded px-1 -mx-1 transition uppercase" data-pop-title="${urgInfo.title}" data-pop-content="${encodeURIComponent(urgInfo.content)}">${esc(urgStr)}</button>`;
 
-        const prazoInfo = popText('Prazo', esc(prazoStr));
-        const btnPrazo = `
-          <button type="button"
-            class="js-pop inline-flex hover:bg-orange-50/50 rounded px-1 -mx-1 transition whitespace-nowrap"
-            data-pop-title="${prazoInfo.title}"
-            data-pop-content="${encodeURIComponent(prazoInfo.content)}">
-            ${esc(prazoStr)}
-          </button>`;
-
-        const urgStr = (item.urgencia || '-').toString().toUpperCase();
-        const urgInfo = popText('Urgência', esc(urgStr));
-        const btnUrgencia = `
-          <button type="button"
-            class="js-pop inline-flex hover:bg-orange-50/50 rounded px-1 -mx-1 transition uppercase"
-            data-pop-title="${urgInfo.title}"
-            data-pop-content="${encodeURIComponent(urgInfo.content)}">
-            ${esc(urgStr)}
-          </button>`;
-
-        const btnLinks = `
-          <button type="button"
-            class="js-pop underline decoration-dotted text-primaria"
-            data-pop-title="Links"
-            data-pop-content="${encodeURIComponent(popLinks(links))}">
-            ${links.length ? `${links.length} link(s)` : '-'}
-          </button>`;
+        const btnLinks=`<button type="button" class="js-pop underline decoration-dotted text-primaria" data-pop-title="Links" data-pop-content="${encodeURIComponent(popLinks(links))}">${links.length?`${links.length} link(s)`:'-'}</button>`;
 
         return `<tr class='align-top'>
           <td class='p-3 whitespace-nowrap text-slate-700'>${btnEnviado}</td>
@@ -1155,353 +445,116 @@
           <td class='p-3 whitespace-nowrap hidden sm:table-cell'>${btnPrazo}</td>
           <td class='p-3 uppercase hidden sm:table-cell'>${btnUrgencia}</td>
           <td class='p-3 hidden lg:table-cell'>${btnLinks}</td>
-          <td class='p-3 col-status'>${badgeStatus(item.status || 'pendente')}</td>
+          <td class='p-3 col-status'>${badgeStatus(item.status||'pendente')}</td>
           <td class='p-3 col-acoes'>${acoes}</td>
         </tr>`;
       }).join('');
 
-      // bind botões de ação
-      tbody.querySelectorAll('button[data-act]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const id = btn.getAttribute('data-id');
-          const act = btn.getAttribute('data-act');
-          abrirModal(id, act);
-        });
+      tbody.querySelectorAll('button[data-act]').forEach(btn=>{
+        btn.addEventListener('click',()=>{ const id=btn.getAttribute('data-id'); const act=btn.getAttribute('data-act'); abrirModal(id,act); });
       });
 
-      // popovers
       tbody.querySelectorAll('.js-pop').forEach(bindPopoverTrigger);
     }
 
-    // =====================================================
-    // MODAL Aprovar/Reprovar
-    // =====================================================
-    let modalState = { id: null, act: null, noJustify: false };
-
-    function updateNoJustifyUI() {
-      const sw = $('#toggleNoJustify');
-      const ta = $('#modalObs');
-      const errorEl = $('#modalError');
-      const isOn = modalState.noJustify;
-
-      if (isOn) sw.classList.add('active'); else sw.classList.remove('active');
-
-      if (isOn) {
-        ta.value = '';
-        ta.setAttribute('disabled', 'true');
-        ta.classList.add('bg-slate-100', 'cursor-not-allowed', 'opacity-70');
-        errorEl.classList.add('hidden');
-        $('#modalCount').textContent = '';
-      } else {
-        ta.removeAttribute('disabled');
-        ta.classList.remove('bg-slate-100', 'cursor-not-allowed', 'opacity-70');
-      }
+    let modalState={id:null,act:null,noJustify:false};
+    function updateNoJustifyUI(){
+      const sw=document.getElementById('toggleNoJustify'); const ta=document.getElementById('modalObs'); const errorEl=document.getElementById('modalError'); const isOn=modalState.noJustify;
+      if(isOn) sw.classList.add('active'); else sw.classList.remove('active');
+      if(isOn){ ta.value=''; ta.setAttribute('disabled','true'); ta.classList.add('bg-slate-100','cursor-not-allowed','opacity-70'); errorEl.classList.add('hidden'); document.getElementById('modalCount').textContent=''; }
+      else { ta.removeAttribute('disabled'); ta.classList.remove('bg-slate-100','cursor-not-allowed','opacity-70'); }
     }
-
-    function abrirModal(id, act) {
-      modalState = { id, act, noJustify: false };
-
-      $('#modalTitulo').textContent = act === 'aprovar'
-        ? 'Confirmar aprovação'
-        : 'Confirmar reprovação';
-
-      $('#modalHelp').textContent = 'Você pode adicionar uma observação.';
-      $('#modalObs').value = '';
-      $('#modalExtras').value = '';
-      $('#modalError').classList.add('hidden');
-      $('#modalConfirmar').disabled = false;
-      $('#toggleNoJustify')?.classList.remove('active');
-
+    function abrirModal(id,act){
+      modalState={id,act,noJustify:false};
+      document.getElementById('modalTitulo').textContent = act==='aprovar'?'Confirmar aprovação':'Confirmar reprovação';
+      document.getElementById('modalHelp').textContent='Você pode adicionar uma observação.';
+      document.getElementById('modalObs').value=''; document.getElementById('modalExtras').value=''; document.getElementById('modalError').classList.add('hidden'); document.getElementById('modalConfirmar').disabled=false; document.getElementById('toggleNoJustify')?.classList.remove('active');
       updateNoJustifyUI();
-
-      $('#modal').classList.remove('hidden');
-      $('#modal').classList.add('flex');
-      setTimeout(() => $('#modalObs').focus(), 0);
+      const modal=document.getElementById('modal'); modal.classList.remove('hidden'); modal.classList.add('flex'); setTimeout(()=>document.getElementById('modalObs').focus(),0);
     }
+    function fecharModal(){ const modal=document.getElementById('modal'); modal.classList.add('hidden'); modal.classList.remove('flex'); modalState={id:null,act:null,noJustify:false}; }
+    document.getElementById('modalCancelar').addEventListener('click',fecharModal);
+    document.getElementById('modal').addEventListener('click',(e)=>{ if(e.target.id==='modal') fecharModal(); });
+    const toggleNoJustify=document.getElementById('toggleNoJustify');
+    if(toggleNoJustify){ toggleNoJustify.addEventListener('click',()=>{ modalState.noJustify=!modalState.noJustify; updateNoJustifyUI(); }); }
+    document.getElementById('modalObs').addEventListener('input',()=>{ const txt=document.getElementById('modalObs').value; const len=txt.trim().length; document.getElementById('modalCount').textContent=len?`${len} caractere(s)`:''; if(len>0) document.getElementById('modalError').classList.add('hidden'); });
 
-    function fecharModal() {
-      $('#modal').classList.add('hidden');
-      $('#modal').classList.remove('flex');
-      modalState = { id: null, act: null, noJustify: false };
-    }
-
-    $('#modalCancelar').addEventListener('click', fecharModal);
-    $('#modal').addEventListener('click', (e) => {
-      if (e.target.id === 'modal') fecharModal();
-    });
-
-    const toggleNoJustify = document.getElementById('toggleNoJustify');
-    if (toggleNoJustify) {
-      toggleNoJustify.addEventListener('click', () => {
-        modalState.noJustify = !modalState.noJustify;
-        updateNoJustifyUI();
-      });
-    }
-
-    $('#modalObs').addEventListener('input', () => {
-      const txt = $('#modalObs').value;
-      const len = txt.trim().length;
-      $('#modalCount').textContent = len ? `${len} caractere(s)` : '';
-      if (len > 0) $('#modalError').classList.add('hidden');
-    });
-
-    // CONFIRMAR (UI otimista)
-    $('#modalConfirmar').addEventListener('click', async () => {
-      if (isSendingStatus) return;
-      isSendingStatus = true;
-
-      const { id, act, noJustify } = modalState;
-      if (!id || !act) {
-        isSendingStatus = false;
-        return;
-      }
-
-      const obs = noJustify ? '' : $('#modalObs').value.trim();
-      const extras = ($('#modalExtras')?.value || '').trim();
-
-      if (act === 'reprovar' && !noJustify && !obs) {
-        $('#modalError').classList.remove('hidden');
-        $('#modalObs').focus();
-        isSendingStatus = false;
-        return;
-      }
-
-      const newStatus = act === 'aprovar' ? 'aprovado' : 'reprovado';
-
-      // aplica UI local antes do backend
-      const alvo = dadosBrutos.find(x => x.submissionId === id);
-      if (alvo) {
-        alvo.status = newStatus;
-        alvo.observacao = obs;
-        alvo.aprovadoPor = currentUser?.email || '';
-        alvo.aprovadoEm = new Date().toISOString();
-      }
-
+    document.getElementById('modalConfirmar').addEventListener('click', async ()=>{
+      if(isSendingStatus) return; isSendingStatus=true;
+      const {id,act,noJustify}=modalState; if(!id||!act){ isSendingStatus=false; return; }
+      const obs=noJustify?'':document.getElementById('modalObs').value.trim(); const extras=(document.getElementById('modalExtras')?.value||'').trim();
+      if(act==='reprovar' && !noJustify && !obs){ document.getElementById('modalError').classList.remove('hidden'); document.getElementById('modalObs').focus(); isSendingStatus=false; return; }
+      const newStatus=act==='aprovar'?'aprovado':'reprovado';
+      const alvo=dadosBrutos.find(x=>x.submissionId===id);
+      if(alvo){ alvo.status=newStatus; alvo.observacao=obs; alvo.aprovadoPor=currentUser?.email||''; alvo.aprovadoEm=new Date().toISOString(); }
       aplicarFiltrosERender(true);
-
-      toast(act === 'aprovar' ? 'Aprovado!' : 'Reprovado!', 'success');
-
+      toast(act==='aprovar'?'Aprovado!':'Reprovado!','success');
       fecharModal();
-
-      try {
-        await atualizarStatus(
-          id,
-          newStatus,
-          obs,
-          extras
-        );
-      } catch (err) {
-        toast('Erro ao salvar no servidor. Tente novamente.', 'error');
-        console.error('Erro atualizar status:', err);
-      } finally {
-        isSendingStatus = false;
-      }
+      try{ await atualizarStatus(id,newStatus,obs,extras); }catch{ toast('Erro ao salvar no servidor. Tente novamente.','error'); }finally{ isSendingStatus=false; }
     });
 
-    // =====================================================
-    // Tabs Pendentes / Histórico
-    // =====================================================
-    function setTab(tab) {
-      activeTab = tab;
-      const p = $('#tabPendentes'), h = $('#tabHistorico');
-
-      if (tab === 'pendentes') {
-        p.classList.add('tab-active'); p.classList.remove('tab-idle');
-        h.classList.add('tab-idle'); h.classList.remove('tab-active');
-      } else {
-        h.classList.add('tab-active'); h.classList.remove('tab-idle');
-        p.classList.add('tab-idle'); p.classList.remove('tab-active');
-      }
-
-      aplicarFiltrosERender();
-    }
-
-    $('#tabPendentes').addEventListener('click', () => setTab('pendentes'));
-    $('#tabHistorico').addEventListener('click', () => setTab('historico'));
-
-    $('#btnAtualizar').addEventListener('click', carregarLista);
-
-    // =====================================================
-    // POPOVER
-    // =====================================================
-    let popEl, popTitleEl, popBodyEl, popPinnedBy = null, hoverTimer = null;
-
-    function ensurePopover() {
-      if (popEl) return popEl;
-      popEl = document.createElement('div');
-      popEl.className = '__pop bg-white rounded-xl shadow-2xl border border-slate-200 p-3 sm:p-4 transition opacity-0 pointer-events-none';
-      popEl.innerHTML = `
-        <div class="flex items-start justify-between gap-3">
-          <div id="__pop_title" class="text-sm font-semibold"></div>
-          <button type="button" id="__pop_close"
-            class="rounded-md p-1 text-slate-500 hover:bg-slate-100"
-            aria-label="Fechar">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4"
-                 viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd"
-                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293A1 1 0 1115.707 5.707L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                clip-rule="evenodd"/>
-            </svg>
-          </button>
-        </div>
-        <div id="__pop_body" class="mt-2 text-sm text-slate-700"></div>
-      `;
+    let popEl, popTitleEl, popBodyEl, popPinnedBy=null, hoverTimer=null;
+    function ensurePopover(){
+      if(popEl) return popEl;
+      popEl=document.createElement('div');
+      popEl.className='__pop bg-white rounded-xl shadow-2xl border border-slate-200 p-3 sm:p-4 transition opacity-0 pointer-events-none';
+      popEl.innerHTML=`<div class="flex items-start justify-between gap-3"><div id="__pop_title" class="text-sm font-semibold"></div><button type="button" id="__pop_close" class="rounded-md p-1 text-slate-500 hover:bg-slate-100" aria-label="Fechar"><svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293A1 1 0 1115.707 5.707L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/></svg></button></div><div id="__pop_body" class="mt-2 text-sm text-slate-700"></div>`;
       document.body.appendChild(popEl);
-      popTitleEl = popEl.querySelector('#__pop_title');
-      popBodyEl = popEl.querySelector('#__pop_body');
-      popEl.querySelector('#__pop_close').addEventListener('click', () => hidePopover());
-
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') hidePopover();
-      });
-
-      window.addEventListener('scroll', () => {
-        if (!popPinnedBy) hidePopover();
-      }, true);
-
-      window.addEventListener('resize', () => {
-        if (!popPinnedBy) hidePopover();
-      });
-
+      popTitleEl=popEl.querySelector('#__pop_title'); popBodyEl=popEl.querySelector('#__pop_body');
+      popEl.querySelector('#__pop_close').addEventListener('click',()=>hidePopover());
+      document.addEventListener('keydown',(e)=>{ if(e.key==='Escape') hidePopover(); });
+      window.addEventListener('scroll',()=>{ if(!popPinnedBy) hidePopover(); },true);
+      window.addEventListener('resize',()=>{ if(!popPinnedBy) hidePopover(); });
       return popEl;
     }
-
-    function showPopoverFor(trigger) {
+    function showPopoverFor(trigger){
       ensurePopover();
-      const title = trigger.getAttribute('data-pop-title')
-        || trigger.nextElementSibling?.getAttribute?.('data-pop-title')
-        || '';
-      const contentAttr = trigger.getAttribute('data-pop-content')
-        || trigger.nextElementSibling?.getAttribute?.('data-pop-content')
-        || '';
-      const content = decodeURIComponent(contentAttr || '');
-
-      popTitleEl.textContent = title;
-      popBodyEl.innerHTML = content;
-
-      positionPopover(trigger);
-
-      popEl.style.opacity = '1';
-      popEl.style.pointerEvents = 'auto';
+      const title=trigger.getAttribute('data-pop-title')||trigger.nextElementSibling?.getAttribute?.('data-pop-title')||'';
+      const contentAttr=trigger.getAttribute('data-pop-content')||trigger.nextElementSibling?.getAttribute?.('data-pop-content')||'';
+      const content=decodeURIComponent(contentAttr||'');
+      popTitleEl.textContent=title; popBodyEl.innerHTML=content; positionPopover(trigger);
+      popEl.style.opacity='1'; popEl.style.pointerEvents='auto';
     }
-
-    function positionPopover(trigger) {
-      const rect = trigger.getBoundingClientRect();
-      const pad = 8;
-      const vw = window.innerWidth;
-      const vh = window.innerHeight;
-
-      popEl.style.opacity = '0';
-      popEl.style.pointerEvents = 'none';
-      popEl.style.top = '-9999px';
-      popEl.style.left = '-9999px';
-
-      requestAnimationFrame(() => {
-        const pw = popEl.offsetWidth;
-        const ph = popEl.offsetHeight;
-
-        let top = rect.top - ph - 8;
-        let left = rect.left;
-
-        if (top < pad) {
-          top = rect.bottom + 8;
-          if (top + ph + pad > vh) {
-            top = Math.max(pad, vh - ph - pad);
-          }
-        }
-
-        if (left + pw + pad > vw) left = Math.max(pad, vw - pw - pad);
-        if (left < pad) left = pad;
-
-        popEl.style.left = `${left}px`;
-        popEl.style.top = `${top}px`;
-        popEl.style.opacity = '1';
-        popEl.style.pointerEvents = 'auto';
+    function positionPopover(trigger){
+      const rect=trigger.getBoundingClientRect(); const pad=8; const vw=window.innerWidth; const vh=window.innerHeight;
+      popEl.style.opacity='0'; popEl.style.pointerEvents='none'; popEl.style.top='-9999px'; popEl.style.left='-9999px';
+      requestAnimationFrame(()=>{
+        const pw=popEl.offsetWidth; const ph=popEl.offsetHeight;
+        let top=rect.top - ph - 8; let left=rect.left;
+        if(top<pad){ top=rect.bottom+8; if(top+ph+pad>vh){ top=Math.max(pad,vh-ph-pad); } }
+        if(left+pw+pad>vw) left=Math.max(pad,vw-pw-pad);
+        if(left<pad) left=pad;
+        popEl.style.left=`${left}px`; popEl.style.top=`${top}px`;
+        popEl.style.opacity='1'; popEl.style.pointerEvents='auto';
       });
     }
-
-    function hidePopover() {
-      if (!popEl) return;
-      popEl.style.opacity = '0';
-      popEl.style.pointerEvents = 'none';
-      popPinnedBy = null;
+    function hidePopover(){ if(!popEl) return; popEl.style.opacity='0'; popEl.style.pointerEvents='none'; popPinnedBy=null; }
+    function bindPopoverTrigger(el){
+      el.addEventListener('mouseenter',()=>{ if(popPinnedBy) return; hoverTimer && clearTimeout(hoverTimer); hoverTimer=setTimeout(()=>showPopoverFor(el),150); });
+      el.addEventListener('mouseleave',()=>{ hoverTimer && clearTimeout(hoverTimer); if(!popPinnedBy) hidePopover(); });
+      el.addEventListener('click',(e)=>{ e.stopPropagation(); const isSame=(popPinnedBy===el); if(isSame){ popPinnedBy=null; hidePopover(); } else { popPinnedBy=el; showPopoverFor(el); } });
     }
-
-    function bindPopoverTrigger(el) {
-      el.addEventListener('mouseenter', () => {
-        if (popPinnedBy) return;
-        hoverTimer && clearTimeout(hoverTimer);
-        hoverTimer = setTimeout(() => showPopoverFor(el), 150);
-      });
-
-      el.addEventListener('mouseleave', () => {
-        hoverTimer && clearTimeout(hoverTimer);
-        if (!popPinnedBy) hidePopover();
-      });
-
-      el.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const isSame = (popPinnedBy === el);
-        if (isSame) {
-          popPinnedBy = null;
-          hidePopover();
-        } else {
-          popPinnedBy = el;
-          showPopoverFor(el);
-        }
-      });
-    }
-
-    document.addEventListener('click', (e) => {
-      if (!popEl) return;
-
-      if (popPinnedBy) {
-        const clickedInsidePop = popEl.contains(e.target);
-        const clickedTrigger = popPinnedBy.contains(e.target);
-
-        if (!clickedInsidePop && !clickedTrigger) {
-          popPinnedBy = null;
-          hidePopover();
-        }
-      } else {
-        const clickedInsidePop = popEl.contains(e.target);
-        if (!clickedInsidePop) hidePopover();
+    document.addEventListener('click',(e)=>{
+      if(!popEl) return;
+      if(popPinnedBy){
+        const insidePop=popEl.contains(e.target);
+        const clickedTrigger=popPinnedBy.contains(e.target);
+        if(!insidePop && !clickedTrigger){ popPinnedBy=null; hidePopover(); }
+      }else{
+        const insidePop=popEl.contains(e.target);
+        if(!insidePop) hidePopover();
       }
     });
 
-    // =====================================================
-    // Auth listener
-    // =====================================================
-    onAuthStateChanged(auth, async (user) => {
-      const adminEmailEl = $('#adminEmail');
-
-      // NÃO LOGADO
-      if (!user) {
-        await doLogout();
-        return;
-      }
-
-      // só quem está em adminAprovacao OU admSupremo
-      const isAllowed = !!user.email && ALLOWED_EMAILS.has(user.email.toLowerCase());
-      if (!isAllowed) {
-        alert('Acesso restrito.');
-        await doLogout();
-        return;
-      }
-
-      currentUser = user;
-
-      // mostra o e-mail logado no header
-      if (adminEmailEl) {
-        adminEmailEl.style.display = 'block';
-        adminEmailEl.textContent = user.email;
-      }
-
-      // carrega dados da planilha
+    onAuthStateChanged(auth, async (user)=>{
+      const adminEmailEl=document.getElementById('adminEmail');
+      if(!user){ await doLogout(); return; }
+      const isAllowed=!!user.email && ALLOWED_EMAILS.has(user.email.toLowerCase());
+      if(!isAllowed){ alert('Acesso restrito.'); await doLogout(); return; }
+      currentUser=user;
+      if(adminEmailEl){ adminEmailEl.style.display='block'; adminEmailEl.textContent=user.email; }
       carregarLista();
     });
-
   </script>
 </body>
-
 </html>
