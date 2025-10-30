@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -8,9 +8,7 @@
   <!-- ===== BLOCO: Fontes & Favicon ===== -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
   <link rel="shortcut icon" href="https://storage.googleapis.com/ecdt-logo-saida/1ebe52af502e25d3521cb9dad62bb72f6bc1c347353cdda5fa381ef8627a9eb8/COLEGIO-E-CURSO-ICONE.webp" type="image/x-icon">
 
   <!-- ===== BLOCO: Tailwind & Chart.js ===== -->
@@ -20,34 +18,85 @@
   </script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+  <!-- ===== Preferência inicial de tema (evita flash) ===== -->
+  <script>
+    (function(){
+      try{
+        const saved = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const theme = saved || (prefersDark ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+      }catch(e){ document.documentElement.setAttribute('data-theme', 'dark'); }
+    })();
+  </script>
+
   <!-- ===== BLOCO: CSS Global & Navbar ===== -->
   <style>
     html{scroll-behavior:smooth}
-    body{font-family:'Roboto',system-ui,-apple-system,Segoe UI,Poppins,Arial,sans-serif;color:#000;background:#253237}
+    /* ===== Paleta por tema ===== */
+    :root{
+      --cantina-primary:#FD7F08; /* laranja/acento */
+      --cantina-secondary:#253237; /* fundo nav/geral (escuro) */
+      --cantina-text:#FD7F08;      /* texto da marca no nav */
+      --cantina-border:rgba(255,255,255,.6);
+
+      --bg:#253237;              /* fundo da página */
+      --text:#f1f5f9;            /* texto principal */
+      --muted:#94a3b8;           /* textos auxiliares */
+      --card-bg:#3A474C;         /* fundo de cartões/modal */
+      --card-border:rgba(255,255,255,.6);
+    }
+    [data-theme="light"]{
+      --cantina-secondary:#ffffff;
+      --cantina-text:#0f172a;
+      --cantina-border:#e2e8f0;
+
+      --bg:#f8fafc;
+      --text:#0f172a;
+      --muted:#475569;
+      --card-bg:#ffffff;
+      --card-border:#e2e8f0;
+    }
+
+    body{font-family:'Roboto',system-ui,-apple-system,Segoe UI,Poppins,Arial,sans-serif; color:var(--text) !important; background:var(--bg)}
     *{box-sizing:border-box}
 
-    :root{--cantina-primary:#FD7F08;--cantina-secondary:#253237;--cantina-text:#FD7F08;--cantina-border:#e2e8f0}
-
+    /* ===== Navbar ===== */
     nav.cantina-nav{position:sticky;top:0;z-index:50;background:var(--cantina-secondary);border-bottom:3px solid var(--cantina-primary);color:var(--cantina-text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji"}
-    nav.cantina-nav .cantina-container{max-width:min(98vw,1400px);margin:0 auto;padding:0 12px;height:96px;display:flex;align-items:center;justify-content:space-between}
+    nav.cantina-nav .cantina-container{max-width:min(98vw,1400px);margin:0 auto;padding:0 12px;height:96px;display:flex;align-items:center;justify-content:space-between;gap:12px}
     nav.cantina-nav a{text-decoration:none;display:flex;align-items:center}
     nav.cantina-nav img{height:64px;width:auto}
     nav.cantina-nav .brand{display:flex;align-items:center;gap:12px;color:var(--cantina-text);height:100%}
     nav.cantina-nav .brand .divider{width:2px;height:70%;align-self:center;background:var(--cantina-primary);border-radius:2px}
     nav.cantina-nav .brand .title{font-weight:800;letter-spacing:.5px;font-size:clamp(18px,3.8vw,32px);line-height:1.15;white-space:normal;word-break:keep-all;color:var(--cantina-text)}
 
-    /* Hambúrguer (checkbox + label) */
-    nav.cantina-nav .menu-wrapper{position:relative;display:inline-block}
+    /* Botões de topo (hambúrguer + tema) */
     nav.cantina-nav .menu-checkbox{position:absolute;opacity:0;pointer-events:none}
-    nav.cantina-nav .menu-button{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:10px;cursor:pointer;user-select:none;background-color:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.18);transition:background-color .15s ease,transform .15s ease,box-shadow .15s ease}
+    nav.cantina-nav .menu-button, .theme-toggle{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:10px;cursor:pointer;user-select:none;transition:background-color .15s ease,transform .15s ease,box-shadow .15s ease,border-color .15s ease}
+    nav.cantina-nav .menu-button{background-color:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.18)}
     nav.cantina-nav .menu-button:hover{background-color:rgba(255,255,255,.12);box-shadow:0 2px 10px rgba(2,8,23,.5)}
     nav.cantina-nav .menu-button:active{transform:scale(.96)}
     nav.cantina-nav .menu-button:focus-visible{outline:2px solid var(--cantina-primary);outline-offset:2px}
-    nav.cantina-nav .icon{width:24px;height:24px;stroke:#fff}
+    nav.cantina-nav .icon{width:24px;height:24px;stroke:currentColor}
     nav.cantina-nav .icon-menu{display:block}
     nav.cantina-nav .icon-close{display:none}
     nav.cantina-nav .menu-checkbox:checked+label .icon-menu{display:none}
     nav.cantina-nav .menu-checkbox:checked+label .icon-close{display:block}
+    /* Dá margem só no botão de tema */
+    nav.cantina-nav .menu-button + .theme-toggle{ margin-left: 8px; }
+
+
+    /* Theme toggle (sol/lua) */
+    .theme-toggle{background-color:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.18);color:#fff}
+    .theme-toggle:hover{background-color:rgba(255,255,255,.12);box-shadow:0 2px 10px rgba(2,8,23,.5)}
+    .theme-toggle:active{transform:scale(.96)}
+    .theme-toggle:focus-visible{outline:2px solid var(--cantina-primary);outline-offset:2px}
+    .theme-toggle .icon-sun, .theme-toggle .icon-moon{width:22px;height:22px}
+    [data-theme="dark"] .theme-toggle .icon-sun{display:none}
+    [data-theme="dark"] .theme-toggle .icon-moon{display:block}
+    [data-theme="light"] .theme-toggle{background-color:rgba(2,8,23,.06);border-color:rgba(2,8,23,.12);color:#0f172a}
+    [data-theme="light"] .theme-toggle .icon-sun{display:block}
+    [data-theme="light"] .theme-toggle .icon-moon{display:none}
 
     /* Dropdown */
     nav.cantina-nav .actions{position:absolute;top:calc(100% + 8px);right:0;z-index:60;display:none;flex-direction:column;gap:6px;background:#fff;border:1px solid var(--cantina-border);border-radius:12px;padding:10px;width:min(70vw,180px);box-shadow:0 24px 60px rgba(2,8,23,.45),0 2px 6px rgba(2,8,23,.2)}
@@ -55,27 +104,53 @@
     nav.cantina-nav .btn{width:100%;justify-content:center;border-radius:10px;padding:10px 12px;border:1px solid var(--cantina-border);background:#fff;color:#000;cursor:pointer;transition:background-color .15s ease,box-shadow .15s ease,transform .15s ease;font-weight:600;display:inline-flex;align-items:center;gap:6px;text-align:center}
     nav.cantina-nav .btn:hover{background-color:#f8fafc;box-shadow:0 2px 8px rgba(0,0,0,.06);transform:translateY(-1px)}
     nav.cantina-nav .btn:focus-visible{outline:2px solid var(--cantina-primary);outline-offset:2px}
+    [data-theme="light"] nav.cantina-nav .icon{color:#0f172a}
+
+
+    nav.cantina-nav .menu-wrapper{position: relative; display: inline-flex; align-items: center; }
+    nav.cantina-nav .actions {left: 0; right: auto; top: calc(100% + 8px);}
+
 
     @media (max-width:640px){
       nav.cantina-nav .cantina-container{height:72px}
       nav.cantina-nav img{height:48px}
       nav.cantina-nav .brand{flex:1;min-width:0}
-      nav.cantina-nav .menu-button{width:40px;height:40px;border-radius:10px}
+      nav.cantina-nav .menu-button,.theme-toggle{width:40px;height:40px;border-radius:10px}
       nav.cantina-nav .icon{width:20px;height:20px}
       nav.cantina-nav .brand .title{font-size:clamp(16px,5vw,22px)}
     }
 
-    .card-dark *{color:#f1f5f9}
+    /* ===== Cartões / conteúdos ===== */
+    .card-dark{background:var(--card-bg) !important; border:1px solid var(--card-border) !important; color:var(--text)}
+    .card-dark *{color:var(--text)}
     .card-dark select option{color:#000!important;background-color:#fff!important}
-    .card-dark select{color:#f1f5f9}
+    .card-dark select{color:var(--text)}
     .kpi-card{cursor:pointer;transition:transform .15s ease,box-shadow .15s ease}
     .kpi-card:hover{transform:scale(1.03);box-shadow:0 0 0 3px rgba(253,127,8,.2),0 20px 40px -10px rgba(0,0,0,.6)}
+
+    /* Ajustes de texto quando claro (sobrepõe utilitários Tailwind usados no HTML) */
+    [data-theme="light"] .text-white{color:#0f172a !important}
+    [data-theme="light"] .text-slate-200{color:#334155 !important}
+    [data-theme="light"] .text-slate-400{color:#475569 !important}
 
     /*Diminuindo tamanho dos botões do menu hambúrguer*/
     nav.cantina-nav .actions {padding: 5px; gap: 6px; width: min(70vw, 150px);}
     nav.cantina-nav .btn{width: 100%; justify-content: center; padding: 8px 10px; font-size: 0.7rem; line-height: 1.1; border-radius: 8px; gap: 6px;}
     nav.cantina-nav .btn svg{ width: 18px; height: 18px;}
-    
+
+
+
+/* Borda do botão "Recarregar dados" */
+#btnRecarregar{ border:1px solid rgba(255,255,255,.18); }             /* escuro */
+[data-theme="light"] #btnRecarregar{ border-color:#cbd5e1; }          /* claro */
+
+/* Borda cinza nos filtros (selects) no modo claro */
+[data-theme="light"] .card-dark select{
+  border-color:#cbd5e1 !important;
+  background:#fff;
+  color:#0f172a;
+}
+
   </style>
 </head>
 
@@ -88,6 +163,8 @@
         <span class="divider" aria-hidden="true"></span>
         <span class="title text-[#FD7F08]">DASHBOARDS DE COMPRAS</span>
       </a>
+
+
 
       <div class="menu-wrapper" id="menuWrapper">
         <input type="checkbox" id="menuCheckbox" class="menu-checkbox" aria-label="Abrir / fechar menu">
@@ -102,6 +179,19 @@
             <line x1="6" y1="6" x2="18" y2="18"></line>
           </svg>
         </label>
+
+      <!-- Botão tema -->
+      <button id="themeToggle" class="theme-toggle" aria-label="Alternar tema claro/escuro" title="Tema claro/escuro">
+        <!-- Sol -->
+        <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
+        </svg>
+        <!-- Lua -->
+        <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+      </button>
 
         <div id="menuActions" class="actions">
           <button id="btnVoltarForm" class="btn">Formulário</button>
@@ -141,7 +231,7 @@
   <main class="w-full px-4 sm:px-6 pb-20 pt-6 sm:pt-8">
     <div class="max-w-6xl mx-auto space-y-8">
       <section class="space-y-4 sm:space-y-6">
-        <div class="card-dark rounded-xl bg-[#3A474C] border border-white/60 shadow-2xl shadow-glow p-4 sm:p-6 flex flex-col gap-4">
+        <div class="card-dark rounded-xl border shadow-2xl shadow-glow p-4 sm:p-6 flex flex-col gap-4">
           <div class="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-end">
             <div class="flex-1 min-w-[150px]">
               <label for="filtroTipo" class="block text-slate-200 text-xs font-medium mb-1">Tipo do pedido</label>
@@ -170,27 +260,27 @@
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4 sm:gap-6">
-          <div id="cardValorGasto" class="kpi-card card-dark rounded-xl bg-[#3A474C] border border-white/60 shadow-2xl shadow-glow p-4 sm:p-6 flex flex-col">
+          <div id="cardValorGasto" class="kpi-card card-dark rounded-xl border shadow-2xl shadow-glow p-4 sm:p-6 flex flex-col">
             <span id="labelValorGasto" class="text-slate-200 text-sm font-medium">Custo total (R$)</span>
             <span class="text-white text-3xl font-semibold leading-tight mt-1" id="kpiValorGasto">--</span>
             <span id="descValorGasto" class="text-slate-400 text-xs mt-2">Somatório de produtos comprados</span>
           </div>
-          <div id="cardQtdPedidos" class="kpi-card card-dark rounded-xl bg-[#3A474C] border border-white/60 shadow-2xl shadow-glow p-4 sm:p-6 flex flex-col">
+          <div id="cardQtdPedidos" class="kpi-card card-dark rounded-xl border shadow-2xl shadow-glow p-4 sm:p-6 flex flex-col">
             <span id="labelQtdPedidos" class="text-slate-200 text-sm font-medium">Solicitações de produto</span>
             <span class="text-white text-3xl font-semibold leading-tight mt-1" id="kpiQtdPedidos">--</span>
             <span id="descQtdPedidos" class="text-slate-400 text-xs mt-2">Total de solicitações registradas</span>
           </div>
-          <div id="cardQtdAprovados" class="kpi-card card-dark rounded-xl bg-[#3A474C] border border-white/60 shadow-2xl shadow-glow p-4 sm:p-6 flex flex-col">
+          <div id="cardQtdAprovados" class="kpi-card card-dark rounded-xl border shadow-2xl shadow-glow p-4 sm:p-6 flex flex-col">
             <span id="labelQtdAprovados" class="text-slate-200 text-sm font-medium">Solicitações aprovadas</span>
             <span class="text-white text-3xl font-semibold leading-tight mt-1" id="kpiQtdAprovados">--</span>
             <span id="descQtdAprovados" class="text-slate-400 text-xs mt-2">Calculado: total − reprovadas</span>
           </div>
-          <div id="cardQtdRejeicoes" class="kpi-card card-dark rounded-xl bg-[#3A474C] border border-white/60 shadow-2xl shadow-glow p-4 sm:p-6 flex flex-col">
+          <div id="cardQtdRejeicoes" class="kpi-card card-dark rounded-xl border shadow-2xl shadow-glow p-4 sm:p-6 flex flex-col">
             <span id="labelQtdRejeicoes" class="text-slate-200 text-sm font-medium">Solicitações reprovadas</span>
             <span class="text-white text-3xl font-semibold leading-tight mt-1" id="kpiQtdRejeicoes">--</span>
             <span id="descQtdRejeicoes" class="text-slate-400 text-xs mt-2">Produtos/serviços não aprovados</span>
           </div>
-          <div id="cardQtdComprados" class="kpi-card card-dark rounded-xl bg-[#3A474C] border border-white/60 shadow-2xl shadow-glow p-4 sm:p-6 flex flex-col">
+          <div id="cardQtdComprados" class="kpi-card card-dark rounded-xl border shadow-2xl shadow-glow p-4 sm:p-6 flex flex-col">
             <span id="labelQtdComprados" class="text-slate-200 text-sm font-medium">Itens comprados</span>
             <span class="text-white text-3xl font-semibold leading-tight mt-1" id="kpiQtdComprados">--</span>
             <span id="descQtdComprados" class="text-slate-400 text-xs mt-2">Status “comprado” (produto/serviço)</span>
@@ -198,7 +288,7 @@
         </div>
       </section>
 
-      <section class="card-dark rounded-xl bg-[#3A474C] border border-white/60 shadow-2xl shadow-glow p-4 sm:p-6 md:p-8">
+      <section class="card-dark rounded-xl border shadow-2xl shadow-glow p-4 sm:p-6 md:p-8">
         <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
           <h2 class="text-white font-semibold text-lg sm:text-xl flex items-center gap-2">
             <span class="text-[#FD7F08]">Gasto por unidade</span>
@@ -216,8 +306,8 @@
 
   <!-- ===== BLOCO: Modal de Detalhe KPI ===== -->
   <div id="modalOverlay" class="fixed inset-0 bg-black/70 z-[100] hidden flex items-center justify-center p-4">
-    <div class="bg-[#3A474C] border border-white/60 rounded-xl shadow-2xl max-w-2xl w-full max-h-[80vh] flex flex-col text-slate-100">
-      <div class="flex items-start justify-between p-4 border-b border-white/20">
+    <div class="card-dark rounded-xl shadow-2xl max-w-2xl w-full max-h-[80vh] flex flex-col">
+      <div class="flex items-start justify-between p-4 border-b" style="border-color: var(--card-border)">
         <div>
           <h3 id="modalTitulo" class="text-white text-lg font-semibold"></h3>
           <p id="modalDescricao" class="text-slate-400 text-xs mt-1 leading-snug"></p>
@@ -226,8 +316,8 @@
       </div>
       <div class="overflow-y-auto p-4 text-sm">
         <table class="w-full text-left text-slate-100 text-xs sm:text-sm">
-          <thead id="modalThead" class="text-slate-400 uppercase border-b border-white/20 text-[11px] sm:text-[12px]"></thead>
-          <tbody id="modalTbody" class="align-top divide-y divide-white/10"></tbody>
+          <thead id="modalThead" class="text-slate-400 uppercase border-b" style="border-color: var(--card-border)"></thead>
+          <tbody id="modalTbody" class="align-top divide-y" style="border-color: var(--card-border)"></tbody>
         </table>
       </div>
     </div>
@@ -242,6 +332,12 @@
     menuToggleLabel?.addEventListener('click',()=>{ setTimeout(()=>{ menuToggleLabel.setAttribute('aria-expanded', String(menuCheckbox.checked)); },0); });
     document.addEventListener('click',(e)=>{ if(!menuWrapper.contains(e.target)) closeMenu(); });
     window.addEventListener('resize', closeMenu);
+
+    // ===== Alternância de Tema
+    const themeToggleBtn = document.getElementById('themeToggle');
+    function getTheme(){ return document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark'; }
+    function setTheme(next){ document.documentElement.setAttribute('data-theme', next); try{ localStorage.setItem('theme', next); }catch(_){} updateChartTheme(); }
+    themeToggleBtn?.addEventListener('click', ()=>{ setTheme(getTheme()==='dark' ? 'light' : 'dark'); });
   </script>
 
   <!-- ===== BLOCO: Firebase/Auth + KPIs + Filtros + Gráfico ===== -->
@@ -325,6 +421,18 @@
     function escapeHtml(s){ if(s===undefined||s===null) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;'); }
     function getTipoSelecionado(){ return (selectTipo.value||'').trim().toLowerCase(); }
 
+    // ===== Cores por tema para o gráfico
+    function themeIsLight(){ return document.documentElement.getAttribute('data-theme')==='light'; }
+    function chartColors(){
+      const isLight = themeIsLight();
+      return {
+        text: isLight ? '#0f172a' : '#f1f5f9',
+        grid: isLight ? 'rgba(15,23,42,0.1)' : 'rgba(255,255,255,0.15)',
+        border: isLight ? 'rgba(15,23,42,0.25)' : 'rgba(255,255,255,0.25)',
+        barStroke: isLight ? '#0f172a' : '#ffffff'
+      }
+    }
+
     // [SEÇÃO] Filtros
     function popularFiltros(){
       const unidades=new Set(); allItems.forEach(i=>{ const u=String(i.unidade||'').trim(); if(u) unidades.add(u); });
@@ -403,9 +511,23 @@
       allItems.forEach(item=>{ const st=String(item.status||'').toLowerCase().trim(); if(st!=='comprado') return; const t=String(item.tipo||'').toLowerCase().trim(); if(tipoSel && t!==tipoSel) return; if(mesSel){ if(!item.timestamp) return; const d=new Date(item.timestamp); if(isNaN(d)) return; if(getMonthKey(d)!==mesSel) return; } const u=(item.unidade||'(sem unidade)').trim()||'(sem unidade)'; const val=parseValorBrToNumber(item.valorCompra); mapa.set(u,(mapa.get(u)||0)+val); });
       const arr=Array.from(mapa.entries()).sort((a,b)=>b[1]-a[1]); return { labels:arr.map(([u])=>u), valores:arr.map(([_,v])=>Number(v.toFixed(2))) };
     }
-    function atualizarGraficoGastoPorUnidade(){ if(!ctxGastoPorUnidade) return; const {labels,valores}=calcularResumoGastoPorUnidade(); const data={ labels, datasets:[{ label:'Total gasto (R$)', data:valores, backgroundColor:'#FD7F08', borderColor:'#ffffff', borderWidth:1, borderRadius:8, barThickness:'flex', maxBarThickness:48 }]}; const options={ responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:(ctx)=>' '+formatBRL(ctx.parsed.y||0) } } }, scales:{ x:{ ticks:{color:'#f1f5f9',maxRotation:45,minRotation:0,autoSkip:false}, grid:{display:false,borderColor:'rgba(255,255,255,0.25)'} }, y:{ ticks:{color:'#f1f5f9',callback:(v)=>formatBRL(v)}, grid:{color:'rgba(255,255,255,0.15)',borderColor:'rgba(255,255,255,0.25)'} } } };
-      if(!gastoPorUnidadeChart){ gastoPorUnidadeChart=new Chart(ctxGastoPorUnidade,{type:'bar',data,options}); } else { gastoPorUnidadeChart.data.labels=data.labels; gastoPorUnidadeChart.data.datasets[0].data=data.datasets[0].data; gastoPorUnidadeChart.update(); }
+    function atualizarGraficoGastoPorUnidade(){ if(!ctxGastoPorUnidade) return; const {labels,valores}=calcularResumoGastoPorUnidade(); const c=chartColors(); const data={ labels, datasets:[{ label:'Total gasto (R$)', data:valores, backgroundColor:'#FD7F08', borderColor:c.barStroke, borderWidth:1, borderRadius:8, barThickness:'flex', maxBarThickness:48 }]}; const options={ responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:(ctx)=>' '+formatBRL(ctx.parsed.y||0) } } }, scales:{ x:{ ticks:{color:c.text,maxRotation:45,minRotation:0,autoSkip:false}, grid:{display:false,borderColor:c.border} }, y:{ ticks:{color:c.text,callback:(v)=>formatBRL(v)}, grid:{color:c.grid,borderColor:c.border} } } };
+      if(!gastoPorUnidadeChart){ gastoPorUnidadeChart=new Chart(ctxGastoPorUnidade,{type:'bar',data,options}); } else { gastoPorUnidadeChart.data.labels=data.labels; gastoPorUnidadeChart.data.datasets[0].data=data.datasets[0].data; gastoPorUnidadeChart.options=scalesThemeMerged(gastoPorUnidadeChart.options,c); gastoPorUnidadeChart.update(); }
     }
+    function scalesThemeMerged(oldOpts,c){
+      const opts = JSON.parse(JSON.stringify(oldOpts||{}));
+      if(!opts.scales) opts.scales={};
+      if(!opts.scales.x) opts.scales.x={};
+      if(!opts.scales.y) opts.scales.y={};
+      opts.scales.x.ticks = Object.assign({}, opts.scales.x.ticks, { color: c.text, maxRotation:45, minRotation:0, autoSkip:false });
+      opts.scales.x.grid  = Object.assign({}, opts.scales.x.grid,  { display:false, borderColor:c.border });
+      opts.scales.y.ticks = Object.assign({}, opts.scales.y.ticks, { color: c.text, callback:(v)=>formatBRL(v) });
+      opts.scales.y.grid  = Object.assign({}, opts.scales.y.grid,  { color:c.grid, borderColor:c.border });
+      if(opts.plugins && opts.plugins.legend){} else { opts.plugins={legend:{display:false}}; }
+      return opts;
+    }
+    // Exposta globalmente para o script anterior trocar tema do gráfico
+    window.updateChartTheme = function(){ if(gastoPorUnidadeChart){ const c=chartColors(); gastoPorUnidadeChart.options=scalesThemeMerged(gastoPorUnidadeChart.options,c); gastoPorUnidadeChart.data.datasets[0].borderColor=c.barStroke; gastoPorUnidadeChart.update(); } }
 
     // [SEÇÃO] Modal
     function fecharModal(){ modalOverlay.classList.add('hidden'); }
@@ -467,7 +589,7 @@
 
     // [SEÇÃO] Boot/Auth
     onAuthStateChanged(auth, async (user)=>{
-      if(!user){ if(hrefLogin) hrefLogin.click(); else location.href="../index.html"; return; }
+      if(!user){ const hrefLoginEl = document.getElementById('hrefLogin'); if(hrefLoginEl) hrefLoginEl.click(); else location.href="../index.html"; return; }
       startLoading();
       try{ const email=user.email||''; await carregarConfigBackend(); allItems=await carregarDadosDoBackend(email); popularFiltros(); atualizarTela(); }
       finally{ stopLoading(); }
